@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../features/start/screens/start_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/register_screen.dart';
-import '../features/home/presentation/screens/home.dart';
+import '../features/home/presentation/screens/home_screen.dart';
 
 class AppRoutes {
   static const start = "/";
