@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../routes/app_routes.dart';
+// import '../../auth/presentation/screens/login_screen.dart';
+import '../../auth/presentation/screens/login_screen.dart';
 
 class StartScreen extends StatelessWidget {
   const StartScreen({super.key});
@@ -20,7 +21,7 @@ class _BackgroundImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox.expand(
-      child: Image.asset("assets/images/start.jpg", fit: BoxFit.cover),
+      child: Image.asset("assets/images/app/start.jpg", fit: BoxFit.cover),
     );
   }
 }
@@ -120,7 +121,12 @@ class _StartButton extends StatelessWidget {
           ),
         ),
         onPressed: () {
-          Navigator.pushNamed(context, AppRoutes.login);
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => const LoginScreen(),
+          );
         },
         child: const Text("Bắt đầu"),
       ),
