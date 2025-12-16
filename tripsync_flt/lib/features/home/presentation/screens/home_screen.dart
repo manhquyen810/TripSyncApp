@@ -3,6 +3,7 @@ import '../widgets/home_header.dart';
 import '../widgets/favorite_features_section.dart';
 import '../widgets/trip_list_header.dart';
 import '../widgets/trip_card.dart';
+import '../../../trip/presentation/screens/join_trip_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -58,8 +59,12 @@ class HomeScreen extends StatelessWidget {
 
                         FavoriteFeaturesSection(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          onJoinTripTap: () {},
-                          onCreateTripTap: () {},
+                          onJoinTripTap: () {
+                            showJoinTripDialog(context);
+                          },
+                          onCreateTripTap: () {
+                            Navigator.pushNamed(context, '/create-trip');
+                          },
                           onProfileTap: () {},
                           onSettingsTap: () {},
                         ),
