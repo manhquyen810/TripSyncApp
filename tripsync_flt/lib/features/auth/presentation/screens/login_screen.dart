@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+
+import '../../../../core/network/api_client.dart';
+import '../../../../core/network/exceptions.dart';
+import '../../data/datasources/auth_remote_data_source.dart';
+import '../../data/repositories/auth_repository_impl.dart';
+import '../../domain/repositories/auth_repository.dart';
 import '../widgets/login/login_header.dart';
 import '../widgets/login/login_tab_bar.dart';
 import '../widgets/login/login_form.dart';
 import '../widgets/login/login_card.dart';
+import '../../../../shared/widgets/top_toast.dart';
 import 'register_screen.dart';
 import '../../../home/presentation/screens/home_screen.dart';
 
@@ -15,8 +22,19 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool isLoginSelected = true;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isSubmitting = false;
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  late final AuthRepository _authRepository;
+
+  @override
+  void initState() {
+    super.initState();
+    _authRepository = AuthRepositoryImpl(AuthRemoteDataSourceImpl(ApiClient()));
+  }
 
   @override
   void dispose() {
@@ -25,15 +43,74 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
-    Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-      (route) => false,
-    );
+  Future<void> _handleLogin() async {
+    if (_isSubmitting) return;
+    final formState = _formKey.currentState;
+    if (formState == null || !formState.validate()) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final email = emailController.text.trim();
+      final password = passwordController.text;
+
+      Map<String, dynamic> raw = await _authRepository.login(
+        username: email,
+        password: password,
+      );
+      final data = raw['data'];
+      final tokenFromLogin =
+          (data is Map<String, dynamic> ? data['access_token'] : null) ??
+          raw['access_token'];
+      if (tokenFromLogin == null) {
+        raw = await _authRepository.token(username: email, password: password);
+      }
+
+      final message =
+          (raw['message'] ?? raw['detail'] ?? 'Đăng nhập thành công')
+              .toString();
+      if (mounted) {
+        showTopToast(context, message: message, type: TopToastType.success);
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 650));
+
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        (route) => false,
+      );
+    } on ApiException catch (e) {
+      if (mounted) {
+        final msg = switch (e) {
+          TimeoutException() => 'Server đang khởi động, thử lại sau vài giây',
+          UnauthorizedException() => 'Email hoặc mật khẩu không đúng',
+          _ => e.message,
+        };
+        showTopToast(context, message: msg, type: TopToastType.error);
+      }
+    } catch (e) {
+      if (mounted) {
+        showTopToast(
+          context,
+          message: 'Đăng nhập thất bại: $e',
+          type: TopToastType.error,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
   }
 
   void _handleForgotPassword() {
-    print('Forgot password');
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Chức năng đang phát triển')));
   }
 
   @override
@@ -109,10 +186,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 24),
 
                     LoginForm(
+                      formKey: _formKey,
                       emailController: emailController,
                       passwordController: passwordController,
                       onForgotPassword: _handleForgotPassword,
                       onLogin: _handleLogin,
+                      isLoading: _isSubmitting,
                     ),
                   ],
                 ),
