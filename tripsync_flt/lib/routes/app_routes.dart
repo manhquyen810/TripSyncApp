@@ -3,6 +3,7 @@ import '../features/start/screens/start_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/register_screen.dart';
 import '../features/home/presentation/screens/home_screen.dart';
+import '../features/trip/presentation/screens/create_trip_screen.dart';
 
 class AppRoutes {
   static const start = "/";
@@ -10,11 +11,13 @@ class AppRoutes {
   static const trips = "/trips";
   static const register = "/register";
   static const home = "/home";
+  static const createTrip = "/create-trip";
 
   static final routes = <String, WidgetBuilder>{
     start: (_) => const StartScreen(),
     login: (_) => const LoginScreen(),
     register: (_) => const RegisterScreen(),
     home: (_) => const HomeScreen(),
+    createTrip: (_) => const CreateTripScreen(),
   };
 }
