@@ -54,7 +54,14 @@ class DatePickerField extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Icon(Icons.calendar_today, size: 20),
+                Image.asset(
+                  'assets/icons/celendar.png',
+                  width: 20,
+                  height: 20,
+                  color: selectedDate != null
+                      ? Colors.black
+                      : const Color(0xFFA8B1BE),
+                ),
               ],
             ),
           ),

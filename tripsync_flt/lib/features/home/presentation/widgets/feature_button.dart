@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class FeatureButton extends StatelessWidget {
   final String label;
   final IconData icon;
+  final String? assetIconPath;
   final VoidCallback? onTap;
   final double width;
 
@@ -10,6 +11,7 @@ class FeatureButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.icon,
+    this.assetIconPath,
     this.onTap,
     this.width = 80,
   });
@@ -38,7 +40,14 @@ class FeatureButton extends StatelessWidget {
                   border: Border.all(color: Colors.black),
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: Icon(icon, size: 20),
+                child: assetIconPath != null
+                    ? Image.asset(
+                        assetIconPath!,
+                        width: 20,
+                        height: 20,
+                        color: Colors.black,
+                      )
+                    : Icon(icon, size: 20),
               ),
             ),
             const SizedBox(height: 4),

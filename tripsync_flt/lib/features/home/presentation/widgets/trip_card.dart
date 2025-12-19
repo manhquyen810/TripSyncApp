@@ -87,10 +87,11 @@ class TripCard extends StatelessWidget {
                         const SizedBox(height: 6),
                         Row(
                           children: [
-                            const Icon(
-                              Icons.location_on,
+                            Image.asset(
+                              'assets/icons/location.png',
+                              width: 20,
+                              height: 20,
                               color: Colors.white,
-                              size: 20,
                             ),
                             const SizedBox(width: 4),
                             Expanded(
@@ -116,11 +117,14 @@ class TripCard extends StatelessWidget {
             const SizedBox(height: 8),
             // Member Info Row
             Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               child: Row(
                 children: [
-                  const Icon(Icons.group, size: 24),
+                  Image.asset('assets/icons/group.png', width: 24, height: 24),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
