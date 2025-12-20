@@ -28,11 +28,24 @@ class MemberAvatar extends StatelessWidget {
               child: Image.network(
                 imageUrl!,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.person, color: Colors.white, size: 15),
+                errorBuilder: (context, error, stackTrace) => Center(
+                  child: Image.asset(
+                    'assets/icons/person.png',
+                    width: 15,
+                    height: 15,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             )
-          : const Icon(Icons.person, color: Colors.white, size: 15),
+          : Center(
+              child: Image.asset(
+                'assets/icons/person.png',
+                width: 15,
+                height: 15,
+                color: Colors.white,
+              ),
+            ),
     );
   }
 }
