@@ -5,7 +5,7 @@ import '../widgets/trip_list_header.dart';
 import '../widgets/trip_card.dart';
 import '../../../trip/presentation/screens/join_trip_screen.dart';
 import '../../../trip/domain/entities/trip.dart';
-import '../../../itinerary/presentation/screens/itinerary_screen.dart';
+import '../../../../routes/app_routes.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -201,11 +201,9 @@ class HomeScreen extends StatelessWidget {
                 cardWidth: cardWidth,
                 imageHeight: imageHeight,
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TripItineraryScreen(trip: trip),
-                    ),
+                  Navigator.of(context).pushNamed(
+                    AppRoutes.itinerary,
+                    arguments: trip,
                   );
                 },
               ),
