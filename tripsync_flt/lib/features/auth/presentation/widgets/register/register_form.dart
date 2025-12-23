@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class RegisterForm extends StatelessWidget {
+class RegisterForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController fullNameController;
   final TextEditingController emailController;
@@ -24,18 +24,23 @@ class RegisterForm extends StatelessWidget {
     this.isLoading = false,
   });
 
+  @override
+  State<RegisterForm> createState() => _RegisterFormState();
+}
+
+class _RegisterFormState extends State<RegisterForm> {
   static final RegExp _emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: formKey,
-      // Validate per-field as the user interacts, not the whole form.
+      key: widget.formKey,
       autovalidateMode: AutovalidateMode.disabled,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Full Name field
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -52,8 +57,8 @@ class RegisterForm extends StatelessWidget {
                 ),
               ),
               TextFormField(
-                controller: fullNameController,
-                enabled: !isLoading,
+                controller: widget.fullNameController,
+                enabled: !widget.isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 textInputAction: TextInputAction.next,
                 validator: (value) {
@@ -100,7 +105,6 @@ class RegisterForm extends StatelessWidget {
           ),
           const SizedBox(height: 19),
 
-          // Email field
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -117,8 +121,8 @@ class RegisterForm extends StatelessWidget {
                 ),
               ),
               TextFormField(
-                controller: emailController,
-                enabled: !isLoading,
+                controller: widget.emailController,
+                enabled: !widget.isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
@@ -166,7 +170,6 @@ class RegisterForm extends StatelessWidget {
           ),
           const SizedBox(height: 19),
 
-          // Password field
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -183,10 +186,10 @@ class RegisterForm extends StatelessWidget {
                 ),
               ),
               TextFormField(
-                controller: passwordController,
-                enabled: !isLoading,
+                controller: widget.passwordController,
+                enabled: !widget.isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                obscureText: true,
+                obscureText: _obscurePassword,
                 textInputAction: TextInputAction.next,
                 validator: (value) {
                   final v = (value ?? '');
@@ -205,6 +208,20 @@ class RegisterForm extends StatelessWidget {
                     Icons.lock_outline,
                     color: Color(0xFF99A1AF),
                     size: 20,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: const Color(0xFF99A1AF),
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -232,7 +249,6 @@ class RegisterForm extends StatelessWidget {
           ),
           const SizedBox(height: 19),
 
-          // Confirm Password field
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -249,15 +265,15 @@ class RegisterForm extends StatelessWidget {
                 ),
               ),
               TextFormField(
-                controller: confirmPasswordController,
-                enabled: !isLoading,
+                controller: widget.confirmPasswordController,
+                enabled: !widget.isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                obscureText: true,
+                obscureText: _obscureConfirmPassword,
                 textInputAction: TextInputAction.done,
                 validator: (value) {
                   final v = (value ?? '');
                   if (v.isEmpty) return 'Vui lòng nhập lại mật khẩu';
-                  if (v != passwordController.text) {
+                  if (v != widget.passwordController.text) {
                     return 'Mật khẩu không khớp';
                   }
                   return null;
@@ -273,6 +289,20 @@ class RegisterForm extends StatelessWidget {
                     Icons.lock_outline,
                     color: Color(0xFF99A1AF),
                     size: 20,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureConfirmPassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: const Color(0xFF99A1AF),
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureConfirmPassword = !_obscureConfirmPassword;
+                      });
+                    },
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -300,15 +330,15 @@ class RegisterForm extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Terms checkbox
+
           Row(
             children: [
               SizedBox(
                 width: 24,
                 height: 24,
                 child: Checkbox(
-                  value: agreeToTerms,
-                  onChanged: isLoading ? null : onTermsChanged,
+                  value: widget.agreeToTerms,
+                  onChanged: widget.isLoading ? null : widget.onTermsChanged,
                   activeColor: const Color(0xFF72BF83),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4),
@@ -331,14 +361,13 @@ class RegisterForm extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // Register button
           SizedBox(
             width: double.infinity,
             height: 51,
             child: ElevatedButton(
-              onPressed: (!agreeToTerms || isLoading)
+              onPressed: (!widget.agreeToTerms || widget.isLoading)
                   ? null
-                  : () => onRegister(),
+                  : () => widget.onRegister(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF72BF83),
                 disabledBackgroundColor: const Color(
@@ -349,7 +378,7 @@ class RegisterForm extends StatelessWidget {
                 ),
               ),
               child: Text(
-                isLoading ? 'Đang đăng ký...' : 'Đăng ký',
+                widget.isLoading ? 'Đang đăng ký...' : 'Đăng ký',
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16,

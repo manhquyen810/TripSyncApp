@@ -182,14 +182,12 @@ class ApiExceptionMapper {
       final message = data['message'] ?? data['error'] ?? data['detail'];
       if (message is String && message.trim().isNotEmpty) return message;
 
-      // FastAPI validation errors often come as: {"detail": [{"msg": "...", ...}, ...]}
       if (message is List && message.isNotEmpty) {
         final first = message.first;
         if (first is Map<String, dynamic>) {
           final msg = first['msg'];
           if (msg is String && msg.trim().isNotEmpty) return msg;
         }
-        // Fallback: stringify the first item.
         final rawFirst = first.toString();
         if (rawFirst.trim().isNotEmpty) return rawFirst;
       }

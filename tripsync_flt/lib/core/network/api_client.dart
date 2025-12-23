@@ -114,7 +114,6 @@ class ApiClient {
       BaseOptions(
         baseUrl: Env.apiBaseUrl,
         contentType: Headers.jsonContentType,
-        // Render free-tier / cold-start can exceed 20s.
         connectTimeout: const Duration(seconds: 60),
         receiveTimeout: const Duration(seconds: 60),
         sendTimeout: const Duration(seconds: 60),
@@ -125,7 +124,6 @@ class ApiClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          // Add token at interceptor-level too (covers raw Dio usage).
           if (authTokenProvider != null &&
               (options.headers['Authorization'] == null ||
                   (options.headers['Authorization'] as String?)?.isEmpty ==

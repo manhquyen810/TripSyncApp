@@ -18,7 +18,6 @@ class HomeHeader extends StatelessWidget {
       padding: padding,
       child: Row(
         children: [
-          // Profile Icon
           InkWell(
             onTap: onProfileTap,
             child: Container(
@@ -40,7 +39,6 @@ class HomeHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          // User Info
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

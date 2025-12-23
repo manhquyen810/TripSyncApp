@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class LoginForm extends StatelessWidget {
+class LoginForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController emailController;
   final TextEditingController passwordController;
@@ -18,18 +18,22 @@ class LoginForm extends StatelessWidget {
     this.isLoading = false,
   });
 
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
   static final RegExp _emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: formKey,
-      // Validate per-field as the user interacts, not the whole form.
+      key: widget.formKey,
       autovalidateMode: AutovalidateMode.disabled,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          // Email field
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -46,8 +50,8 @@ class LoginForm extends StatelessWidget {
                 ),
               ),
               TextFormField(
-                controller: emailController,
-                enabled: !isLoading,
+                controller: widget.emailController,
+                enabled: !widget.isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
@@ -93,7 +97,6 @@ class LoginForm extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 19),
-          // Password field
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -110,10 +113,10 @@ class LoginForm extends StatelessWidget {
                 ),
               ),
               TextFormField(
-                controller: passwordController,
-                enabled: !isLoading,
+                controller: widget.passwordController,
+                enabled: !widget.isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                obscureText: true,
+                obscureText: _obscurePassword,
                 validator: (value) {
                   final v = (value ?? '');
                   if (v.isEmpty) return 'Vui lòng nhập mật khẩu';
@@ -131,6 +134,20 @@ class LoginForm extends StatelessWidget {
                     Icons.lock_outline,
                     color: Color(0xFF99A1AF),
                     size: 20,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: const Color(0xFF99A1AF),
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -157,9 +174,8 @@ class LoginForm extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 19),
-          // Forgot password button
           TextButton(
-            onPressed: isLoading ? null : onForgotPassword,
+            onPressed: widget.isLoading ? null : widget.onForgotPassword,
             child: const Text(
               'Quên mật khẩu?',
               style: TextStyle(
@@ -170,12 +186,11 @@ class LoginForm extends StatelessWidget {
               ),
             ),
           ),
-          // Login button
           SizedBox(
             width: double.infinity,
             height: 51,
             child: ElevatedButton(
-              onPressed: isLoading ? null : () => onLogin(),
+              onPressed: widget.isLoading ? null : () => widget.onLogin(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF72BF83),
                 disabledBackgroundColor: const Color(0xFF72BF83),
@@ -184,7 +199,7 @@ class LoginForm extends StatelessWidget {
                 ),
               ),
               child: Text(
-                isLoading ? 'Đang đăng nhập...' : 'Đăng nhập',
+                widget.isLoading ? 'Đang đăng nhập...' : 'Đăng nhập',
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16,

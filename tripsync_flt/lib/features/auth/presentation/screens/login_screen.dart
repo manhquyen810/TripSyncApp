@@ -11,6 +11,7 @@ import '../widgets/login/login_form.dart';
 import '../widgets/login/login_card.dart';
 import '../../../../shared/widgets/top_toast.dart';
 import 'register_screen.dart';
+import 'forgot_password_screen.dart';
 import '../../../home/presentation/screens/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -108,9 +109,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleForgotPassword() {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Chức năng đang phát triển')));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const ForgotPasswordScreen(),
+      ),
+    );
   }
 
   @override

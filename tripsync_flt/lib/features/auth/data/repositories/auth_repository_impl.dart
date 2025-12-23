@@ -35,4 +35,32 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Map<String, dynamic>> me() async {
     return _remote.me();
   }
+
+  @override
+  Future<Map<String, dynamic>> forgotPassword({
+    required String email,
+  }) async {
+    return _remote.forgotPassword(email: email);
+  }
+
+  @override
+  Future<Map<String, dynamic>> verifyOtp({
+    required String email,
+    required String otp,
+  }) async {
+    return _remote.verifyOtp(email: email, otp: otp);
+  }
+
+  @override
+  Future<Map<String, dynamic>> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    return _remote.resetPassword(
+      email: email,
+      otp: otp,
+      newPassword: newPassword,
+    );
+  }
 }
