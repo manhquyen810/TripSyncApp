@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'propose_activity_screen.dart';
 import '../../../../shared/widgets/trip_bottom_navigation.dart';
 import '../../../../shared/widgets/trip_header.dart';
 import '../../../../routes/app_routes.dart';
@@ -36,7 +37,7 @@ class TripItineraryScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     _buildStatsSection(),
                     const SizedBox(height: 16),
-                    _buildActionButtons(),
+                    _buildActionButtons(context),
                     const SizedBox(height: 16),
                     _buildItineraryList(),
                   ],
@@ -72,6 +73,73 @@ class TripItineraryScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 80),
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ProposeActivityScreen()),
+            );
+          },
+          backgroundColor: const Color(0xFF00C950),
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 24),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Container(
+              width: 43,
+              height: 43,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F6F8),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.arrow_back, size: 24),
+            ),
+          ),
+          const SizedBox(width: 17),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  trip.title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Image.asset(
+                      'assets/icons/location.png',
+                      width: 20,
+                      height: 20,
+                      color: const Color(0xFF99A1AF),
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      trip.location,
+                      style: TextStyle(fontSize: 14, color: Color(0xFF99A1AF)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -255,14 +323,20 @@ class TripItineraryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
           Expanded(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const ProposeActivityScreen(),
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF00C950),
                 foregroundColor: Colors.black,
