@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/widgets/trip_bottom_navigation.dart';
 import '../../../../shared/widgets/trip_header.dart';
-import '../../../../shared/widgets/add_floating_button.dart';
+import '../../../../routes/app_routes.dart';
 import '../../../trip/domain/entities/trip.dart';
 import '../../../home/presentation/widgets/member_avatar.dart';
 
@@ -58,7 +58,11 @@ class TripItineraryScreen extends StatelessWidget {
                     // TODO: Navigate to Upload/Document screen
                     break;
                   case 2:
-                    // TODO: Navigate to Expense screen
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.expense,
+                      arguments: trip,
+                    );
                     break;
                   case 3:
                     // TODO: Navigate to Checklist screen
@@ -69,7 +73,6 @@ class TripItineraryScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: const AddFloatingButton(),
     );
   }
 
