@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart' hide TabBarView;
 import 'package:tripsync_flt/features/auth/presentation/screens/login_screen.dart';
+
+import '../../../../core/network/api_client.dart';
+import '../../../../core/network/exceptions.dart';
+import '../../data/datasources/auth_remote_data_source.dart';
+import '../../data/repositories/auth_repository_impl.dart';
+import '../../domain/repositories/auth_repository.dart';
 import '../widgets/login/login_header.dart';
 import '../widgets/login/login_tab_bar.dart';
 import '../widgets/login/login_card.dart';
 import '../widgets/register/register_form.dart';
+import '../../../../shared/widgets/top_toast.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -13,12 +20,23 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isSubmitting = false;
+
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
   bool agreeToTerms = false;
+
+  late final AuthRepository _authRepository;
+
+  @override
+  void initState() {
+    super.initState();
+    _authRepository = AuthRepositoryImpl(AuthRemoteDataSourceImpl(ApiClient()));
+  }
 
   @override
   void dispose() {
@@ -29,14 +47,63 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _handleRegister() {
-    if (passwordController.text != confirmPasswordController.text) {
-      ScaffoldMessenger.of(
+  Future<void> _handleRegister() async {
+    if (_isSubmitting) return;
+    if (!agreeToTerms) {
+      showTopToast(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Mật khẩu không khớp')));
+        message: 'Vui lòng đồng ý điều khoản',
+        type: TopToastType.error,
+      );
       return;
     }
-    print('Register with: ${emailController.text}');
+
+    final formState = _formKey.currentState;
+    if (formState == null || !formState.validate()) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final raw = await _authRepository.register(
+        email: emailController.text.trim(),
+        password: passwordController.text,
+        name: fullNameController.text.trim(),
+      );
+
+      final message = (raw['message'] ?? raw['detail'] ?? 'Đăng ký thành công')
+          .toString();
+      if (mounted) {
+        showTopToast(context, message: message, type: TopToastType.success);
+      }
+
+      await Future<void>.delayed(const Duration(milliseconds: 650));
+
+      if (!mounted) return;
+      Navigator.pop(context);
+    } on ApiException catch (e) {
+      if (mounted) {
+        final msg = e is TimeoutException
+            ? 'Server đang khởi động, thử lại sau vài giây'
+            : e.message;
+        showTopToast(context, message: msg, type: TopToastType.error);
+      }
+    } catch (e) {
+      if (mounted) {
+        showTopToast(
+          context,
+          message: 'Đăng ký thất bại: $e',
+          type: TopToastType.error,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
   }
 
   @override
@@ -126,6 +193,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               Expanded(
                                 child: SingleChildScrollView(
                                   child: RegisterForm(
+                                    formKey: _formKey,
                                     fullNameController: fullNameController,
                                     emailController: emailController,
                                     passwordController: passwordController,
@@ -138,6 +206,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       });
                                     },
                                     onRegister: _handleRegister,
+                                    isLoading: _isSubmitting,
                                   ),
                                 ),
                               ),

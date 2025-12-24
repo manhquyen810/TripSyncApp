@@ -115,7 +115,6 @@ class TripCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            // Member Info Row
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
