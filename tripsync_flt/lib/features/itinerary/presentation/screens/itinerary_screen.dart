@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/widgets/trip_bottom_navigation.dart';
+import '../../../../shared/widgets/trip_header.dart';
+import '../../../../shared/widgets/add_floating_button.dart';
 import '../../../trip/domain/entities/trip.dart';
 import '../../../home/presentation/widgets/member_avatar.dart';
 
@@ -16,7 +18,10 @@ class TripItineraryScreen extends StatelessWidget {
         child: Column(
           children: [
             // Header Section
-            _buildHeader(context),
+            TripHeader(
+              title: trip.title,
+              location: trip.location,
+            ),
 
             // Trip Image and Info
             Expanded(
@@ -40,73 +45,31 @@ class TripItineraryScreen extends StatelessWidget {
             ),
 
             // Bottom Navigation
-            const TripBottomNavigation(currentIndex: 0),
+            TripBottomNavigation(
+              currentIndex: 0,
+              onTap: (index) {
+                if (index == 0) return; // Already on itinerary screen
+                
+                switch (index) {
+                  case 0:
+                    // Itinerary screen (current)
+                    break;
+                  case 1:
+                    // TODO: Navigate to Upload/Document screen
+                    break;
+                  case 2:
+                    // TODO: Navigate to Expense screen
+                    break;
+                  case 3:
+                    // TODO: Navigate to Checklist screen
+                    break;
+                }
+              },
+            ),
           ],
         ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 80),
-        child: FloatingActionButton(
-          onPressed: () {},
-          backgroundColor: const Color(0xFF00C950),
-          child: const Icon(Icons.add, color: Colors.white),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 24),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Container(
-              width: 43,
-              height: 43,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F6F8),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.arrow_back, size: 24),
-            ),
-          ),
-          const SizedBox(width: 17),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  trip.title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
-                ),
-                Row(
-                  children: [
-                    Image.asset(
-                      'assets/icons/location.png',
-                      width: 20,
-                      height: 20,
-                      color: const Color(0xFF99A1AF),
-                    ),
-                    SizedBox(width: 4),
-                    Text(
-                      trip.location,
-                      style: TextStyle(fontSize: 14, color: Color(0xFF99A1AF)),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      floatingActionButton: const AddFloatingButton(),
     );
   }
 
