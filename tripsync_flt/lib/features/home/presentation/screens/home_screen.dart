@@ -52,7 +52,9 @@ class HomeScreen extends StatelessWidget {
                         HomeHeader(
                           userName: 'nghiemqsang02',
                           padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                          onProfileTap: () {},
+                          onProfileTap: () {
+                            Navigator.of(context).pushNamed('/my-profile');
+                          },
                         ),
 
                         SizedBox(height: topSpacing),
@@ -63,10 +65,14 @@ class HomeScreen extends StatelessWidget {
                             showJoinTripDialog(context);
                           },
                           onCreateTripTap: () {
-                            Navigator.pushNamed(context, '/create-trip');
+                            Navigator.of(context).pushNamed('/create-trip');
                           },
-                          onProfileTap: () {},
-                          onSettingsTap: () {},
+                          onProfileTap: () {
+                            Navigator.of(context).pushNamed('/my-profile');
+                          },
+                          onSettingsTap: () {
+                            Navigator.of(context).pushNamed('/settings');
+                          },
                         ),
 
                         const SizedBox(height: 24),
