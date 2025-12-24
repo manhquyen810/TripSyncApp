@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+class AddFloatingButton extends StatelessWidget {
+  final VoidCallback? onPressed;
 import '../../features/expense/presentation/screens/add_expense_screen.dart';
 
 class AddFloatingButton extends StatelessWidget {
@@ -13,6 +16,13 @@ class AddFloatingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: onPressed ?? () {},
+      backgroundColor: const Color(0xFF00C950),
+      child: const Icon(
+        Icons.add,
+        color: Colors.white,
+        size: 28,
     return Padding(
       padding: const EdgeInsets.only(bottom: 80),
       child: FloatingActionButton(
