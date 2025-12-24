@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'propose_activity_screen.dart';
 import '../../../../shared/widgets/trip_bottom_navigation.dart';
 import '../../../trip/domain/entities/trip.dart';
 import '../../../home/presentation/widgets/member_avatar.dart';
@@ -31,7 +32,7 @@ class TripItineraryScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     _buildStatsSection(),
                     const SizedBox(height: 16),
-                    _buildActionButtons(),
+                    _buildActionButtons(context),
                     const SizedBox(height: 16),
                     _buildItineraryList(),
                   ],
@@ -47,7 +48,11 @@ class TripItineraryScreen extends StatelessWidget {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 80),
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ProposeActivityScreen()),
+            );
+          },
           backgroundColor: const Color(0xFF00C950),
           child: const Icon(Icons.add, color: Colors.white),
         ),
@@ -289,14 +294,20 @@ class TripItineraryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
           Expanded(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const ProposeActivityScreen(),
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF00C950),
                 foregroundColor: Colors.black,

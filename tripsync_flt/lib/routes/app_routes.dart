@@ -3,7 +3,11 @@ import '../features/start/screens/start_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/register_screen.dart';
 import '../features/home/presentation/screens/home_screen.dart';
+import '../features/home/presentation/screens/edit_profile_screen.dart';
+import '../features/home/presentation/screens/my_profile_screen.dart';
+import '../features/home/presentation/screens/settings_screen.dart';
 import '../features/trip/presentation/screens/create_trip_screen.dart';
+import '../features/home/presentation/models/profile_data.dart';
 import '../features/itinerary/presentation/screens/itinerary_screen.dart';
 import '../features/documents/presentation/screens/document_management_screen.dart';
 import '../features/trip/domain/entities/trip.dart';
@@ -15,6 +19,9 @@ class AppRoutes {
   static const register = "/register";
   static const home = "/home";
   static const createTrip = "/create-trip";
+  static const editProfile = "/edit-profile";
+  static const myProfile = "/my-profile";
+  static const settings = "/settings";
   static const itinerary = "/itinerary";
   static const documents = "/documents";
 
@@ -25,6 +32,14 @@ class AppRoutes {
     home: (_) => const HomeScreen(),
     createTrip: (_) => const CreateTripScreen(),
     documents: (_) => const DocumentManagementScreen(),
+    editProfile: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      return EditProfileScreen(
+        initialData: args is ProfileData ? args : null,
+      );
+    },
+    myProfile: (_) => const MyProfileScreen(),
+    settings: (_) => const SettingsScreen(),
     itinerary: (context) {
       final trip = ModalRoute.of(context)!.settings.arguments as Trip;
       return TripItineraryScreen(trip: trip);
