@@ -8,6 +8,8 @@ import '../features/home/presentation/screens/my_profile_screen.dart';
 import '../features/home/presentation/screens/settings_screen.dart';
 import '../features/trip/presentation/screens/create_trip_screen.dart';
 import '../features/home/presentation/models/profile_data.dart';
+import '../features/itinerary/presentation/screens/itinerary_screen.dart';
+import '../features/trip/domain/entities/trip.dart';
 
 class AppRoutes {
   static const start = "/";
@@ -19,6 +21,7 @@ class AppRoutes {
   static const editProfile = "/edit-profile";
   static const myProfile = "/my-profile";
   static const settings = "/settings";
+  static const itinerary = "/itinerary";
 
   static final routes = <String, WidgetBuilder>{
     start: (_) => const StartScreen(),
@@ -34,5 +37,9 @@ class AppRoutes {
     },
     myProfile: (_) => const MyProfileScreen(),
     settings: (_) => const SettingsScreen(),
+    itinerary: (context) {
+      final trip = ModalRoute.of(context)!.settings.arguments as Trip;
+      return TripItineraryScreen(trip: trip);
+    },
   };
 }

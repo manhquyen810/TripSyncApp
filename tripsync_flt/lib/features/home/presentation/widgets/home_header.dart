@@ -18,7 +18,6 @@ class HomeHeader extends StatelessWidget {
       padding: padding,
       child: Row(
         children: [
-          // Profile Icon
           InkWell(
             onTap: onProfileTap,
             child: Container(
@@ -35,12 +34,16 @@ class HomeHeader extends StatelessWidget {
                   border: Border.all(color: Colors.black),
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: const Icon(Icons.person, size: 20),
+                child: Image.asset(
+                  'assets/icons/person.png',
+                  width: 20,
+                  height: 20,
+                  color: Colors.black,
+                ),
               ),
             ),
           ),
           const SizedBox(width: 8),
-          // User Info
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -48,7 +51,7 @@ class HomeHeader extends StatelessWidget {
                 'Welcome',
                 style: TextStyle(
                   fontSize: 13,
-                  color: Color(0xFF99A1AF),
+                  color: Color.fromARGB(255, 0, 0, 0),
                   fontFamily: 'Inter',
                 ),
               ),

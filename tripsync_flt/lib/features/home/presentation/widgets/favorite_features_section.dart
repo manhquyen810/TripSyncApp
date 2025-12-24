@@ -55,6 +55,7 @@ class FavoriteFeaturesSection extends StatelessWidget {
             FeatureButton(
               label: 'Hồ sơ',
               icon: Icons.person,
+              assetIconPath: 'assets/icons/person.png',
               onTap: onProfileTap,
               width: buttonWidth,
             ),
