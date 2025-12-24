@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'propose_activity_screen.dart';
+import '../../../../shared/widgets/add_floating_button.dart';
 import '../../../../shared/widgets/trip_bottom_navigation.dart';
 import '../../../../shared/widgets/trip_header.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../trip/domain/entities/trip.dart';
 import '../../../home/presentation/widgets/member_avatar.dart';
-import '../../../../routes/app_routes.dart';
 
 class TripItineraryScreen extends StatelessWidget {
   final Trip trip;
@@ -20,10 +20,7 @@ class TripItineraryScreen extends StatelessWidget {
         child: Column(
           children: [
             // Header Section
-            TripHeader(
-              title: trip.title,
-              location: trip.location,
-            ),
+            TripHeader(title: trip.title, location: trip.location),
 
             // Trip Image and Info
             Expanded(
@@ -47,51 +44,16 @@ class TripItineraryScreen extends StatelessWidget {
             ),
 
             // Bottom Navigation
-            TripBottomNavigation(
-              currentIndex: 0,
-              onTap: (index) {
-                if (index == 3) {
-                  Navigator.pushReplacementNamed(
-                    context,
-                    AppRoutes.checklist,
-                    arguments: trip,
-                  );
-                if (index == 0) return; // Already on itinerary screen
-                
-                switch (index) {
-                  case 0:
-                    // Itinerary screen (current)
-                    break;
-                  case 1:
-                    // TODO: Navigate to Upload/Document screen
-                    break;
-                  case 2:
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.expense,
-                      arguments: trip,
-                    );
-                    break;
-                  case 3:
-                    // TODO: Navigate to Checklist screen
-                    break;
-                }
-              },
-            ),
+            const TripBottomNavigation(currentIndex: 0),
           ],
         ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 80),
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ProposeActivityScreen()),
-            );
-          },
-          backgroundColor: const Color(0xFF00C950),
-          child: const Icon(Icons.add, color: Colors.white),
-        ),
+      floatingActionButton: AddFloatingButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const ProposeActivityScreen()),
+          );
+        },
       ),
     );
   }

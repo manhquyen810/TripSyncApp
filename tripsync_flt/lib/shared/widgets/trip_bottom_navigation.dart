@@ -84,7 +84,7 @@ class TripBottomNavigation extends StatelessWidget {
         return;
       }
 
-      Navigator.of(context).pushReplacementNamed(routeName, arguments: arguments);
+      Navigator.of(context).pushNamed(routeName, arguments: arguments);
     }
 
     switch (index) {
@@ -99,10 +99,18 @@ class TripBottomNavigation extends StatelessWidget {
         goTo(AppRoutes.documents, arguments: tripArg);
         return;
       case 2:
-        showNotReady('Chi tiêu');
+        if (tripArg != null) {
+          goTo(AppRoutes.expense, arguments: tripArg);
+        } else {
+          showNotReady('Chi tiêu');
+        }
         return;
       case 3:
-        showNotReady('Checklist');
+        if (tripArg != null) {
+          goTo(AppRoutes.checklist, arguments: tripArg);
+        } else {
+          showNotReady('Checklist');
+        }
         return;
     }
   }

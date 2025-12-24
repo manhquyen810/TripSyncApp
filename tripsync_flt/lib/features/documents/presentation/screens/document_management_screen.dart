@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+
+import '../../../../routes/app_routes.dart';
 import '../../../../shared/styles/app_colors.dart';
+import '../../../../shared/widgets/add_floating_button.dart';
 import '../../../../shared/widgets/trip_bottom_navigation.dart';
 import '../models/document_item.dart';
 import '../widgets/document_category_filters.dart';
@@ -146,15 +149,17 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
     final ext = (doc.extension ?? '').toLowerCase();
 
     if (bytes == null || bytes.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Chưa có file để xem.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Chưa có file để xem.')));
       return;
     }
 
     if (!_isImageExtension(ext)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Hiện chỉ hỗ trợ xem ảnh (JPG/PNG/WEBP).')),
+        const SnackBar(
+          content: Text('Hiện chỉ hỗ trợ xem ảnh (JPG/PNG/WEBP).'),
+        ),
       );
       return;
     }
@@ -166,10 +171,18 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
         final maxHeight = MediaQuery.sizeOf(context).height * 0.7;
 
         return Dialog(
-          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 24,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: maxWidth, maxHeight: maxHeight),
+            constraints: BoxConstraints(
+              maxWidth: maxWidth,
+              maxHeight: maxHeight,
+            ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Stack(
@@ -238,7 +251,9 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
               children: [
                 // Header
                 DocumentHeader(
-                  onBack: () => Navigator.pop(context),
+                  onBack: () => Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil(AppRoutes.home, (_) => false),
                   title: 'Đà Lạt-Thành Phố Mộng Mơ',
                   location: 'Đà Lạt, Lâm Đồng',
                 ),
@@ -283,7 +298,10 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
             Positioned(
               right: 16,
               bottom: 100,
-              child: _buildFloatingActionButton(),
+              child: AddFloatingButton(
+                padding: EdgeInsets.zero,
+                onPressed: _openUploadDocumentSheet,
+              ),
             ),
           ],
         ),
@@ -305,23 +323,6 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildFloatingActionButton() {
-    return GestureDetector(
-      onTap: () {
-        _openUploadDocumentSheet();
-      },
-      child: Container(
-        width: 60,
-        height: 60,
-        decoration: const BoxDecoration(
-          color: AppColors.primary,
-          shape: BoxShape.circle,
-        ),
-        child: const Icon(Icons.add, color: Colors.white, size: 32),
-      ),
     );
   }
 }

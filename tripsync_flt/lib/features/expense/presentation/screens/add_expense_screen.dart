@@ -31,13 +31,6 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     'Nam',
   ];
 
-  @override
-    {'icon': '🍴', 'label': 'Ăn uống'},
-    {'icon': '✈️', 'label': 'Vé máy bay'},
-    {'icon': '🚌', 'label': 'Vé xe khách'},
-    {'icon': '🏨', 'label': 'Khách sạn'},
-  ];
-
   final List<Map<String, String>> users = [
     {'name': 'Minh Anh', 'avatar': '👧'},
     {'name': 'Tuấn Anh', 'avatar': '👦'},
@@ -135,10 +128,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       children: [
         const Text(
           'Danh mục*',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 16),
         Wrap(
@@ -153,11 +143,16 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 });
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border.all(
-                    color: isSelected ? const Color(0xFF00C950) : const Color(0xFF99A1AF),
+                    color: isSelected
+                        ? const Color(0xFF00C950)
+                        : const Color(0xFF99A1AF),
                     width: 1,
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -165,11 +160,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      category['icon'],
-                      size: 24,
-                      color: Colors.black,
-                    ),
+                    Icon(category['icon'], size: 24, color: Colors.black),
                     const SizedBox(width: 8),
                     Text(
                       category['name'],
@@ -191,20 +182,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       children: [
         const Text(
           'Mô tả chi tiêu*',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 16),
         TextField(
           controller: descriptionController,
           decoration: InputDecoration(
             hintText: 'VD: Ăn trưa quán bé mặn, Vé máy bay ...',
-            hintStyle: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF9A9A9A),
-            ),
+            hintStyle: const TextStyle(fontSize: 14, color: Color(0xFF9A9A9A)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Color(0xFF9A9A9A)),
@@ -230,10 +215,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       children: [
         const Text(
           'Số tiền(VND)*',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 16),
         TextField(
@@ -241,10 +223,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
             hintText: 'VD: 1500000',
-            hintStyle: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF9A9A9A),
-            ),
+            hintStyle: const TextStyle(fontSize: 14, color: Color(0xFF9A9A9A)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Color(0xFF9A9A9A)),
@@ -270,10 +249,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       children: [
         const Text(
           'Ai đã trả*',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 16),
         Wrap(
@@ -288,11 +264,16 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 });
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border.all(
-                    color: isSelected ? const Color(0xFF00C950) : const Color(0xFF99A1AF),
+                    color: isSelected
+                        ? const Color(0xFF00C950)
+                        : const Color(0xFF99A1AF),
                     width: 1,
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -309,10 +290,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      member,
-                      style: const TextStyle(fontSize: 14),
-                    ),
+                    Text(member, style: const TextStyle(fontSize: 14)),
                   ],
                 ),
               ),
@@ -329,10 +307,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       children: [
         const Text(
           'Chia cho ai*',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 16),
         Wrap(
@@ -351,11 +326,16 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 });
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border.all(
-                    color: isSelected ? const Color(0xFF00C950) : const Color(0xFF99A1AF),
+                    color: isSelected
+                        ? const Color(0xFF00C950)
+                        : const Color(0xFF99A1AF),
                     width: 1,
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -379,10 +359,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      member,
-                      style: const TextStyle(fontSize: 14),
-                    ),
+                    Text(member, style: const TextStyle(fontSize: 14)),
                   ],
                 ),
               ),
@@ -408,10 +385,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             ),
             child: const Text(
               'Huỷ',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.black,
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.black),
             ),
           ),
         ),
@@ -431,16 +405,16 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             ),
             child: const Text(
               '+ Thêm chi tiêu',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white,
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.white),
             ),
           ),
         ),
       ],
     );
   }
+
+  // ignore: unused_field
+  static const String _addExpenseScreenLegacy = r'''
 
   @override
   void dispose() {
@@ -459,83 +433,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF5F6F8),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        size: 24,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: const Text(
-                        'Thêm chi tiêu',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Poppins',
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 34),
-                ],
-              ),
-            ),
 
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                const Text(
-                  'Danh mục *',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Poppins',
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Wrap(
-                  spacing: 16,
-                  runSpacing: 16,
-                  children: categories.map((category) {
-                    final isSelected = selectedCategory == category['label'];
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedCategory = category['label'];
-                        });
-                      },
-                      child: Container(
-                        height: 56,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                        decoration: BoxDecoration(
-                          color: isSelected ? const Color(0xFF4CA5E0) : Colors.white,
-                          border: Border.all(
-                            color: isSelected ? const Color(0xFF4CA5E0) : const Color(0xFF99A1AF),
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              category['icon'],
-                              style: const TextStyle(fontSize: 24),
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              category['label'],
+                    }
                               style: TextStyle(
                                 fontSize: 14,
                                 fontFamily: 'Poppins',
@@ -835,4 +734,6 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       ),
     );
   }
+
+  ''';
 }
