@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../shared/widgets/trip_bottom_navigation.dart';
 import '../../../trip/domain/entities/trip.dart';
 import '../../../home/presentation/widgets/member_avatar.dart';
+import '../../../../routes/app_routes.dart';
 
 class TripItineraryScreen extends StatelessWidget {
   final Trip trip;
@@ -40,7 +41,18 @@ class TripItineraryScreen extends StatelessWidget {
             ),
 
             // Bottom Navigation
-            const TripBottomNavigation(currentIndex: 0),
+            TripBottomNavigation(
+              currentIndex: 0,
+              onTap: (index) {
+                if (index == 3) {
+                  Navigator.pushReplacementNamed(
+                    context,
+                    AppRoutes.checklist,
+                    arguments: trip,
+                  );
+                }
+              },
+            ),
           ],
         ),
       ),
