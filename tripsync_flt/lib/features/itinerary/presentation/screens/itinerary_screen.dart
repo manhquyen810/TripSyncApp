@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'propose_activity_screen.dart';
 import '../../../../shared/widgets/trip_bottom_navigation.dart';
+import '../../../../shared/widgets/trip_header.dart';
+import '../../../../routes/app_routes.dart';
 import '../../../trip/domain/entities/trip.dart';
 import '../../../home/presentation/widgets/member_avatar.dart';
 import '../../../../routes/app_routes.dart';
@@ -17,7 +20,10 @@ class TripItineraryScreen extends StatelessWidget {
         child: Column(
           children: [
             // Header Section
-            _buildHeader(context),
+            TripHeader(
+              title: trip.title,
+              location: trip.location,
+            ),
 
             // Trip Image and Info
             Expanded(
@@ -32,7 +38,7 @@ class TripItineraryScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     _buildStatsSection(),
                     const SizedBox(height: 16),
-                    _buildActionButtons(),
+                    _buildActionButtons(context),
                     const SizedBox(height: 16),
                     _buildItineraryList(),
                   ],
@@ -50,6 +56,25 @@ class TripItineraryScreen extends StatelessWidget {
                     AppRoutes.checklist,
                     arguments: trip,
                   );
+                if (index == 0) return; // Already on itinerary screen
+                
+                switch (index) {
+                  case 0:
+                    // Itinerary screen (current)
+                    break;
+                  case 1:
+                    // TODO: Navigate to Upload/Document screen
+                    break;
+                  case 2:
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.expense,
+                      arguments: trip,
+                    );
+                    break;
+                  case 3:
+                    // TODO: Navigate to Checklist screen
+                    break;
                 }
               },
             ),
@@ -59,7 +84,11 @@ class TripItineraryScreen extends StatelessWidget {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 80),
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ProposeActivityScreen()),
+            );
+          },
           backgroundColor: const Color(0xFF00C950),
           child: const Icon(Icons.add, color: Colors.white),
         ),
@@ -301,14 +330,20 @@ class TripItineraryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
           Expanded(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const ProposeActivityScreen(),
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF00C950),
                 foregroundColor: Colors.black,
