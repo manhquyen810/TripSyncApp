@@ -5,6 +5,7 @@ import '../../../../shared/widgets/trip_header.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../trip/domain/entities/trip.dart';
 import '../../../home/presentation/widgets/member_avatar.dart';
+import '../../../../routes/app_routes.dart';
 
 class TripItineraryScreen extends StatelessWidget {
   final Trip trip;
@@ -49,6 +50,12 @@ class TripItineraryScreen extends StatelessWidget {
             TripBottomNavigation(
               currentIndex: 0,
               onTap: (index) {
+                if (index == 3) {
+                  Navigator.pushReplacementNamed(
+                    context,
+                    AppRoutes.checklist,
+                    arguments: trip,
+                  );
                 if (index == 0) return; // Already on itinerary screen
                 
                 switch (index) {
