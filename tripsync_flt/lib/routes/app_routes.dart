@@ -7,6 +7,8 @@ import '../features/home/presentation/screens/edit_profile_screen.dart';
 import '../features/home/presentation/screens/my_profile_screen.dart';
 import '../features/home/presentation/screens/settings_screen.dart';
 import '../features/trip/presentation/screens/create_trip_screen.dart';
+import '../features/itinerary/presentation/screens/itinerary_screen.dart';
+import '../features/trip/domain/entities/trip.dart';
 import '../features/home/presentation/models/profile_data.dart';
 
 class AppRoutes {
@@ -16,6 +18,7 @@ class AppRoutes {
   static const register = "/register";
   static const home = "/home";
   static const createTrip = "/create-trip";
+  static const itinerary = "/itinerary";
   static const editProfile = "/edit-profile";
   static const myProfile = "/my-profile";
   static const settings = "/settings";
@@ -26,11 +29,13 @@ class AppRoutes {
     register: (_) => const RegisterScreen(),
     home: (_) => const HomeScreen(),
     createTrip: (_) => const CreateTripScreen(),
+    itinerary: (context) {
+      final trip = ModalRoute.of(context)!.settings.arguments as Trip;
+      return TripItineraryScreen(trip: trip);
+    },
     editProfile: (context) {
       final args = ModalRoute.of(context)?.settings.arguments;
-      return EditProfileScreen(
-        initialData: args is ProfileData ? args : null,
-      );
+      return EditProfileScreen(initialData: args is ProfileData ? args : null);
     },
     myProfile: (_) => const MyProfileScreen(),
     settings: (_) => const SettingsScreen(),

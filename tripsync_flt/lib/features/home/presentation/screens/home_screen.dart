@@ -4,6 +4,8 @@ import '../widgets/favorite_features_section.dart';
 import '../widgets/trip_list_header.dart';
 import '../widgets/trip_card.dart';
 import '../../../trip/presentation/screens/join_trip_screen.dart';
+import '../../../trip/domain/entities/trip.dart';
+import '../../../itinerary/presentation/screens/itinerary_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -134,39 +136,42 @@ class HomeScreen extends StatelessWidget {
 
     final imageHeight = preferredImageHeight.clamp(0.0, maxImageHeight);
 
-    final trips = <_TripCardData>[
-      _TripCardData(
+    final trips = <Trip>[
+      const Trip(
         title: 'Đà Lạt-Thành Phố Mộng Mơ',
         location: 'Đà Lạt, Lâm Đồng',
         imageUrl: 'assets/images/app/trip_1.jpg',
         memberCount: 3,
-        memberColors: const [
-          Color(0xFFFF6B6B),
-          Color(0xFFE59600),
-          Color(0xFFA8E6CF),
-        ],
+        memberColors: ['#A8E6CF', '#E59600', '#FF6B6B'],
+        startDate: '12/12/2025',
+        endDate: '15/12/2025',
+        daysCount: 3,
+        confirmedCount: 2,
+        proposedCount: 0,
       ),
-      _TripCardData(
+      const Trip(
         title: 'Sapa- Xứ sở sương mù',
         location: 'Lào Cai',
         imageUrl: 'assets/images/app/trip_1.jpg',
         memberCount: 3,
-        memberColors: const [
-          Color(0xFFFF6B6B),
-          Color(0xFFE59600),
-          Color(0xFFA8E6CF),
-        ],
+        memberColors: ['#A8E6CF', '#E59600', '#FF6B6B'],
+        startDate: '20/12/2025',
+        endDate: '23/12/2025',
+        daysCount: 4,
+        confirmedCount: 3,
+        proposedCount: 1,
       ),
-      _TripCardData(
-        title: 'Sapa- Xứ sở sương mù',
-        location: 'Lào Cai',
+      const Trip(
+        title: 'Hà Nội - Thủ đô ngàn năm',
+        location: 'Hà Nội',
         imageUrl: 'assets/images/app/trip_1.jpg',
         memberCount: 3,
-        memberColors: const [
-          Color(0xFFFF6B6B),
-          Color(0xFFE59600),
-          Color(0xFFA8E6CF),
-        ],
+        memberColors: ['#A8E6CF', '#E59600', '#FF6B6B'],
+        startDate: '01/01/2026',
+        endDate: '05/01/2026',
+        daysCount: 5,
+        confirmedCount: 4,
+        proposedCount: 2,
       ),
     ];
 
@@ -193,10 +198,22 @@ class HomeScreen extends StatelessWidget {
                 location: trip.location,
                 imageUrl: trip.imageUrl,
                 memberCount: trip.memberCount,
-                memberColors: trip.memberColors,
+                memberColors: trip.memberColors
+                    .map(
+                      (color) =>
+                          Color(int.parse(color.replaceFirst('#', '0xFF'))),
+                    )
+                    .toList(),
                 cardWidth: cardWidth,
                 imageHeight: imageHeight,
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TripItineraryScreen(trip: trip),
+                    ),
+                  );
+                },
               ),
             );
           },
@@ -204,20 +221,4 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class _TripCardData {
-  final String title;
-  final String location;
-  final String imageUrl;
-  final int memberCount;
-  final List<Color> memberColors;
-
-  const _TripCardData({
-    required this.title,
-    required this.location,
-    required this.imageUrl,
-    required this.memberCount,
-    required this.memberColors,
-  });
 }
