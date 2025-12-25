@@ -9,6 +9,10 @@ import '../features/home/presentation/screens/settings_screen.dart';
 import '../features/trip/presentation/screens/create_trip_screen.dart';
 import '../features/home/presentation/models/profile_data.dart';
 import '../features/itinerary/presentation/screens/itinerary_screen.dart';
+import '../features/checklist/presentation/screens/checklist_screen.dart';
+import '../features/expense/presentation/screens/expense_screen.dart';
+import '../features/expense/presentation/screens/add_expense_screen.dart';
+import '../features/documents/presentation/screens/document_management_screen.dart';
 import '../features/trip/domain/entities/trip.dart';
 import '../features/home/presentation/models/profile_data.dart';
 
@@ -23,6 +27,10 @@ class AppRoutes {
   static const editProfile = "/edit-profile";
   static const myProfile = "/my-profile";
   static const settings = "/settings";
+  static const checklist = "/checklist";
+  static const expense = "/expense";
+  static const addExpense = "/add-expense";
+  static const documents = "/documents";
 
   static final routes = <String, WidgetBuilder>{
     start: (_) => const StartScreen(),
@@ -30,6 +38,7 @@ class AppRoutes {
     register: (_) => const RegisterScreen(),
     home: (_) => const HomeScreen(),
     createTrip: (_) => const CreateTripScreen(),
+    documents: (_) => const DocumentManagementScreen(),
     editProfile: (context) {
       final args = ModalRoute.of(context)?.settings.arguments;
       return EditProfileScreen(initialData: args is ProfileData ? args : null);
@@ -40,5 +49,14 @@ class AppRoutes {
       final trip = ModalRoute.of(context)!.settings.arguments as Trip;
       return TripItineraryScreen(trip: trip);
     },
+    checklist: (context) {
+      final trip = ModalRoute.of(context)!.settings.arguments as Trip;
+      return ChecklistScreen(trip: trip);
+    },
+    expense: (context) {
+      final trip = ModalRoute.of(context)!.settings.arguments as Trip;
+      return ExpenseScreen(trip: trip);
+    },
+    addExpense: (_) => const AddExpenseScreen(),
   };
 }

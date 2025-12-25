@@ -1,45 +1,26 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/styles/app_colors.dart';
 
-import '../styles/app_colors.dart';
-import '../../routes/app_routes.dart';
-
-class TripHeader extends StatelessWidget {
+class DocumentHeader extends StatelessWidget {
+  final VoidCallback onBack;
   final String title;
   final String location;
-  final VoidCallback? onBackPressed;
 
-  const TripHeader({
+  const DocumentHeader({
     super.key,
+    required this.onBack,
     required this.title,
     required this.location,
-    this.onBackPressed,
   });
-
-  void _navigateBackToHome(BuildContext context) {
-    final navigator = Navigator.of(context);
-
-    var foundHome = false;
-    navigator.popUntil((route) {
-      if (route.settings.name == AppRoutes.home) {
-        foundHome = true;
-        return true;
-      }
-      return false;
-    });
-
-    if (!foundHome) {
-      navigator.pushNamedAndRemoveUntil(AppRoutes.home, (_) => false);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 24),
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
           GestureDetector(
-            onTap: onBackPressed ?? () => _navigateBackToHome(context),
+            onTap: onBack,
             child: Container(
               width: 43,
               height: 43,
@@ -47,10 +28,14 @@ class TripHeader extends StatelessWidget {
                 color: AppColors.buttonBackground,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.arrow_back, size: 24),
+              child: const Icon(
+                Icons.arrow_back,
+                size: 24,
+                color: AppColors.textPrimary,
+              ),
             ),
           ),
-          const SizedBox(width: 17),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,12 +45,12 @@ class TripHeader extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black,
+                    color: AppColors.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 4),
                 Row(
                   children: [
                     Image.asset(
@@ -90,10 +75,6 @@ class TripHeader extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.black),
-            onPressed: () {},
           ),
         ],
       ),
