@@ -5,6 +5,8 @@ import '../widgets/trip_list_header.dart';
 import '../widgets/trip_card.dart';
 import '../../../trip/presentation/screens/join_trip_screen.dart';
 import '../../../trip/domain/entities/trip.dart';
+import '../../../itinerary/presentation/screens/itinerary_screen.dart';
+import 'all_trips_screen.dart';
 import '../../../../routes/app_routes.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -82,7 +84,14 @@ class HomeScreen extends StatelessWidget {
                         TripListHeader(
                           activeTripCount: 2,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          onViewAllTap: () {},
+                          onViewAllTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AllTripsScreen(),
+                              ),
+                            );
+                          },
                         ),
 
                         const SizedBox(height: 12),
