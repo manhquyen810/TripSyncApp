@@ -110,9 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleForgotPassword() {
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const ForgotPasswordScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
     );
   }
 
@@ -120,51 +118,42 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: Container(
-        height: MediaQuery.of(context).size.height,
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(0),
-            topRight: Radius.circular(0),
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 26.5, top: 45.5),
-                  child: Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 1.5),
+      child: SafeArea(
+        child: Column(
+          children: [
+            Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 26.5, top: 45.5),
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border(
+                      top: BorderSide(color: Colors.white, width: 1.5),
+                      left: BorderSide(color: Colors.white, width: 1.5),
+                      right: BorderSide(color: Colors.white, width: 1.5),
+                      bottom: BorderSide(color: Colors.white, width: 1.5),
                     ),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                        size: 15,
-                      ),
-                      onPressed: () => Navigator.pop(context),
+                  ),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                      size: 15,
                     ),
+                    onPressed: () => Navigator.pop(context),
                   ),
                 ),
               ),
+            ),
 
-              const SizedBox(height: 47),
+            const SizedBox(height: 20),
 
-              const Padding(
-                padding: EdgeInsets.only(left: 24, right: 26),
-                child: LoginHeader(),
-              ),
-
-              const Spacer(),
-
-              LoginCard(
+            Expanded(
+              child: LoginCard(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -188,21 +177,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 24),
 
-                    LoginForm(
-                      formKey: _formKey,
-                      emailController: emailController,
-                      passwordController: passwordController,
-                      onForgotPassword: _handleForgotPassword,
-                      onLogin: _handleLogin,
-                      isLoading: _isSubmitting,
+                    SingleChildScrollView(
+                      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                      child: LoginForm(
+                        formKey: _formKey,
+                        emailController: emailController,
+                        passwordController: passwordController,
+                        onForgotPassword: _handleForgotPassword,
+                        onLogin: _handleLogin,
+                        isLoading: _isSubmitting,
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+
