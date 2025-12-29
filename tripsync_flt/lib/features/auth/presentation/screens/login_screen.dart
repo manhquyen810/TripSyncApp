@@ -193,7 +193,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 24),
 
                     SingleChildScrollView(
-                      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
                       child: LoginForm(
                         formKey: _formKey,
                         emailController: emailController,
@@ -213,4 +214,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

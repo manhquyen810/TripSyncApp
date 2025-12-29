@@ -11,6 +11,7 @@ class ProfileStore {
   static const _kEmail = 'profile.email';
   static const _kPhone = 'profile.phone';
   static const _kAddress = 'profile.address';
+  static const _kAvatarUrl = 'profile.avatarUrl';
   static const _kAvatarPath = 'profile.avatarPath';
 
   static Future<ProfileData> load() async {
@@ -20,6 +21,7 @@ class ProfileStore {
     final email = prefs.getString(_kEmail) ?? ProfileData.demo.email;
     final phone = prefs.getString(_kPhone) ?? ProfileData.demo.phone;
     final address = prefs.getString(_kAddress) ?? ProfileData.demo.address;
+    final avatarUrl = prefs.getString(_kAvatarUrl);
     final avatarPath = prefs.getString(_kAvatarPath);
 
     Uint8List? avatarBytes;
@@ -39,6 +41,7 @@ class ProfileStore {
       email: email,
       phone: phone,
       address: address,
+      avatarUrl: avatarUrl,
       avatarBytes: avatarBytes,
       avatarPath: avatarPath,
     );
@@ -58,6 +61,10 @@ class ProfileStore {
     await prefs.setString(_kEmail, data.email);
     await prefs.setString(_kPhone, data.phone);
     await prefs.setString(_kAddress, data.address);
+    final avatarUrl = data.avatarUrl?.trim();
+    if (avatarUrl != null && avatarUrl.isNotEmpty) {
+      await prefs.setString(_kAvatarUrl, avatarUrl);
+    }
     if (savedAvatarPath != null && savedAvatarPath.isNotEmpty) {
       await prefs.setString(_kAvatarPath, savedAvatarPath);
     }
@@ -82,6 +89,7 @@ class ProfileStore {
     await prefs.remove(_kEmail);
     await prefs.remove(_kPhone);
     await prefs.remove(_kAddress);
+    await prefs.remove(_kAvatarUrl);
     await prefs.remove(_kAvatarPath);
   }
 
