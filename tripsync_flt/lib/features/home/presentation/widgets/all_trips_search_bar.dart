@@ -3,59 +3,62 @@ import 'package:flutter/material.dart';
 class AllTripsSearchBar extends StatelessWidget {
   final Function(String)? onSearchChanged;
 
-  const AllTripsSearchBar({
-    super.key,
-    this.onSearchChanged,
-  });
+  const AllTripsSearchBar({super.key, this.onSearchChanged});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: const Color(0xFF959DA3),
-          width: 1,
-        ),
-        borderRadius: BorderRadius.circular(12),
-      ),
+    final borderColor = const Color(0xFF959DA3);
+    final focusColor = const Color(0xFF00C950);
+
+    return SizedBox(
+      height: 48,
       child: TextField(
         onChanged: onSearchChanged,
+        textAlignVertical: TextAlignVertical.center,
+        textInputAction: TextInputAction.search,
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          color: Color(0xFF959DA3),
+          color: Colors.black,
           fontFamily: 'Inter',
         ),
         decoration: InputDecoration(
-          hintText: 'Tìm kiếm chuyến đi..',
-          hintStyle: const TextStyle(
+          hintText: 'Tìm kiếm chuyến đi...',
+          hintStyle: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            color: Color(0xFF959DA3),
+            color: borderColor,
             fontFamily: 'Inter',
           ),
-          border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 10,
+            horizontal: 12,
+            vertical: 12,
           ),
           prefixIcon: Padding(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsetsDirectional.only(start: 12, end: 8),
             child: Image.asset(
-              'assets/icons/search.png',
-              width: 24,
-              height: 24,
-              color: const Color(0xFF959DA3),
-              errorBuilder: (context, error, stackTrace) => const Icon(
-                Icons.search,
-                size: 24,
-                color: Color(0xFF959DA3),
-              ),
+              'icons/search.png',
+              width: 20,
+              height: 20,
+              color: borderColor,
+              errorBuilder: (context, error, stackTrace) =>
+                  Icon(Icons.search, size: 20, color: borderColor),
             ),
           ),
           prefixIconConstraints: const BoxConstraints(
             minWidth: 44,
-            minHeight: 24,
+            minHeight: 20,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: borderColor.withOpacity(0.55),
+              width: 1,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: focusColor, width: 1.3),
           ),
         ),
       ),

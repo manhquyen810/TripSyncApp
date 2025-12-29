@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'member_avatar.dart';
 
@@ -38,16 +41,7 @@ class TripCard extends StatelessWidget {
                 height: imageHeight,
                 child: Stack(
                   children: [
-                    Image.asset(
-                      imageUrl,
-                      width: cardWidth,
-                      height: imageHeight,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.image, size: 50),
-                      ),
-                    ),
+                    _buildCoverImage(),
                     Positioned(
                       left: 0,
                       right: 0,
@@ -66,52 +60,52 @@ class TripCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                  Positioned(
-                    left: 12,
-                    right: 12,
-                    bottom: 12,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            fontFamily: 'Poppins',
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            Image.asset(
-                              'assets/icons/location.png',
-                              width: 20,
-                              height: 20,
+                    Positioned(
+                      left: 12,
+                      right: 12,
+                      bottom: 12,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                               color: Colors.white,
+                              fontFamily: 'Poppins',
                             ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                location,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.white,
-                                  fontFamily: 'Poppins',
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Image.asset(
+                                'assets/icons/location.png',
+                                width: 20,
+                                height: 20,
+                                color: Colors.white,
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  location,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
                   ],
                 ),
               ),
@@ -152,5 +146,91 @@ class TripCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildCoverImage() {
+    final url = _coerceCoverUrl(imageUrl);
+    final placeholder = Container(
+      color: Colors.grey[300],
+      alignment: Alignment.center,
+      child: const Icon(Icons.image, size: 50),
+    );
+
+    if (url.isEmpty)
+      return SizedBox(
+        width: cardWidth,
+        height: imageHeight,
+        child: placeholder,
+      );
+
+    if (url.startsWith('assets/')) {
+      return Image.asset(
+        url,
+        width: cardWidth,
+        height: imageHeight,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => placeholder,
+      );
+    }
+
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return Image.network(
+        url,
+        width: cardWidth,
+        height: imageHeight,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => placeholder,
+      );
+    }
+
+    if (kIsWeb) {
+      return SizedBox(
+        width: cardWidth,
+        height: imageHeight,
+        child: placeholder,
+      );
+    }
+
+    return Image.file(
+      File(url),
+      width: cardWidth,
+      height: imageHeight,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) => placeholder,
+    );
+  }
+
+  String _coerceCoverUrl(String raw) {
+    var value = raw.trim();
+    if (value.isEmpty) return value;
+
+    // Some buggy call paths can end up with an encoded URL being treated like an
+    // asset path on web (e.g. "assets/https%253A//...").
+    if (value.startsWith('assets/')) {
+      final rest = value.substring('assets/'.length);
+      if (_looksLikeEncodedHttpUrl(rest)) {
+        value = rest;
+      }
+    }
+
+    // Decode percent-encoded URLs (sometimes double-encoded).
+    for (var i = 0; i < 2; i++) {
+      if (!_looksLikeEncodedHttpUrl(value)) break;
+      try {
+        value = Uri.decodeFull(value).trim();
+      } catch (_) {
+        break;
+      }
+    }
+
+    return value;
+  }
+
+  bool _looksLikeEncodedHttpUrl(String value) {
+    final lower = value.toLowerCase();
+    return lower.startsWith('http%3a') ||
+        lower.startsWith('https%3a') ||
+        lower.startsWith('http%253a') ||
+        lower.startsWith('https%253a');
   }
 }

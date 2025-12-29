@@ -14,6 +14,7 @@ import '../features/expense/presentation/screens/expense_screen.dart';
 import '../features/expense/presentation/screens/add_expense_screen.dart';
 import '../features/documents/presentation/screens/document_management_screen.dart';
 import '../features/trip/domain/entities/trip.dart';
+import '../features/home/presentation/models/profile_data.dart';
 
 class AppRoutes {
   static const start = "/";
@@ -22,10 +23,10 @@ class AppRoutes {
   static const register = "/register";
   static const home = "/home";
   static const createTrip = "/create-trip";
+  static const itinerary = "/itinerary";
   static const editProfile = "/edit-profile";
   static const myProfile = "/my-profile";
   static const settings = "/settings";
-  static const itinerary = "/itinerary";
   static const checklist = "/checklist";
   static const expense = "/expense";
   static const addExpense = "/add-expense";
@@ -40,9 +41,7 @@ class AppRoutes {
     documents: (_) => const DocumentManagementScreen(),
     editProfile: (context) {
       final args = ModalRoute.of(context)?.settings.arguments;
-      return EditProfileScreen(
-        initialData: args is ProfileData ? args : null,
-      );
+      return EditProfileScreen(initialData: args is ProfileData ? args : null);
     },
     myProfile: (_) => const MyProfileScreen(),
     settings: (_) => const SettingsScreen(),
