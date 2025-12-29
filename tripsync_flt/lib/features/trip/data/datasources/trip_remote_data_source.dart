@@ -1,6 +1,7 @@
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_endpoints.dart';
 import 'package:dio/dio.dart';
+import 'dart:typed_data';
 
 abstract interface class TripRemoteDataSource {
   Future<Map<String, dynamic>> listTrips();
@@ -19,7 +20,9 @@ abstract interface class TripRemoteDataSource {
 
   Future<Map<String, dynamic>> uploadTripCover({
     required int tripId,
-    required String filePath,
+    String? filePath,
+    Uint8List? bytes,
+    String? filename,
     String category = 'cover',
   });
 
@@ -87,14 +90,34 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
   @override
   Future<Map<String, dynamic>> uploadTripCover({
     required int tripId,
-    required String filePath,
+    String? filePath,
+    Uint8List? bytes,
+    String? filename,
     String category = 'cover',
   }) async {
-    final filename = filePath.split(RegExp(r'[\\/]+')).last;
+    final safePath = filePath?.trim();
+    final safeName = (filename?.trim().isNotEmpty == true)
+        ? filename!.trim()
+        : (safePath != null && safePath.isNotEmpty)
+        ? safePath.split(RegExp(r'[\\/]+')).last
+        : 'upload.jpg';
 
-    final form = FormData.fromMap({
-      'file': await MultipartFile.fromFile(filePath, filename: filename),
-    });
+    final MultipartFile multipart;
+    if (bytes != null && bytes.isNotEmpty) {
+      multipart = MultipartFile.fromBytes(bytes, filename: safeName);
+    } else {
+      if (safePath == null || safePath.isEmpty) {
+        throw ArgumentError('Either bytes or filePath must be provided');
+      }
+      if (safePath.startsWith('content://')) {
+        throw StateError(
+          'Cannot upload from content URI without bytes. Pick file with withData=true or provide bytes.',
+        );
+      }
+      multipart = await MultipartFile.fromFile(safePath, filename: safeName);
+    }
+
+    final form = FormData.fromMap({'file': multipart});
 
     final response = await _client.post<dynamic>(
       ApiEndpoints.documentsUpload,

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 abstract interface class TripRepository {
   Future<Map<String, dynamic>> listTrips();
 
@@ -15,7 +17,9 @@ abstract interface class TripRepository {
 
   Future<String> uploadTripCover({
     required int tripId,
-    required String filePath,
+    String? filePath,
+    Uint8List? bytes,
+    String? filename,
   });
 
   Future<Map<String, dynamic>> updateTripCover({

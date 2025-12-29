@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:file_picker/file_picker.dart';
+import 'dart:typed_data';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/auth_token_store.dart';
@@ -31,6 +32,8 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
   final TextEditingController memberEmailController = TextEditingController();
   int? selectedImageIndex;
   String? selectedCoverFilePath;
+  Uint8List? selectedCoverBytes;
+  String? selectedCoverFileName;
   DateTime? startDate;
   DateTime? endDate;
 
@@ -276,13 +279,16 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
       var coverSyncFailed = false;
 
       final selectedFile = selectedCoverFilePath?.trim();
-      if (selectedFile != null &&
-          selectedFile.isNotEmpty &&
-          createdTripId != null) {
+      final hasCoverToUpload =
+          (selectedCoverBytes != null && selectedCoverBytes!.isNotEmpty) ||
+          (selectedFile != null && selectedFile.isNotEmpty);
+      if (hasCoverToUpload && createdTripId != null) {
         try {
           final uploadedUrl = await _tripRepository.uploadTripCover(
             tripId: createdTripId,
             filePath: selectedFile,
+            bytes: selectedCoverBytes,
+            filename: selectedCoverFileName,
           );
 
           await _tripRepository.updateTripCover(
@@ -425,14 +431,23 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.image,
         allowMultiple: false,
-        withData: false,
+        withData: true,
       );
-      final path = result?.files.single.path;
-      if (path == null || path.trim().isEmpty) return;
+      final file = result?.files.single;
+      final path = file?.path;
+      final bytes = file?.bytes;
+      final name = file?.name;
+
+      if ((bytes == null || bytes.isEmpty) &&
+          (path == null || path.trim().isEmpty)) {
+        return;
+      }
 
       if (!mounted) return;
       setState(() {
         selectedCoverFilePath = path;
+        selectedCoverBytes = bytes;
+        selectedCoverFileName = name;
         selectedImageIndex = null;
       });
     } catch (e) {

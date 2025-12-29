@@ -3,6 +3,9 @@ import '../../../../core/network/api_client.dart';
 import '../../../../core/network/auth_token_store.dart';
 import '../../../../core/network/exceptions.dart';
 import '../../../../shared/widgets/top_toast.dart';
+import '../../../auth/data/datasources/auth_remote_data_source.dart';
+import '../../../auth/data/repositories/auth_repository_impl.dart';
+import '../../../auth/domain/repositories/auth_repository.dart';
 import '../../../trip/data/datasources/trip_remote_data_source.dart';
 import '../../../trip/data/repositories/trip_repository_impl.dart';
 import '../../../trip/domain/repositories/trip_repository.dart';
@@ -13,7 +16,6 @@ import '../widgets/trip_list_header.dart';
 import '../widgets/trip_card.dart';
 import '../../../trip/presentation/screens/join_trip_screen.dart';
 import '../../../trip/domain/entities/trip.dart';
-import '../../../itinerary/presentation/screens/itinerary_screen.dart';
 import 'all_trips_screen.dart';
 import '../../../../routes/app_routes.dart';
 
@@ -28,6 +30,9 @@ class _HomeScreenState extends State<HomeScreen> {
   late final TripRepository _tripRepository;
   late Future<List<Trip>> _tripsFuture;
 
+  late final AuthRepository _authRepository;
+  String _userName = 'nghiemqsang02';
+
   bool _hasShownLoadError = false;
 
   @override
@@ -38,7 +43,42 @@ class _HomeScreenState extends State<HomeScreen> {
         ApiClient(authTokenProvider: AuthTokenStore.getAccessToken),
       ),
     );
+
+    _authRepository = AuthRepositoryImpl(
+      AuthRemoteDataSourceImpl(
+        ApiClient(authTokenProvider: AuthTokenStore.getAccessToken),
+      ),
+    );
+
     _tripsFuture = _loadTrips();
+    _loadMe();
+  }
+
+  Future<void> _loadMe() async {
+    try {
+      final raw = await _authRepository.me();
+      final name = _extractUserName(raw);
+      if (!mounted) return;
+      if (name != null && name.trim().isNotEmpty) {
+        setState(() => _userName = name.trim());
+      }
+    } on ApiException {
+      // Ignore: user may not be logged in yet.
+    } catch (_) {
+      // Ignore: keep default username.
+    }
+  }
+
+  String? _extractUserName(Map<String, dynamic> raw) {
+    final data = raw['data'];
+    if (data is Map<String, dynamic>) {
+      final v = data['name'] ?? data['username'] ?? data['email'];
+      if (v is String && v.trim().isNotEmpty) return v;
+    }
+
+    final v = raw['name'] ?? raw['username'] ?? raw['email'];
+    if (v is String && v.trim().isNotEmpty) return v;
+    return null;
   }
 
   void _refreshTrips() {
@@ -120,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             HomeHeader(
-                              userName: 'nghiemqsang02',
+                              userName: _userName,
                               padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
                               onProfileTap: () {
                                 Navigator.of(context).pushNamed('/my-profile');

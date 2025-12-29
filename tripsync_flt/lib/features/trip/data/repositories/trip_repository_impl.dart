@@ -1,4 +1,5 @@
 import 'package:tripsync_flt/core/config/env.dart';
+import 'dart:typed_data';
 
 import '../../domain/repositories/trip_repository.dart';
 import '../datasources/trip_remote_data_source.dart';
@@ -42,11 +43,20 @@ class TripRepositoryImpl implements TripRepository {
   @override
   Future<String> uploadTripCover({
     required int tripId,
-    required String filePath,
+    String? filePath,
+    Uint8List? bytes,
+    String? filename,
   }) async {
+    if ((bytes == null || bytes.isEmpty) &&
+        (filePath == null || filePath.trim().isEmpty)) {
+      throw ArgumentError('Either bytes or filePath must be provided');
+    }
+
     final response = await _remote.uploadTripCover(
       tripId: tripId,
       filePath: filePath,
+      bytes: bytes,
+      filename: filename,
     );
     return _extractUploadedUrl(response);
   }
