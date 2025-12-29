@@ -42,26 +42,26 @@ class ProfileAvatar extends StatelessWidget {
                 },
               )
             : (imageUrl != null && imageUrl!.trim().isNotEmpty)
-                ? Image.network(
-                    imageUrl!.trim(),
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const ColoredBox(
-                        color: AppColors.buttonBackground,
-                        child: Center(child: Icon(Icons.person, size: 32)),
-                      );
-                    },
-                  )
-                : Image.asset(
-                    imageAsset,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const ColoredBox(
-                        color: AppColors.buttonBackground,
-                        child: Center(child: Icon(Icons.person, size: 32)),
-                      );
-                    },
-                  ),
+            ? Image.network(
+                imageUrl!.trim(),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const ColoredBox(
+                    color: AppColors.buttonBackground,
+                    child: Center(child: Icon(Icons.person, size: 32)),
+                  );
+                },
+              )
+            : Image.asset(
+                imageAsset,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const ColoredBox(
+                    color: AppColors.buttonBackground,
+                    child: Center(child: Icon(Icons.person, size: 32)),
+                  );
+                },
+              ),
       ),
     );
 
