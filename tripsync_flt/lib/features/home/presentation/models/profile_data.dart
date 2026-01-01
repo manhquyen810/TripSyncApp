@@ -5,6 +5,7 @@ class ProfileData {
   final String email;
   final String phone;
   final String address;
+  final String? avatarUrl;
   final Uint8List? avatarBytes;
   final String? avatarPath;
   final String avatarAsset;
@@ -14,6 +15,7 @@ class ProfileData {
     required this.email,
     required this.phone,
     required this.address,
+    this.avatarUrl,
     this.avatarBytes,
     this.avatarPath,
     this.avatarAsset = 'assets/images/trip/person.png',
@@ -24,6 +26,7 @@ class ProfileData {
     String? email,
     String? phone,
     String? address,
+    String? avatarUrl,
     Uint8List? avatarBytes,
     bool clearAvatarBytes = false,
     String? avatarPath,
@@ -35,6 +38,7 @@ class ProfileData {
       email: email ?? this.email,
       phone: phone ?? this.phone,
       address: address ?? this.address,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
       avatarBytes: clearAvatarBytes ? null : (avatarBytes ?? this.avatarBytes),
       avatarPath: clearAvatarPath ? null : (avatarPath ?? this.avatarPath),
       avatarAsset: avatarAsset ?? this.avatarAsset,

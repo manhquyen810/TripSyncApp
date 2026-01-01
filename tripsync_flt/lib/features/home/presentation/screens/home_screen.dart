@@ -1,16 +1,113 @@
 import 'package:flutter/material.dart';
+import '../../../../core/network/api_client.dart';
+import '../../../../core/network/auth_token_store.dart';
+import '../../../../core/network/exceptions.dart';
+import '../../../../shared/widgets/top_toast.dart';
+import '../../../auth/data/datasources/auth_remote_data_source.dart';
+import '../../../auth/data/repositories/auth_repository_impl.dart';
+import '../../../auth/domain/repositories/auth_repository.dart';
+import '../../../trip/data/datasources/trip_remote_data_source.dart';
+import '../../../trip/data/repositories/trip_repository_impl.dart';
+import '../../../trip/domain/repositories/trip_repository.dart';
+import '../../../trip/presentation/services/trip_list_loader.dart';
 import '../widgets/home_header.dart';
 import '../widgets/favorite_features_section.dart';
 import '../widgets/trip_list_header.dart';
 import '../widgets/trip_card.dart';
 import '../../../trip/presentation/screens/join_trip_screen.dart';
 import '../../../trip/domain/entities/trip.dart';
-import '../../../itinerary/presentation/screens/itinerary_screen.dart';
 import 'all_trips_screen.dart';
 import '../../../../routes/app_routes.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late final TripRepository _tripRepository;
+  late Future<List<Trip>> _tripsFuture;
+
+  late final AuthRepository _authRepository;
+  String _userName = 'nghiemqsang02';
+  String? _userAvatarUrl;
+
+  bool _hasShownLoadError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tripRepository = TripRepositoryImpl(
+      TripRemoteDataSourceImpl(
+        ApiClient(authTokenProvider: AuthTokenStore.getAccessToken),
+      ),
+    );
+
+    _authRepository = AuthRepositoryImpl(
+      AuthRemoteDataSourceImpl(
+        ApiClient(authTokenProvider: AuthTokenStore.getAccessToken),
+      ),
+    );
+
+    _tripsFuture = _loadTrips();
+    _loadMe();
+  }
+
+  Future<void> _loadMe() async {
+    try {
+      final raw = await _authRepository.me();
+      final name = _extractUserName(raw);
+      final avatarUrl = _extractUserAvatarUrl(raw);
+      if (!mounted) return;
+      if (name != null && name.trim().isNotEmpty) {
+        setState(() => _userName = name.trim());
+      }
+      if (avatarUrl != null && avatarUrl.trim().isNotEmpty) {
+        setState(() => _userAvatarUrl = avatarUrl.trim());
+      }
+    } on ApiException {
+      // Ignore: user may not be logged in yet.
+    } catch (_) {
+      // Ignore: keep default username.
+    }
+  }
+
+  String? _extractUserName(Map<String, dynamic> raw) {
+    final data = raw['data'];
+    if (data is Map<String, dynamic>) {
+      final v = data['name'] ?? data['username'] ?? data['email'];
+      if (v is String && v.trim().isNotEmpty) return v;
+    }
+
+    final v = raw['name'] ?? raw['username'] ?? raw['email'];
+    if (v is String && v.trim().isNotEmpty) return v;
+    return null;
+  }
+
+  String? _extractUserAvatarUrl(Map<String, dynamic> raw) {
+    final data = raw['data'];
+    if (data is Map<String, dynamic>) {
+      final v = data['avatar_url'] ?? data['avatarUrl'];
+      if (v is String && v.trim().isNotEmpty) return v;
+    }
+
+    final v = raw['avatar_url'] ?? raw['avatarUrl'];
+    if (v is String && v.trim().isNotEmpty) return v;
+    return null;
+  }
+
+  void _refreshTrips() {
+    setState(() {
+      _hasShownLoadError = false;
+      _tripsFuture = _loadTrips();
+    });
+  }
+
+  Future<List<Trip>> _loadTrips() async {
+    return TripListLoader.loadTrips(_tripRepository);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,74 +142,115 @@ class HomeScreen extends StatelessWidget {
                 maxSpacing,
               );
 
-              return Padding(
-                padding: const EdgeInsets.only(bottom: bottomPadding),
-                child: SizedBox(
-                  height: usableHeight,
-                  child: ClipRect(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        HomeHeader(
-                          userName: 'nghiemqsang02',
-                          padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                          onProfileTap: () {
-                            Navigator.of(context).pushNamed('/my-profile');
-                          },
-                        ),
+              return FutureBuilder<List<Trip>>(
+                future: _tripsFuture,
+                builder: (context, snapshot) {
+                  final trips = snapshot.data ?? const <Trip>[];
 
-                        SizedBox(height: topSpacing),
+                  if (snapshot.hasError && !_hasShownLoadError) {
+                    _hasShownLoadError = true;
+                    final err = snapshot.error;
+                    final msg = switch (err) {
+                      TimeoutException() =>
+                        'Server đang khởi động, thử lại sau vài giây',
+                      UnauthorizedException() =>
+                        'Vui lòng đăng nhập để xem danh sách chuyến đi',
+                      ApiException() => err.message,
+                      _ => 'Không tải được danh sách chuyến đi',
+                    };
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (!mounted) return;
+                      showTopToast(
+                        context,
+                        message: msg,
+                        type: TopToastType.error,
+                      );
+                    });
+                  }
 
-                        FavoriteFeaturesSection(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          onJoinTripTap: () {
-                            showJoinTripDialog(context);
-                          },
-                          onCreateTripTap: () {
-                            Navigator.of(context).pushNamed('/create-trip');
-                          },
-                          onProfileTap: () {
-                            Navigator.of(context).pushNamed('/my-profile');
-                          },
-                          onSettingsTap: () {
-                            Navigator.of(context).pushNamed('/settings');
-                          },
-                        ),
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: bottomPadding),
+                    child: SizedBox(
+                      height: usableHeight,
+                      child: ClipRect(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            HomeHeader(
+                              userName: _userName,
+                              avatarUrl: _userAvatarUrl,
+                              padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                              onProfileTap: () {
+                                Navigator.of(context).pushNamed('/my-profile');
+                              },
+                            ),
 
-                        const SizedBox(height: 24),
+                            SizedBox(height: topSpacing),
 
-                        TripListHeader(
-                          activeTripCount: 2,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          onViewAllTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AllTripsScreen(),
+                            FavoriteFeaturesSection(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
                               ),
-                            );
-                          },
-                        ),
+                              onJoinTripTap: () {
+                                showJoinTripDialog(context).then((joined) {
+                                  if (joined == true) {
+                                    _refreshTrips();
+                                  }
+                                });
+                              },
+                              onCreateTripTap: () {
+                                Navigator.of(context)
+                                    .pushNamed('/create-trip')
+                                    .then((_) => _refreshTrips());
+                              },
+                              onProfileTap: () {
+                                Navigator.of(context).pushNamed('/my-profile');
+                              },
+                              onSettingsTap: () {
+                                Navigator.of(context).pushNamed('/settings');
+                              },
+                            ),
 
-                        const SizedBox(height: 12),
+                            const SizedBox(height: 24),
 
-                        Expanded(
-                          child: LayoutBuilder(
-                            builder: (context, tripConstraints) {
-                              return Align(
-                                alignment: Alignment.topLeft,
-                                child: _buildTripCards(
+                            TripListHeader(
+                              activeTripCount: trips.length,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              onViewAllTap: () {
+                                Navigator.push(
                                   context,
-                                  maxHeight: tripConstraints.maxHeight,
-                                ),
-                              );
-                            },
-                          ),
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AllTripsScreen(),
+                                  ),
+                                ).then((_) => _refreshTrips());
+                              },
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            Expanded(
+                              child: LayoutBuilder(
+                                builder: (context, tripConstraints) {
+                                  return Align(
+                                    alignment: Alignment.topLeft,
+                                    child: _buildTripCards(
+                                      context,
+                                      maxHeight: tripConstraints.maxHeight,
+                                      trips: trips,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
               );
             },
           ),
@@ -121,7 +259,11 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTripCards(BuildContext context, {required double maxHeight}) {
+  Widget _buildTripCards(
+    BuildContext context, {
+    required double maxHeight,
+    required List<Trip> trips,
+  }) {
     const horizontalPadding = 14.0;
     final screenWidth = MediaQuery.of(context).size.width;
     final availableWidth = screenWidth - (horizontalPadding * 2);
@@ -145,44 +287,10 @@ class HomeScreen extends StatelessWidget {
 
     final imageHeight = preferredImageHeight.clamp(0.0, maxImageHeight);
 
-    final trips = <Trip>[
-      const Trip(
-        title: 'Đà Lạt-Thành Phố Mộng Mơ',
-        location: 'Đà Lạt, Lâm Đồng',
-        imageUrl: 'assets/images/app/trip_1.jpg',
-        memberCount: 3,
-        memberColors: ['#A8E6CF', '#E59600', '#FF6B6B'],
-        startDate: '12/12/2025',
-        endDate: '15/12/2025',
-        daysCount: 3,
-        confirmedCount: 2,
-        proposedCount: 0,
-      ),
-      const Trip(
-        title: 'Sapa- Xứ sở sương mù',
-        location: 'Lào Cai',
-        imageUrl: 'assets/images/app/trip_1.jpg',
-        memberCount: 3,
-        memberColors: ['#A8E6CF', '#E59600', '#FF6B6B'],
-        startDate: '20/12/2025',
-        endDate: '23/12/2025',
-        daysCount: 4,
-        confirmedCount: 3,
-        proposedCount: 1,
-      ),
-      const Trip(
-        title: 'Hà Nội - Thủ đô ngàn năm',
-        location: 'Hà Nội',
-        imageUrl: 'assets/images/app/trip_1.jpg',
-        memberCount: 3,
-        memberColors: ['#A8E6CF', '#E59600', '#FF6B6B'],
-        startDate: '01/01/2026',
-        endDate: '05/01/2026',
-        daysCount: 5,
-        confirmedCount: 4,
-        proposedCount: 2,
-      ),
-    ];
+    if (trips.isEmpty) {
+      // Keep UX minimal: no extra empty-state components.
+      return const SizedBox.shrink();
+    }
 
     return SizedBox(
       height: maxHeight,
@@ -207,6 +315,7 @@ class HomeScreen extends StatelessWidget {
                 location: trip.location,
                 imageUrl: trip.imageUrl,
                 memberCount: trip.memberCount,
+                memberAvatarUrls: trip.memberAvatarUrls,
                 memberColors: trip.memberColors
                     .map(
                       (color) =>
@@ -216,10 +325,9 @@ class HomeScreen extends StatelessWidget {
                 cardWidth: cardWidth,
                 imageHeight: imageHeight,
                 onTap: () {
-                  Navigator.of(context).pushNamed(
-                    AppRoutes.itinerary,
-                    arguments: trip,
-                  );
+                  Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.itinerary, arguments: trip);
                 },
               ),
             );

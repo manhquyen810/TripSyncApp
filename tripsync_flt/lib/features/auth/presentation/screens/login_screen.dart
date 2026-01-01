@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/network/api_client.dart';
+import '../../../../core/network/auth_token_store.dart';
 import '../../../../core/network/exceptions.dart';
 import '../../data/datasources/auth_remote_data_source.dart';
 import '../../data/repositories/auth_repository_impl.dart';
@@ -69,6 +70,11 @@ class _LoginScreenState extends State<LoginScreen> {
         raw = await _authRepository.token(username: email, password: password);
       }
 
+      final token = _extractAccessToken(raw);
+      if (token != null) {
+        await AuthTokenStore.saveAccessToken(token);
+      }
+
       final message =
           (raw['message'] ?? raw['detail'] ?? 'Đăng nhập thành công')
               .toString();
@@ -106,6 +112,15 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       }
     }
+  }
+
+  String? _extractAccessToken(Map<String, dynamic> raw) {
+    final data = raw['data'];
+    final token =
+        (data is Map<String, dynamic> ? data['access_token'] : null) ??
+        raw['access_token'];
+    if (token is String && token.trim().isNotEmpty) return token;
+    return null;
   }
 
   void _handleForgotPassword() {
@@ -178,7 +193,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 24),
 
                     SingleChildScrollView(
-                      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
                       child: LoginForm(
                         formKey: _formKey,
                         emailController: emailController,
@@ -198,4 +214,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

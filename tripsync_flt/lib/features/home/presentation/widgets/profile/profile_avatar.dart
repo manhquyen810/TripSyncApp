@@ -6,6 +6,7 @@ import '../../../../../shared/styles/app_colors.dart';
 class ProfileAvatar extends StatelessWidget {
   final String imageAsset;
   final Uint8List? imageBytes;
+  final String? imageUrl;
   final VoidCallback? onTap;
   final bool showCameraBadge;
 
@@ -13,6 +14,7 @@ class ProfileAvatar extends StatelessWidget {
     super.key,
     required this.imageAsset,
     required this.imageBytes,
+    this.imageUrl,
     this.onTap,
     this.showCameraBadge = false,
   });
@@ -31,6 +33,17 @@ class ProfileAvatar extends StatelessWidget {
         child: imageBytes != null
             ? Image.memory(
                 imageBytes!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const ColoredBox(
+                    color: AppColors.buttonBackground,
+                    child: Center(child: Icon(Icons.person, size: 32)),
+                  );
+                },
+              )
+            : (imageUrl != null && imageUrl!.trim().isNotEmpty)
+            ? Image.network(
+                imageUrl!.trim(),
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return const ColoredBox(

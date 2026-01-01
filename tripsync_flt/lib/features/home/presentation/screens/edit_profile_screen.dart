@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
+
+import '../../../../core/network/api_client.dart';
+import '../../../../core/network/auth_token_store.dart';
+import '../../../../core/network/exceptions.dart';
+import '../../../auth/data/datasources/auth_remote_data_source.dart';
+import '../../../auth/data/repositories/auth_repository_impl.dart';
+import '../../../auth/domain/repositories/auth_repository.dart';
 import '../../../../shared/styles/app_colors.dart';
 import '../models/profile_data.dart';
 import '../widgets/profile/profile_avatar.dart';
@@ -17,34 +24,41 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
+  late final ProfileData _initialProfile;
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
-  late final TextEditingController _phoneController;
-  late final TextEditingController _addressController;
 
   Uint8List? _avatarBytes;
   late final String _avatarAsset;
   String? _avatarPath;
+  String? _avatarFileName;
+  bool _avatarChanged = false;
+
+  late final AuthRepository _authRepository;
+  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
-    final initial = widget.initialData ?? ProfileData.demo;
-    _nameController = TextEditingController(text: initial.name);
-    _emailController = TextEditingController(text: initial.email);
-    _phoneController = TextEditingController(text: initial.phone);
-    _addressController = TextEditingController(text: initial.address);
-    _avatarBytes = initial.avatarBytes;
-    _avatarPath = initial.avatarPath;
-    _avatarAsset = initial.avatarAsset;
+    _authRepository = AuthRepositoryImpl(
+      AuthRemoteDataSourceImpl(
+        ApiClient(authTokenProvider: AuthTokenStore.getAccessToken),
+      ),
+    );
+
+    _initialProfile = widget.initialData ?? ProfileData.demo;
+    _nameController = TextEditingController(text: _initialProfile.name);
+    _emailController = TextEditingController(text: _initialProfile.email);
+    _avatarBytes = _initialProfile.avatarBytes;
+    _avatarPath = _initialProfile.avatarPath;
+    _avatarAsset = _initialProfile.avatarAsset;
+    _avatarFileName = null;
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
-    _addressController.dispose();
     super.dispose();
   }
 
@@ -67,6 +81,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 controller: _nameController,
                 imageAsset: _avatarAsset,
                 imageBytes: _avatarBytes,
+                imageUrl: _initialProfile.avatarUrl,
                 onPickAvatar: _pickAvatar,
               ),
               const SizedBox(height: 18),
@@ -76,11 +91,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 countries: '5',
               ),
               const SizedBox(height: 20),
-              _EditInfoList(
-                emailController: _emailController,
-                phoneController: _phoneController,
-                addressController: _addressController,
-              ),
+              _EditInfoList(emailController: _emailController),
               const Spacer(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -94,17 +105,90 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   _ActionButton(
                     label: 'Lưu',
                     isPrimary: true,
-                    onPressed: () {
+                    onPressed: () async {
+                      if (_isSaving) return;
+                      final messenger = ScaffoldMessenger.of(context);
+                      final navigator = Navigator.of(context);
+                      setState(() => _isSaving = true);
+
+                      final name = _nameController.text.trim();
+                      final email = _emailController.text.trim();
+
+                      String? avatarUrl = _initialProfile.avatarUrl;
+                      final shouldUploadAvatar = _avatarChanged;
+
+                      if (shouldUploadAvatar) {
+                        try {
+                          avatarUrl = await _authRepository.uploadAvatar(
+                            filePath: _avatarPath,
+                            bytes: _avatarBytes,
+                            filename: _avatarFileName,
+                          );
+                        } catch (e) {
+                          if (!mounted) return;
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text('Không tải avatar lên server: $e'),
+                            ),
+                          );
+                        }
+                      }
+
                       final updated = ProfileData(
-                        name: _nameController.text.trim(),
-                        email: _emailController.text.trim(),
-                        phone: _phoneController.text.trim(),
-                        address: _addressController.text.trim(),
+                        name: name,
+                        email: email,
+                        phone: _initialProfile.phone,
+                        address: _initialProfile.address,
+                        avatarUrl: avatarUrl,
                         avatarBytes: _avatarBytes,
                         avatarPath: _avatarPath,
                         avatarAsset: _avatarAsset,
                       );
-                      Navigator.of(context).pop(updated);
+
+                      try {
+                        await _authRepository.updateProfile(
+                          name: updated.name,
+                          avatarUrl: updated.avatarUrl,
+                        );
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          const SnackBar(
+                            content: Text('Đã lưu hồ sơ lên server'),
+                          ),
+                        );
+                      } on UnauthorizedException {
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Vui lòng đăng nhập để lưu hồ sơ lên server',
+                            ),
+                          ),
+                        );
+                      } on ApiException catch (e) {
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Không lưu được lên server: ${e.message}',
+                            ),
+                          ),
+                        );
+                      } catch (e) {
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text('Không lưu được lên server: $e'),
+                          ),
+                        );
+                      } finally {
+                        if (mounted) {
+                          setState(() => _isSaving = false);
+                        }
+                      }
+
+                      if (!mounted) return;
+                      navigator.pop(updated);
                     },
                   ),
                 ],
@@ -134,6 +218,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() {
       _avatarBytes = bytes;
       _avatarPath = file?.path;
+      _avatarFileName = file?.name;
+      _avatarChanged = true;
     });
   }
 }
@@ -142,12 +228,14 @@ class _AvatarWithNameField extends StatelessWidget {
   final TextEditingController controller;
   final String imageAsset;
   final Uint8List? imageBytes;
+  final String? imageUrl;
   final VoidCallback onPickAvatar;
 
   const _AvatarWithNameField({
     required this.controller,
     required this.imageAsset,
     required this.imageBytes,
+    required this.imageUrl,
     required this.onPickAvatar,
   });
 
@@ -158,6 +246,7 @@ class _AvatarWithNameField extends StatelessWidget {
         ProfileAvatar(
           imageAsset: imageAsset,
           imageBytes: imageBytes,
+          imageUrl: imageUrl,
           onTap: onPickAvatar,
           showCameraBadge: true,
         ),
@@ -197,14 +286,8 @@ class _AvatarWithNameField extends StatelessWidget {
 
 class _EditInfoList extends StatelessWidget {
   final TextEditingController emailController;
-  final TextEditingController phoneController;
-  final TextEditingController addressController;
 
-  const _EditInfoList({
-    required this.emailController,
-    required this.phoneController,
-    required this.addressController,
-  });
+  const _EditInfoList({required this.emailController});
 
   @override
   Widget build(BuildContext context) {
@@ -214,18 +297,6 @@ class _EditInfoList extends StatelessWidget {
           icon: Icons.email_outlined,
           controller: emailController,
           width: 303,
-        ),
-        const SizedBox(height: 16),
-        _EditInfoRow(
-          icon: Icons.phone_outlined,
-          controller: phoneController,
-          width: 305,
-        ),
-        const SizedBox(height: 16),
-        _EditInfoRow(
-          icon: Icons.location_on_outlined,
-          controller: addressController,
-          width: 305,
         ),
       ],
     );
