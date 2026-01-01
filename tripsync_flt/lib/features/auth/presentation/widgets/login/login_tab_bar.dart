@@ -5,6 +5,19 @@ class LoginTabBar extends StatelessWidget {
   final VoidCallback onLoginTap;
   final VoidCallback onSignupTap;
 
+  static const _selectedShadows = [
+    BoxShadow(
+      color: Color(0x40000000),
+      offset: Offset(0, 2),
+      blurRadius: 4,
+    ),
+    BoxShadow(
+      color: Color(0x1A000000),
+      offset: Offset(0, 4),
+      blurRadius: 6,
+    ),
+  ];
+
   const LoginTabBar({
     super.key,
     required this.isLoginSelected,
@@ -16,9 +29,9 @@ class LoginTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF3F4F6),
-        borderRadius: BorderRadius.circular(100),
+      decoration: const BoxDecoration(
+        color: Color(0xFFF3F4F6),
+        borderRadius: BorderRadius.all(Radius.circular(100)),
       ),
       child: Row(
         children: [
@@ -32,25 +45,12 @@ class LoginTabBar extends StatelessWidget {
                   color: isLoginSelected
                       ? Colors.white
                       : const Color(0xFFF3F4F6),
-                  borderRadius: BorderRadius.circular(100),
-                  boxShadow: isLoginSelected
-                      ? [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.25),
-                            offset: const Offset(0, 2),
-                            blurRadius: 4,
-                          ),
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            offset: const Offset(0, 4),
-                            blurRadius: 6,
-                          ),
-                        ]
-                      : null,
+                  borderRadius: const BorderRadius.all(Radius.circular(100)),
+                  boxShadow: isLoginSelected ? _selectedShadows : null,
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  'Đăng nhập',
+                child: const Text(
+                  '\u0110\u0103ng nh\u1eadp',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 16,
@@ -70,25 +70,12 @@ class LoginTabBar extends StatelessWidget {
                   color: !isLoginSelected
                       ? Colors.white
                       : const Color(0xFFF3F4F6),
-                  borderRadius: BorderRadius.circular(100),
-                  boxShadow: !isLoginSelected
-                      ? [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.25),
-                            offset: const Offset(0, 2),
-                            blurRadius: 4,
-                          ),
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            offset: const Offset(0, 4),
-                            blurRadius: 6,
-                          ),
-                        ]
-                      : null,
+                  borderRadius: const BorderRadius.all(Radius.circular(100)),
+                  boxShadow: !isLoginSelected ? _selectedShadows : null,
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  'Đăng ký',
+                child: const Text(
+                  '\u0110\u0103ng k\u00fd',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 16,

@@ -1,0 +1,45 @@
+import 'package:flutter/material.dart';
+
+import '../../routes/app_routes.dart';
+import '../styles/app_colors.dart';
+
+class AddFloatingButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+  final bool isExpenseScreen;
+  final String? routeName;
+  final Object? routeArguments;
+  final EdgeInsetsGeometry padding;
+
+  const AddFloatingButton({
+    super.key,
+    this.onPressed,
+    this.isExpenseScreen = false,
+    this.routeName,
+    this.routeArguments,
+    this.padding = const EdgeInsets.only(bottom: 80),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final VoidCallback? effectiveOnPressed =
+        onPressed ??
+        (routeName != null
+            ? () => Navigator.pushNamed(
+                context,
+                routeName!,
+                arguments: routeArguments,
+              )
+            : (isExpenseScreen
+                  ? () => Navigator.pushNamed(context, AppRoutes.addExpense)
+                  : null));
+
+    return Padding(
+      padding: padding,
+      child: FloatingActionButton(
+        onPressed: effectiveOnPressed,
+        backgroundColor: AppColors.primary,
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
+      ),
+    );
+  }
+}

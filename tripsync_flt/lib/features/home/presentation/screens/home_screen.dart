@@ -6,6 +6,8 @@ import '../widgets/trip_card.dart';
 import '../../../trip/presentation/screens/join_trip_screen.dart';
 import '../../../trip/domain/entities/trip.dart';
 import '../../../itinerary/presentation/screens/itinerary_screen.dart';
+import 'all_trips_screen.dart';
+import '../../../../routes/app_routes.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -54,7 +56,9 @@ class HomeScreen extends StatelessWidget {
                         HomeHeader(
                           userName: 'nghiemqsang02',
                           padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                          onProfileTap: () {},
+                          onProfileTap: () {
+                            Navigator.of(context).pushNamed('/my-profile');
+                          },
                         ),
 
                         SizedBox(height: topSpacing),
@@ -65,10 +69,14 @@ class HomeScreen extends StatelessWidget {
                             showJoinTripDialog(context);
                           },
                           onCreateTripTap: () {
-                            Navigator.pushNamed(context, '/create-trip');
+                            Navigator.of(context).pushNamed('/create-trip');
                           },
-                          onProfileTap: () {},
-                          onSettingsTap: () {},
+                          onProfileTap: () {
+                            Navigator.of(context).pushNamed('/my-profile');
+                          },
+                          onSettingsTap: () {
+                            Navigator.of(context).pushNamed('/settings');
+                          },
                         ),
 
                         const SizedBox(height: 24),
@@ -76,7 +84,14 @@ class HomeScreen extends StatelessWidget {
                         TripListHeader(
                           activeTripCount: 2,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          onViewAllTap: () {},
+                          onViewAllTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AllTripsScreen(),
+                              ),
+                            );
+                          },
                         ),
 
                         const SizedBox(height: 12),
@@ -201,11 +216,9 @@ class HomeScreen extends StatelessWidget {
                 cardWidth: cardWidth,
                 imageHeight: imageHeight,
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TripItineraryScreen(trip: trip),
-                    ),
+                  Navigator.of(context).pushNamed(
+                    AppRoutes.itinerary,
+                    arguments: trip,
                   );
                 },
               ),

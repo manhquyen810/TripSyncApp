@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class RegisterForm extends StatelessWidget {
+class RegisterForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController fullNameController;
   final TextEditingController emailController;
@@ -24,18 +24,46 @@ class RegisterForm extends StatelessWidget {
     this.isLoading = false,
   });
 
+  @override
+  State<RegisterForm> createState() => _RegisterFormState();
+}
+
+class _RegisterFormState extends State<RegisterForm> {
   static final RegExp _emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+  static const _labelStyle = TextStyle(
+    fontFamily: 'Poppins',
+    fontSize: 14,
+    color: Color(0xFF6A7282),
+    height: 1.43,
+  );
+  static const _hintStyle = TextStyle(
+    fontFamily: 'Poppins',
+    fontSize: 16,
+    color: Color(0x800A0A0A),
+  );
+  static const _hintColor = Color(0xFF0A0A0A);
+  static const _borderColor = Color(0xFFE5E7EB);
+  static const _iconColor = Color(0xFF99A1AF);
+  static const _borderRadius = BorderRadius.all(Radius.circular(16));
+  static const _border = OutlineInputBorder(
+    borderRadius: _borderRadius,
+    borderSide: BorderSide(color: _borderColor),
+  );
+  static const _checkboxShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(4)),
+  );
+  
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: formKey,
-      // Validate per-field as the user interacts, not the whole form.
+      key: widget.formKey,
       autovalidateMode: AutovalidateMode.disabled,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Full Name field
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -43,64 +71,44 @@ class RegisterForm extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 3),
                 child: Text(
                   'Họ và tên',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Color(0xFF6A7282),
-                    height: 1.43,
-                  ),
+                  style: _labelStyle,
                 ),
               ),
               TextFormField(
-                controller: fullNameController,
-                enabled: !isLoading,
+                controller: widget.fullNameController,
+                enabled: !widget.isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 textInputAction: TextInputAction.next,
+                enableSuggestions: false,
+                autocorrect: false,
                 validator: (value) {
                   final v = (value ?? '').trim();
                   if (v.isEmpty) return 'Vui lòng nhập họ và tên';
                   if (v.length < 2) return 'Họ và tên quá ngắn';
                   return null;
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Nhập họ và tên',
-                  hintStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    color: const Color(0xFF0A0A0A).withOpacity(0.5),
-                  ),
-                  prefixIcon: const Icon(
+                  hintStyle: _hintStyle,
+                  prefixIcon: Icon(
                     Icons.person_outline,
-                    color: Color(0xFF99A1AF),
+                    color: _iconColor,
                     size: 20,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
+                  contentPadding: EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 16,
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
+                  enabledBorder: _border,
+                  focusedBorder: _border,
+                  errorBorder: _border,
+                  focusedErrorBorder: _border,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 19),
 
-          // Email field
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -108,65 +116,44 @@ class RegisterForm extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 3),
                 child: Text(
                   'Email',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Color(0xFF6A7282),
-                    height: 1.43,
-                  ),
+                  style: _labelStyle,
                 ),
               ),
               TextFormField(
-                controller: emailController,
-                enabled: !isLoading,
+                controller: widget.emailController,
+                enabled: !widget.isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
+                enableSuggestions: false,
+                autocorrect: false,
                 validator: (value) {
                   final v = (value ?? '').trim();
                   if (v.isEmpty) return 'Vui lòng nhập email';
                   if (!_emailRegex.hasMatch(v)) return 'Email không hợp lệ';
                   return null;
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Nhập email',
-                  hintStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    color: const Color(0xFF0A0A0A).withOpacity(0.5),
-                  ),
-                  prefixIcon: const Icon(
+                  hintStyle: _hintStyle,
+                  prefixIcon: Icon(
                     Icons.email_outlined,
-                    color: Color(0xFF99A1AF),
+                    color: _iconColor,
                     size: 20,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
+                  contentPadding: EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 16,
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
+                  enabledBorder: _border,
+                  focusedBorder: _border,
+                  errorBorder: _border,
+                  focusedErrorBorder: _border,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 19),
 
-          // Password field
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -174,20 +161,17 @@ class RegisterForm extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 3),
                 child: Text(
                   'Mật khẩu',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Color(0xFF6A7282),
-                    height: 1.43,
-                  ),
+                  style: _labelStyle,
                 ),
               ),
               TextFormField(
-                controller: passwordController,
-                enabled: !isLoading,
+                controller: widget.passwordController,
+                enabled: !widget.isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                obscureText: true,
+                obscureText: _obscurePassword,
                 textInputAction: TextInputAction.next,
+                enableSuggestions: false,
+                autocorrect: false,
                 validator: (value) {
                   final v = (value ?? '');
                   if (v.isEmpty) return 'Vui lòng nhập mật khẩu';
@@ -196,43 +180,40 @@ class RegisterForm extends StatelessWidget {
                 },
                 decoration: InputDecoration(
                   hintText: 'Nhập mật khẩu',
-                  hintStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    color: const Color(0xFF0A0A0A).withOpacity(0.5),
-                  ),
+                  hintStyle: _hintStyle,
                   prefixIcon: const Icon(
                     Icons.lock_outline,
-                    color: Color(0xFF99A1AF),
+                    color: _iconColor,
                     size: 20,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: _iconColor,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 16,
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
+                  enabledBorder: _border,
+                  focusedBorder: _border,
+                  errorBorder: _border,
+                  focusedErrorBorder: _border,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 19),
 
-          // Confirm Password field
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -240,79 +221,72 @@ class RegisterForm extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 3),
                 child: Text(
                   'Xác nhận mật khẩu',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Color(0xFF6A7282),
-                    height: 1.43,
-                  ),
+                  style: _labelStyle,
                 ),
               ),
               TextFormField(
-                controller: confirmPasswordController,
-                enabled: !isLoading,
+                controller: widget.confirmPasswordController,
+                enabled: !widget.isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                obscureText: true,
+                obscureText: _obscureConfirmPassword,
                 textInputAction: TextInputAction.done,
+                enableSuggestions: false,
+                autocorrect: false,
                 validator: (value) {
                   final v = (value ?? '');
                   if (v.isEmpty) return 'Vui lòng nhập lại mật khẩu';
-                  if (v != passwordController.text) {
+                  if (v != widget.passwordController.text) {
                     return 'Mật khẩu không khớp';
                   }
                   return null;
                 },
                 decoration: InputDecoration(
                   hintText: 'Nhập lại mật khẩu',
-                  hintStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    color: const Color(0xFF0A0A0A).withOpacity(0.5),
-                  ),
+                  hintStyle: _hintStyle,
                   prefixIcon: const Icon(
                     Icons.lock_outline,
-                    color: Color(0xFF99A1AF),
+                    color: _iconColor,
                     size: 20,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureConfirmPassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: _iconColor,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureConfirmPassword = !_obscureConfirmPassword;
+                      });
+                    },
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 16,
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
+                  enabledBorder: _border,
+                  focusedBorder: _border,
+                  errorBorder: _border,
+                  focusedErrorBorder: _border,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
 
-          // Terms checkbox
+
           Row(
             children: [
               SizedBox(
                 width: 24,
                 height: 24,
                 child: Checkbox(
-                  value: agreeToTerms,
-                  onChanged: isLoading ? null : onTermsChanged,
+                  value: widget.agreeToTerms,
+                  onChanged: widget.isLoading ? null : widget.onTermsChanged,
                   activeColor: const Color(0xFF72BF83),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
+                  shape: _checkboxShape,
                 ),
               ),
               const SizedBox(width: 8),
@@ -331,25 +305,22 @@ class RegisterForm extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // Register button
           SizedBox(
             width: double.infinity,
             height: 51,
             child: ElevatedButton(
-              onPressed: (!agreeToTerms || isLoading)
+              onPressed: (!widget.agreeToTerms || widget.isLoading)
                   ? null
-                  : () => onRegister(),
+                  : () => widget.onRegister(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF72BF83),
-                disabledBackgroundColor: const Color(
-                  0xFF72BF83,
-                ).withOpacity(0.5),
+                disabledBackgroundColor: const Color(0x8072BF83),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
               child: Text(
-                isLoading ? 'Đang đăng ký...' : 'Đăng ký',
+                widget.isLoading ? 'Đang đăng ký...' : 'Đăng ký',
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16,

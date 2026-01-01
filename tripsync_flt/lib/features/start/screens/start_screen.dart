@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// import '../../auth/presentation/screens/login_screen.dart';
 import '../../auth/presentation/screens/login_screen.dart';
 
 class StartScreen extends StatelessWidget {
@@ -21,7 +20,13 @@ class _BackgroundImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox.expand(
-      child: Image.asset("assets/images/app/start.jpg", fit: BoxFit.cover),
+      child: Image.asset(
+        "assets/images/app/start.jpg",
+        fit: BoxFit.cover,
+        cacheWidth: 540,
+        cacheHeight: 1200,
+        filterQuality: FilterQuality.medium,
+      ),
     );
   }
 }
@@ -41,11 +46,11 @@ class _ContentOverlay extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _LogoTitle(),
+              const _LogoTitle(),
               const SizedBox(height: 20),
-              _WelcomeMessage(),
+              const _WelcomeMessage(),
               const SizedBox(height: 16),
-              _StartButton(),
+              const _StartButton(),
               const SizedBox(height: 40),
             ],
           ),
@@ -56,6 +61,8 @@ class _ContentOverlay extends StatelessWidget {
 }
 
 class _LogoTitle extends StatelessWidget {
+  const _LogoTitle();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -63,7 +70,7 @@ class _LogoTitle extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(color: Colors.white, width: 1),
         borderRadius: BorderRadius.circular(22),
-        color: Colors.black.withOpacity(0.2),
+        color: const Color(0x33000000),
       ),
       child: const Text(
         "TripSync",
@@ -102,16 +109,18 @@ class _WelcomeMessage extends StatelessWidget {
 }
 
 class _StartButton extends StatelessWidget {
+  const _StartButton();
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueGrey[100],
+          backgroundColor: const Color(0xFFE0E0E0),
           foregroundColor: Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(34),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(34)),
           ),
           padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 30),
           textStyle: const TextStyle(

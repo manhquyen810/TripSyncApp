@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class LoginForm extends StatelessWidget {
+class LoginForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController emailController;
   final TextEditingController passwordController;
@@ -18,18 +18,39 @@ class LoginForm extends StatelessWidget {
     this.isLoading = false,
   });
 
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
   static final RegExp _emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+  static const _labelStyle = TextStyle(
+    fontFamily: 'Poppins',
+    fontSize: 14,
+    color: Color(0xFF6A7282),
+    height: 1.43,
+  );
+  static const _hintStyle = TextStyle(
+    fontFamily: 'Poppins',
+    fontSize: 16,
+    color: Color(0x800A0A0A),
+  );
+  static const _borderRadius = BorderRadius.all(Radius.circular(16));
+  static const _border = OutlineInputBorder(
+    borderRadius: _borderRadius,
+    borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+  );
+  
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: formKey,
-      // Validate per-field as the user interacts, not the whole form.
+      key: widget.formKey,
       autovalidateMode: AutovalidateMode.disabled,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          // Email field
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -37,63 +58,42 @@ class LoginForm extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 3),
                 child: Text(
                   'Email',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Color(0xFF6A7282),
-                    height: 1.43,
-                  ),
+                  style: _labelStyle,
                 ),
               ),
               TextFormField(
-                controller: emailController,
-                enabled: !isLoading,
+                controller: widget.emailController,
+                enabled: !widget.isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                keyboardType: TextInputType.emailAddress,
+                enableSuggestions: false,
+                autocorrect: false,
                 validator: (value) {
                   final v = (value ?? '').trim();
                   if (v.isEmpty) return 'Vui lòng nhập email';
                   if (!_emailRegex.hasMatch(v)) return 'Email không hợp lệ';
                   return null;
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Nhập email',
-                  hintStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    color: const Color(0xFF0A0A0A).withOpacity(0.5),
-                  ),
-                  prefixIcon: const Icon(
+                  hintStyle: _hintStyle,
+                  prefixIcon: Icon(
                     Icons.email_outlined,
                     color: Color(0xFF99A1AF),
                     size: 20,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
+                  contentPadding: EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 16,
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
+                  enabledBorder: _border,
+                  focusedBorder: _border,
+                  errorBorder: _border,
+                  focusedErrorBorder: _border,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 19),
-          // Password field
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -101,19 +101,16 @@ class LoginForm extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 3),
                 child: Text(
                   'Mật khẩu',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Color(0xFF6A7282),
-                    height: 1.43,
-                  ),
+                  style: _labelStyle,
                 ),
               ),
               TextFormField(
-                controller: passwordController,
-                enabled: !isLoading,
+                controller: widget.passwordController,
+                enabled: !widget.isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                obscureText: true,
+                obscureText: _obscurePassword,
+                enableSuggestions: false,
+                autocorrect: false,
                 validator: (value) {
                   final v = (value ?? '');
                   if (v.isEmpty) return 'Vui lòng nhập mật khẩu';
@@ -122,44 +119,41 @@ class LoginForm extends StatelessWidget {
                 },
                 decoration: InputDecoration(
                   hintText: 'Nhập mật khẩu',
-                  hintStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    color: const Color(0xFF0A0A0A).withOpacity(0.5),
-                  ),
+                  hintStyle: _hintStyle,
                   prefixIcon: const Icon(
                     Icons.lock_outline,
                     color: Color(0xFF99A1AF),
                     size: 20,
                   ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: const Color(0xFF99A1AF),
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 16,
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
+                  enabledBorder: _border,
+                  focusedBorder: _border,
+                  errorBorder: _border,
+                  focusedErrorBorder: _border,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 19),
-          // Forgot password button
           TextButton(
-            onPressed: isLoading ? null : onForgotPassword,
+            onPressed: widget.isLoading ? null : widget.onForgotPassword,
             child: const Text(
               'Quên mật khẩu?',
               style: TextStyle(
@@ -170,12 +164,11 @@ class LoginForm extends StatelessWidget {
               ),
             ),
           ),
-          // Login button
           SizedBox(
             width: double.infinity,
             height: 51,
             child: ElevatedButton(
-              onPressed: isLoading ? null : () => onLogin(),
+              onPressed: widget.isLoading ? null : () => widget.onLogin(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF72BF83),
                 disabledBackgroundColor: const Color(0xFF72BF83),
@@ -184,7 +177,7 @@ class LoginForm extends StatelessWidget {
                 ),
               ),
               child: Text(
-                isLoading ? 'Đang đăng nhập...' : 'Đăng nhập',
+                widget.isLoading ? 'Đang đăng nhập...' : 'Đăng nhập',
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16,

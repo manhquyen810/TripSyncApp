@@ -10,19 +10,32 @@ abstract interface class AuthRemoteDataSource {
     required String name,
   });
 
-  /// Swagger defines this endpoint as `application/x-www-form-urlencoded`.
   Future<Map<String, dynamic>> login({
     required String username,
     required String password,
   });
 
-  /// Optional per OpenAPI security scheme tokenUrl.
   Future<Map<String, dynamic>> token({
     required String username,
     required String password,
   });
 
   Future<Map<String, dynamic>> me();
+
+  Future<Map<String, dynamic>> forgotPassword({
+    required String email,
+  });
+
+  Future<Map<String, dynamic>> verifyOtp({
+    required String email,
+    required String otp,
+  });
+
+  Future<Map<String, dynamic>> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -79,6 +92,52 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<Map<String, dynamic>> me() async {
     final response = await _client.get<dynamic>(ApiEndpoints.usersMe);
+    return _asJsonMap(response.data);
+  }
+
+  @override
+  Future<Map<String, dynamic>> forgotPassword({
+    required String email,
+  }) async {
+    final response = await _client.post<dynamic>(
+      ApiEndpoints.authForgotPassword,
+      data: <String, dynamic>{'email': email},
+    );
+
+    return _asJsonMap(response.data);
+  }
+
+  @override
+  Future<Map<String, dynamic>> verifyOtp({
+    required String email,
+    required String otp,
+  }) async {
+    final response = await _client.post<dynamic>(
+      ApiEndpoints.authVerifyOtp,
+      data: <String, dynamic>{
+        'email': email,
+        'otp': otp,
+      },
+    );
+
+    return _asJsonMap(response.data);
+  }
+
+  @override
+  Future<Map<String, dynamic>> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    final response = await _client.post<dynamic>(
+      ApiEndpoints.authResetPassword,
+      data: <String, dynamic>{
+        'email': email,
+        'otp': otp,
+        'new_password': newPassword,
+      },
+    );
+
     return _asJsonMap(response.data);
   }
 }

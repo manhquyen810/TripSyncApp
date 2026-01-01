@@ -32,16 +32,13 @@ class TripCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: imageHeight,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: Image.asset(
+            ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Container(
+                height: imageHeight,
+                child: Stack(
+                  children: [
+                    Image.asset(
                       imageUrl,
                       width: cardWidth,
                       height: imageHeight,
@@ -51,20 +48,24 @@ class TripCard extends StatelessWidget {
                         child: const Icon(Icons.image, size: 50),
                       ),
                     ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24),
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.6),
-                        ],
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      height: imageHeight * 0.5,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.6),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
                   Positioned(
                     left: 12,
                     right: 12,
@@ -111,11 +112,11 @@ class TripCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                ],
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 8),
-            // Member Info Row
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
