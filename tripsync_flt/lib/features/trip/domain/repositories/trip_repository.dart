@@ -3,6 +3,15 @@ import 'dart:typed_data';
 abstract interface class TripRepository {
   Future<Map<String, dynamic>> listTrips();
 
+  Future<Map<String, dynamic>> getTripDetail({required int tripId});
+
+  Future<Map<String, dynamic>> listTripMembers({required int tripId});
+
+  Future<Map<String, dynamic>> addTripMember({
+    required int tripId,
+    required String userEmail,
+  });
+
   Future<Map<String, dynamic>> createTrip({
     required String name,
     required String destination,
@@ -26,4 +35,6 @@ abstract interface class TripRepository {
     required int tripId,
     required String coverImageUrl,
   });
+
+  Future<Map<String, dynamic>> deleteTrip({required int tripId});
 }

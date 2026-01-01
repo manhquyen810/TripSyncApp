@@ -14,6 +14,8 @@ class MemberAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final normalizedUrl = imageUrl?.trim();
+
     return Container(
       width: size,
       height: size,
@@ -23,29 +25,36 @@ class MemberAvatar extends StatelessWidget {
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white.withOpacity(0.9), width: 2),
       ),
-      child: imageUrl != null
-          ? ClipOval(
-              child: Image.network(
-                imageUrl!,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Center(
-                  child: Image.asset(
-                    'assets/icons/person.png',
-                    width: 15,
-                    height: 15,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            )
-          : Center(
-              child: Image.asset(
-                'assets/icons/person.png',
-                width: 15,
-                height: 15,
-                color: Colors.white,
-              ),
-            ),
+      child: (normalizedUrl != null && normalizedUrl.isNotEmpty)
+          ? ClipOval(child: _buildImage(normalizedUrl))
+          : _buildFallbackIcon(),
+    );
+  }
+
+  Widget _buildImage(String url) {
+    if (url.startsWith('assets/')) {
+      return Image.asset(
+        url,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildFallbackIcon(),
+      );
+    }
+
+    return Image.network(
+      url,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) => _buildFallbackIcon(),
+    );
+  }
+
+  Widget _buildFallbackIcon() {
+    return Center(
+      child: Image.asset(
+        'assets/icons/person.png',
+        width: 15,
+        height: 15,
+        color: Colors.white,
+      ),
     );
   }
 }

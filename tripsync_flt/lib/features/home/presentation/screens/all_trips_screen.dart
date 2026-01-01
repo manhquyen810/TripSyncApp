@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/auth_token_store.dart';
 import '../../../../core/network/exceptions.dart';
+import '../../../../shared/styles/app_colors.dart';
 import '../../../../shared/widgets/top_toast.dart';
 import '../widgets/all_trips_header.dart';
 import '../widgets/all_trips_search_bar.dart';
@@ -26,6 +26,98 @@ class _AllTripsScreenState extends State<AllTripsScreen> {
   late Future<List<Trip>> _tripsFuture;
   bool _hasShownLoadError = false;
   String _query = '';
+
+  Future<bool> _confirmAndDeleteTrip(Trip trip) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        final shape = RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        );
+        return AlertDialog(
+          title: const Text('Xóa chuyến đi?'),
+          content: Text('Bạn có chắc muốn xóa "${trip.title}" không?'),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 44,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        shape: shape,
+                        foregroundColor: AppColors.textPrimary,
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Hủy'),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: SizedBox(
+                    height: 44,
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        shape: shape,
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Xóa'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return false;
+    if (!mounted) return false;
+
+    final tripId = trip.id;
+    if (tripId == null) {
+      if (mounted) {
+        showTopToast(
+          context,
+          message: 'Không thể xóa chuyến đi (thiếu trip_id)',
+          type: TopToastType.error,
+        );
+      }
+      return false;
+    }
+
+    try {
+      await _tripRepository.deleteTrip(tripId: tripId);
+
+      if (mounted) {
+        showTopToast(
+          context,
+          message: 'Xóa chuyến đi thành công',
+          type: TopToastType.success,
+        );
+      }
+      return true;
+    } catch (err) {
+      final msg = switch (err) {
+        TimeoutException() => 'Server đang khởi động, thử lại sau vài giây',
+        UnauthorizedException() => 'Vui lòng đăng nhập để xóa chuyến đi',
+        ApiException() => err.message,
+        _ => 'Không xóa được chuyến đi',
+      };
+      if (mounted) {
+        showTopToast(context, message: msg, type: TopToastType.error);
+      }
+      return false;
+    }
+  }
 
   @override
   void initState() {
@@ -60,8 +152,6 @@ class _AllTripsScreenState extends State<AllTripsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const borderColor = Color(0xFF959DA3);
-
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       body: SafeArea(
@@ -173,11 +263,13 @@ class _AllTripsScreenState extends State<AllTripsScreen> {
                           const SizedBox(height: 20),
                       itemBuilder: (context, index) {
                         final trip = visibleTrips[index];
-                        return TripCard(
+
+                        final card = TripCard(
                           title: trip.title,
                           location: trip.location,
                           imageUrl: trip.imageUrl,
                           memberCount: trip.memberCount,
+                          memberAvatarUrls: trip.memberAvatarUrls,
                           memberColors: trip.memberColors
                               .map(
                                 (color) => Color(
@@ -196,6 +288,40 @@ class _AllTripsScreenState extends State<AllTripsScreen> {
                               ),
                             );
                           },
+                        );
+
+                        final tripId = trip.id;
+                        if (tripId == null) return card;
+
+                        const outerRadius = 24.0;
+
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(outerRadius),
+                          child: Dismissible(
+                            key: ValueKey<int>(tripId),
+                            direction: DismissDirection.endToStart,
+                            confirmDismiss: (direction) async {
+                              if (direction != DismissDirection.endToStart) {
+                                return false;
+                              }
+                              final deleted = await _confirmAndDeleteTrip(trip);
+                              if (deleted && mounted) {
+                                _refreshTrips();
+                              }
+                              // Keep the widget in the tree; it will disappear after refresh.
+                              return false;
+                            },
+                            background: Container(
+                              color: AppColors.primary,
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              child: const Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                            ),
+                            child: card,
+                          ),
                         );
                       },
                     ),
