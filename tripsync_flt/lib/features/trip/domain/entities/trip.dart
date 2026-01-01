@@ -1,4 +1,5 @@
 class Trip {
+  final int? id;
   final String title;
   final String location;
   final String imageUrl;
@@ -11,6 +12,7 @@ class Trip {
   final int proposedCount;
 
   const Trip({
+    this.id,
     required this.title,
     required this.location,
     required this.imageUrl,

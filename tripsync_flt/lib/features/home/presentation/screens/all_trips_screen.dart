@@ -191,6 +191,10 @@ class _AllTripsScreenState extends State<AllTripsScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
+                                settings: RouteSettings(
+                                  name: '/itinerary',
+                                  arguments: trip,
+                                ),
                                 builder: (context) =>
                                     TripItineraryScreen(trip: trip),
                               ),
