@@ -9,6 +9,7 @@ class TripCard extends StatelessWidget {
   final String location;
   final String imageUrl;
   final int memberCount;
+  final List<String> memberAvatarUrls;
   final List<Color> memberColors;
   final VoidCallback? onTap;
   final double cardWidth;
@@ -20,6 +21,7 @@ class TripCard extends StatelessWidget {
     required this.location,
     required this.imageUrl,
     required this.memberCount,
+    this.memberAvatarUrls = const [],
     this.memberColors = const [],
     this.onTap,
     this.cardWidth = 320,
@@ -133,17 +135,86 @@ class TripCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Row(
-                    children: memberColors
-                        .take(3)
-                        .map((color) => MemberAvatar(color: color))
-                        .toList(),
-                  ),
+                  Row(children: _buildMemberAvatars()),
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  List<Widget> _buildMemberAvatars() {
+    final normalizedAvatarUrls = memberAvatarUrls
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty)
+        .toList(growable: false);
+
+    final avatars = <Widget>[];
+    final maxShown = 3;
+    final effectiveMemberCount = memberCount < 0 ? 0 : memberCount;
+
+    if (normalizedAvatarUrls.isNotEmpty) {
+      var shownCount = maxShown;
+      if (effectiveMemberCount < shownCount) shownCount = effectiveMemberCount;
+      if (normalizedAvatarUrls.length < shownCount) {
+        shownCount = normalizedAvatarUrls.length;
+      }
+
+      final shownUrls = normalizedAvatarUrls
+          .take(shownCount)
+          .toList(growable: false);
+      for (final url in shownUrls) {
+        avatars.add(MemberAvatar(color: Colors.grey.shade300, imageUrl: url));
+      }
+
+      final overflow = effectiveMemberCount - shownUrls.length;
+      if (overflow > 0) {
+        avatars.add(_buildOverflowAvatar(overflow));
+      }
+
+      return avatars;
+    }
+
+    var shownCount = maxShown;
+    if (effectiveMemberCount < shownCount) shownCount = effectiveMemberCount;
+    if (memberColors.length < shownCount) shownCount = memberColors.length;
+
+    final shownColors = memberColors.take(shownCount).toList(growable: false);
+    for (final color in shownColors) {
+      avatars.add(MemberAvatar(color: color));
+    }
+
+    final overflow = effectiveMemberCount - shownColors.length;
+    if (overflow > 0) {
+      avatars.add(_buildOverflowAvatar(overflow));
+    }
+
+    return avatars;
+  }
+
+  Widget _buildOverflowAvatar(int overflow) {
+    return Container(
+      width: 25,
+      height: 25,
+      margin: const EdgeInsets.only(right: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade500,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white.withOpacity(0.9), width: 2),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        '+$overflow',
+        style: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+          fontFamily: 'Poppins',
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.clip,
       ),
     );
   }

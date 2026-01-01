@@ -6,6 +6,15 @@ import 'dart:typed_data';
 abstract interface class TripRemoteDataSource {
   Future<Map<String, dynamic>> listTrips();
 
+  Future<Map<String, dynamic>> getTripDetail({required int tripId});
+
+  Future<Map<String, dynamic>> listTripMembers({required int tripId});
+
+  Future<Map<String, dynamic>> addTripMember({
+    required int tripId,
+    required String userEmail,
+  });
+
   Future<Map<String, dynamic>> createTrip({
     required String name,
     required String destination,
@@ -30,6 +39,8 @@ abstract interface class TripRemoteDataSource {
     required int tripId,
     required Map<String, dynamic> payload,
   });
+
+  Future<Map<String, dynamic>> deleteTrip({required int tripId});
 }
 
 class TripRemoteDataSourceImpl implements TripRemoteDataSource {
@@ -40,6 +51,34 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
   @override
   Future<Map<String, dynamic>> listTrips() async {
     final response = await _client.get<dynamic>(ApiEndpoints.trips);
+    return _asJsonMap(response.data);
+  }
+
+  @override
+  Future<Map<String, dynamic>> getTripDetail({required int tripId}) async {
+    final response = await _client.get<dynamic>(
+      ApiEndpoints.tripDetail(tripId),
+    );
+    return _asJsonMap(response.data);
+  }
+
+  @override
+  Future<Map<String, dynamic>> listTripMembers({required int tripId}) async {
+    final response = await _client.get<dynamic>(
+      ApiEndpoints.tripMembers(tripId),
+    );
+    return _asJsonMap(response.data);
+  }
+
+  @override
+  Future<Map<String, dynamic>> addTripMember({
+    required int tripId,
+    required String userEmail,
+  }) async {
+    final response = await _client.post<dynamic>(
+      ApiEndpoints.tripMembers(tripId),
+      data: <String, dynamic>{'user_email': userEmail},
+    );
     return _asJsonMap(response.data);
   }
 
@@ -140,6 +179,14 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
     final response = await _client.put<dynamic>(
       ApiEndpoints.tripDetail(tripId),
       data: payload,
+    );
+    return _asJsonMap(response.data);
+  }
+
+  @override
+  Future<Map<String, dynamic>> deleteTrip({required int tripId}) async {
+    final response = await _client.delete<dynamic>(
+      ApiEndpoints.tripDetail(tripId),
     );
     return _asJsonMap(response.data);
   }

@@ -14,6 +14,7 @@ class ApiEndpoints {
 
   static const String trips = '/trips';
   static String tripDetail(int tripId) => '/trips/$tripId';
+  static String tripMembers(int tripId) => '/trips/$tripId/members';
   static const String tripsJoin = '/trips/join';
 
   static const String itineraryCreateDay = '/itinerary/days';
