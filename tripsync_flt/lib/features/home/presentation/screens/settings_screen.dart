@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/styles/app_colors.dart';
+import '../../../../core/network/auth_token_store.dart';
+import '../../../../routes/app_routes.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -57,7 +59,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       icon: Icons.phone_android,
                       label: 'Thông báo đẩy',
                       value: _pushNotificationsEnabled,
-                      onChanged: (v) => setState(() => _pushNotificationsEnabled = v),
+                      onChanged: (v) =>
+                          setState(() => _pushNotificationsEnabled = v),
                     ),
                     const SizedBox(height: 10),
                     _SettingsToggleRow(
@@ -133,10 +136,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       width: double.infinity,
                       height: 44,
                       child: OutlinedButton.icon(
-                        onPressed: () {
+                        onPressed: () async {
+                          await AuthTokenStore.clear();
+                          if (!context.mounted) return;
                           Navigator.of(context).pushNamedAndRemoveUntil(
-                            '/login',
+                            AppRoutes.start,
                             (route) => false,
+                            arguments: const <String, dynamic>{
+                              'openLogin': true,
+                            },
                           );
                         },
                         icon: Icon(Icons.logout, color: errorColor, size: 20),
@@ -232,10 +240,7 @@ class _SettingsNavRow extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const _SettingsNavRow({
-    required this.icon,
-    required this.label,
-  });
+  const _SettingsNavRow({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {

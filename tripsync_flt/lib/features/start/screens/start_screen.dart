@@ -1,8 +1,48 @@
 import 'package:flutter/material.dart';
 import '../../auth/presentation/screens/login_screen.dart';
 
-class StartScreen extends StatelessWidget {
+class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
+
+  static const String kOpenLoginArg = 'openLogin';
+
+  @override
+  State<StartScreen> createState() => _StartScreenState();
+}
+
+class _StartScreenState extends State<StartScreen> {
+  bool _didAutoOpenLogin = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_didAutoOpenLogin) return;
+
+    final args = ModalRoute.of(context)?.settings.arguments;
+    bool openLogin = false;
+
+    if (args is bool) {
+      openLogin = args;
+    } else if (args is Map) {
+      final map = Map<String, dynamic>.from(args);
+      final v = map[StartScreen.kOpenLoginArg];
+      if (v is bool) openLogin = v;
+    }
+
+    if (!openLogin) return;
+
+    _didAutoOpenLogin = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => const LoginScreen(),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
