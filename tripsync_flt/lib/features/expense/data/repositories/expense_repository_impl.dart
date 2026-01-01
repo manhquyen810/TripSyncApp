@@ -34,6 +34,7 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
     required double amount,
     required String description,
     String? category,
+    required int payerId,
     required List<int> involvedUserIds,
   }) async {
     final model = await _remoteDataSource.createExpense(
@@ -41,6 +42,7 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
       amount: amount,
       description: description,
       category: category,
+      payerId: payerId,
       involvedUserIds: involvedUserIds,
     );
     return model.toEntity();

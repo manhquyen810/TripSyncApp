@@ -17,6 +17,7 @@ class AddExpenseScreen extends StatefulWidget {
 
 class _AddExpenseScreenState extends State<AddExpenseScreen> {
   String? selectedCategory;
+  int? selectedPayerId;
   final Set<int> selectedMemberIds = {};
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
@@ -74,6 +75,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     _buildDescriptionSection(),
                     const SizedBox(height: 30),
                     _buildAmountSection(),
+                    const SizedBox(height: 30),
+                    _buildPayerSection(),
                     const SizedBox(height: 30),
                     _buildParticipantsSection(),
                     const SizedBox(height: 40),
@@ -251,6 +254,86 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
 
 
+  Widget _buildPayerSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Ai đã trả*',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 16),
+        FutureBuilder<List<TripMember>>(
+          future: _membersFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+            
+            if (snapshot.hasError || !snapshot.hasData) {
+              return const Text('Không thể tải danh sách thành viên');
+            }
+            
+            final members = snapshot.data!;
+            
+            return Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: members.map((member) {
+                final isSelected = selectedPayerId == member.id;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedPayerId = member.id;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                        color: isSelected
+                            ? const Color(0xFF00C950)
+                            : const Color(0xFF99A1AF),
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (isSelected)
+                          const Icon(
+                            Icons.check_circle,
+                            color: Color(0xFF00C950),
+                            size: 20,
+                          ),
+                        if (isSelected) const SizedBox(width: 6),
+                        Container(
+                          width: 18,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade200,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(member.name, style: const TextStyle(fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   Widget _buildParticipantsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,6 +484,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       return;
     }
 
+    if (selectedPayerId == null) {
+      showTopToast(context, message: 'Vui lòng chọn người đã trả', type: TopToastType.error);
+      return;
+    }
+
     if (selectedMemberIds.isEmpty) {
       showTopToast(context, message: 'Vui lòng chọn người tham gia', type: TopToastType.error);
       return;
@@ -416,6 +504,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         amount: amount,
         description: descriptionController.text.trim(),
         category: selectedCategory,
+        payerId: selectedPayerId!,
         involvedUserIds: selectedMemberIds.toList(),
       );
 

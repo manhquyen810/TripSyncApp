@@ -12,6 +12,7 @@ abstract class ExpenseRepository {
     required double amount,
     required String description,
     String? category,
+    required int payerId,
     required List<int> involvedUserIds,
   });
   Future<void> createSettlement({
