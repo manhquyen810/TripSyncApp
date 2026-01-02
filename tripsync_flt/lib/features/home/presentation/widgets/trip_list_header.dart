@@ -14,6 +14,8 @@ class TripListHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const activeColor = Color(0xFF00C950);
+
     return Padding(
       padding: padding,
       child: Row(
@@ -33,16 +35,25 @@ class TripListHeader extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  '$activeTripCount chuyến đi đang hoạt động',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF959DA3),
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w400,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.circle, size: 10, color: activeColor),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        '$activeTripCount chuyến đi đang hoạt động',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: activeColor,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w400,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

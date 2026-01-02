@@ -37,9 +37,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> forgotPassword({
-    required String email,
-  }) async {
+  Future<Map<String, dynamic>> forgotPassword({required String email}) async {
     return _remote.forgotPassword(email: email);
   }
 
@@ -61,6 +59,27 @@ class AuthRepositoryImpl implements AuthRepository {
       email: email,
       otp: otp,
       newPassword: newPassword,
+    );
+  }
+
+  @override
+  Future<Map<String, dynamic>> updateProfile({
+    required String name,
+    String? avatarUrl,
+  }) async {
+    return _remote.updateProfile(name: name, avatarUrl: avatarUrl);
+  }
+
+  @override
+  Future<String> uploadAvatar({
+    String? filePath,
+    List<int>? bytes,
+    String? filename,
+  }) {
+    return _remote.uploadAvatar(
+      filePath: filePath,
+      bytes: bytes,
+      filename: filename,
     );
   }
 }

@@ -10,9 +10,11 @@ class ApiEndpoints {
   static const String authResetPassword = '/auth/reset-password';
 
   static const String usersMe = '/users/me';
+  static const String usersMeAvatarUpload = '/users/me/avatar';
 
   static const String trips = '/trips';
   static String tripDetail(int tripId) => '/trips/$tripId';
+  static String tripMembers(int tripId) => '/trips/$tripId/members';
   static const String tripsJoin = '/trips/join';
 
   static const String itineraryCreateDay = '/itinerary/days';

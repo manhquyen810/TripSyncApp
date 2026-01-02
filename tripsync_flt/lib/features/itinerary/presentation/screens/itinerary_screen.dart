@@ -1,6 +1,11 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'propose_activity_screen.dart';
+import '../../../../shared/widgets/add_floating_button.dart';
 import '../../../../shared/widgets/trip_bottom_navigation.dart';
+import '../../../../shared/widgets/trip_header.dart';
 import '../../../trip/domain/entities/trip.dart';
 import '../../../home/presentation/widgets/member_avatar.dart';
 
@@ -17,7 +22,7 @@ class TripItineraryScreen extends StatelessWidget {
         child: Column(
           children: [
             // Header Section
-            _buildHeader(context),
+            TripHeader(title: trip.title, location: trip.location),
 
             // Trip Image and Info
             Expanded(
@@ -45,17 +50,12 @@ class TripItineraryScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 80),
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ProposeActivityScreen()),
-            );
-          },
-          backgroundColor: const Color(0xFF00C950),
-          child: const Icon(Icons.add, color: Colors.white),
-        ),
+      floatingActionButton: AddFloatingButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const ProposeActivityScreen()),
+          );
+        },
       ),
     );
   }
@@ -120,16 +120,12 @@ class TripItineraryScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
-        child: Container(
+        child: SizedBox(
           height: 235,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(trip.imageUrl),
-              fit: BoxFit.cover,
-            ),
-          ),
           child: Stack(
+            fit: StackFit.expand,
             children: [
+              _buildCoverImage(trip.imageUrl),
               Positioned(
                 left: 11,
                 bottom: 10,
@@ -170,6 +166,70 @@ class TripItineraryScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildCoverImage(String rawUrl) {
+    final url = _coerceCoverUrl(rawUrl);
+    final placeholder = Container(
+      color: Colors.grey.shade300,
+      alignment: Alignment.center,
+      child: const Icon(Icons.image, size: 50),
+    );
+
+    if (url.isEmpty) return placeholder;
+
+    if (url.startsWith('assets/')) {
+      return Image.asset(
+        url,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => placeholder,
+      );
+    }
+
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return Image.network(
+        url,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => placeholder,
+      );
+    }
+
+    if (kIsWeb) return placeholder;
+
+    return Image.file(
+      File(url),
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) => placeholder,
+    );
+  }
+
+  String _coerceCoverUrl(String raw) {
+    var value = raw.trim();
+    if (value.isEmpty) return value;
+
+    if (value.startsWith('assets/')) {
+      final rest = value.substring('assets/'.length);
+      if (_looksLikeEncodedHttpUrl(rest)) value = rest;
+    }
+
+    for (var i = 0; i < 2; i++) {
+      if (!_looksLikeEncodedHttpUrl(value)) break;
+      try {
+        value = Uri.decodeFull(value).trim();
+      } catch (_) {
+        break;
+      }
+    }
+
+    return value;
+  }
+
+  bool _looksLikeEncodedHttpUrl(String value) {
+    final lower = value.toLowerCase();
+    return lower.startsWith('http%3a') ||
+        lower.startsWith('https%3a') ||
+        lower.startsWith('http%253a') ||
+        lower.startsWith('https%253a');
   }
 
   Widget _buildMemberInfo() {

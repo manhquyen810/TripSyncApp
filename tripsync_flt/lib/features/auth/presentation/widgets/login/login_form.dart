@@ -24,6 +24,23 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   static final RegExp _emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+  static const _labelStyle = TextStyle(
+    fontFamily: 'Poppins',
+    fontSize: 14,
+    color: Color(0xFF6A7282),
+    height: 1.43,
+  );
+  static const _hintStyle = TextStyle(
+    fontFamily: 'Poppins',
+    fontSize: 16,
+    color: Color(0x800A0A0A),
+  );
+  static const _borderRadius = BorderRadius.all(Radius.circular(16));
+  static const _border = OutlineInputBorder(
+    borderRadius: _borderRadius,
+    borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+  );
+  
   bool _obscurePassword = true;
 
   @override
@@ -41,57 +58,37 @@ class _LoginFormState extends State<LoginForm> {
                 padding: EdgeInsets.only(bottom: 3),
                 child: Text(
                   'Email',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Color(0xFF6A7282),
-                    height: 1.43,
-                  ),
+                  style: _labelStyle,
                 ),
               ),
               TextFormField(
                 controller: widget.emailController,
                 enabled: !widget.isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                keyboardType: TextInputType.emailAddress,
+                enableSuggestions: false,
+                autocorrect: false,
                 validator: (value) {
                   final v = (value ?? '').trim();
                   if (v.isEmpty) return 'Vui lòng nhập email';
                   if (!_emailRegex.hasMatch(v)) return 'Email không hợp lệ';
                   return null;
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Nhập email',
-                  hintStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    color: const Color(0xFF0A0A0A).withOpacity(0.5),
-                  ),
-                  prefixIcon: const Icon(
+                  hintStyle: _hintStyle,
+                  prefixIcon: Icon(
                     Icons.email_outlined,
                     color: Color(0xFF99A1AF),
                     size: 20,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
+                  contentPadding: EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 16,
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
+                  enabledBorder: _border,
+                  focusedBorder: _border,
+                  errorBorder: _border,
+                  focusedErrorBorder: _border,
                 ),
               ),
             ],
@@ -104,12 +101,7 @@ class _LoginFormState extends State<LoginForm> {
                 padding: EdgeInsets.only(bottom: 3),
                 child: Text(
                   'Mật khẩu',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Color(0xFF6A7282),
-                    height: 1.43,
-                  ),
+                  style: _labelStyle,
                 ),
               ),
               TextFormField(
@@ -117,6 +109,8 @@ class _LoginFormState extends State<LoginForm> {
                 enabled: !widget.isLoading,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 obscureText: _obscurePassword,
+                enableSuggestions: false,
+                autocorrect: false,
                 validator: (value) {
                   final v = (value ?? '');
                   if (v.isEmpty) return 'Vui lòng nhập mật khẩu';
@@ -125,11 +119,7 @@ class _LoginFormState extends State<LoginForm> {
                 },
                 decoration: InputDecoration(
                   hintText: 'Nhập mật khẩu',
-                  hintStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    color: const Color(0xFF0A0A0A).withOpacity(0.5),
-                  ),
+                  hintStyle: _hintStyle,
                   prefixIcon: const Icon(
                     Icons.lock_outline,
                     color: Color(0xFF99A1AF),
@@ -153,22 +143,10 @@ class _LoginFormState extends State<LoginForm> {
                     horizontal: 16,
                     vertical: 16,
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
+                  enabledBorder: _border,
+                  focusedBorder: _border,
+                  errorBorder: _border,
+                  focusedErrorBorder: _border,
                 ),
               ),
             ],
