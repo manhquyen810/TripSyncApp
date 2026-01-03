@@ -25,7 +25,11 @@ class ExpenseScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            TripHeader(title: trip.title, location: trip.location),
+            TripHeader(
+              title: trip.title,
+              location: trip.location,
+              onSettingsPressed: () {},
+            ),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.only(bottom: 110),
