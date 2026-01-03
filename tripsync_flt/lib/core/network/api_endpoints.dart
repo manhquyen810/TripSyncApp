@@ -18,13 +18,24 @@ class ApiEndpoints {
   static const String tripsJoin = '/trips/join';
 
   static const String itineraryCreateDay = '/itinerary/days';
+  static String itineraryTrip(int tripId) => '/itinerary/trip/$tripId';
+  static String itineraryDayActivities(int dayId) =>
+      '/itinerary/days/$dayId/activities';
+
   static const String itineraryActivities = '/itinerary/activities';
+  static String itineraryActivity(int activityId) =>
+      '/itinerary/activities/$activityId';
+  static String itineraryConfirmActivity(int activityId) =>
+      '/itinerary/activities/$activityId/confirm';
   static String itineraryVoteActivity(int activityId) =>
       '/itinerary/activities/$activityId/vote';
   static String itineraryActivitiesByDay({
     required int tripId,
     required int dayNumber,
   }) => '/itinerary/trips/$tripId/days/$dayNumber/activities';
+
+  static String itineraryTripLocations(int tripId) =>
+      '/itinerary/trip/$tripId/locations';
 
   static const String expenses = '/expenses';
   static String expensesByTrip(int tripId) => '/expenses/trip/$tripId';

@@ -325,9 +325,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 cardWidth: cardWidth,
                 imageHeight: imageHeight,
                 onTap: () {
-                  Navigator.of(
-                    context,
-                  ).pushNamed(AppRoutes.itinerary, arguments: trip);
+                  Navigator.of(context)
+                      .pushNamed(AppRoutes.itinerary, arguments: trip)
+                      .then((changed) {
+                        if (changed == true) {
+                          _refreshTrips();
+                        }
+                      });
                 },
               ),
             );

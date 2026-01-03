@@ -10,6 +10,33 @@ class TripListLoader {
   static final Map<int, _TripMembersSnapshot> _membersCache =
       <int, _TripMembersSnapshot>{};
 
+  static void invalidateMembersCache({int? tripId}) {
+    if (tripId == null) {
+      _membersCache.clear();
+      return;
+    }
+    _membersCache.remove(tripId);
+  }
+
+  static void setMembersSnapshot({
+    required int tripId,
+    required int memberCount,
+    required List<String> avatarUrls,
+  }) {
+    _membersCache[tripId] = _TripMembersSnapshot(
+      memberCount: memberCount,
+      avatarUrls: List<String>.from(avatarUrls),
+    );
+  }
+
+  static int? getCachedMemberCount(int tripId) {
+    return _membersCache[tripId]?.memberCount;
+  }
+
+  static List<String>? getCachedMemberAvatarUrls(int tripId) {
+    return _membersCache[tripId]?.avatarUrls;
+  }
+
   static Future<List<Trip>> loadTrips(TripRepository repository) async {
     final raw = await repository.listTrips();
     final data = raw['data'];
@@ -62,6 +89,7 @@ class TripListLoader {
       final serverCover = _extractServerCoverUrl(tripJson);
 
       final inviteCodeKey = _parseTripKey(tripJson['invite_code']);
+      final inviteCode = inviteCodeKey ?? '';
       final savedCoverById = tripKey != null ? coverById[tripKey] : null;
       final savedCover = (savedCoverById != null && savedCoverById.isNotEmpty)
           ? savedCoverById
@@ -81,6 +109,7 @@ class TripListLoader {
                       ? savedCover
                       : fallbackCover),
           ),
+          inviteCode: inviteCode,
           memberCount: memberCount,
           memberAvatarUrls: memberAvatarUrls,
           memberColors: const ['#A8E6CF', '#E59600', '#FF6B6B'],
@@ -186,6 +215,7 @@ class TripListLoader {
         title: current.title,
         location: current.location,
         imageUrl: current.imageUrl,
+        inviteCode: current.inviteCode,
         memberCount: nextCount,
         memberAvatarUrls: nextUrls,
         memberColors: current.memberColors,

@@ -7,12 +7,14 @@ class TripHeader extends StatelessWidget {
   final String title;
   final String location;
   final VoidCallback? onBackPressed;
+  final VoidCallback? onSettingsPressed;
 
   const TripHeader({
     super.key,
     required this.title,
     required this.location,
     this.onBackPressed,
+    this.onSettingsPressed,
   });
 
   void _navigateBackToHome(BuildContext context) {
@@ -92,8 +94,8 @@ class TripHeader extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.black),
-            onPressed: () {},
+            icon: const Icon(Icons.settings, color: Colors.black),
+            onPressed: onSettingsPressed,
           ),
         ],
       ),

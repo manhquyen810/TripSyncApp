@@ -280,13 +280,17 @@ class _AllTripsScreenState extends State<AllTripsScreen> {
                           cardWidth: double.infinity,
                           imageHeight: 235,
                           onTap: () {
-                            Navigator.push(
+                            Navigator.push<bool>(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
                                     TripItineraryScreen(trip: trip),
                               ),
-                            );
+                            ).then((changed) {
+                              if (changed == true) {
+                                _refreshTrips();
+                              }
+                            });
                           },
                         );
 

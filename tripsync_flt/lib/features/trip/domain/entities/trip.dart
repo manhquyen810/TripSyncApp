@@ -3,6 +3,7 @@ class Trip {
   final String title;
   final String location;
   final String imageUrl;
+  final String inviteCode;
   final int memberCount;
   final List<String> memberAvatarUrls;
   final List<String> memberColors;
@@ -17,6 +18,7 @@ class Trip {
     required this.title,
     required this.location,
     required this.imageUrl,
+    this.inviteCode = '',
     required this.memberCount,
     this.memberAvatarUrls = const <String>[],
     required this.memberColors,

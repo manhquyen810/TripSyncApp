@@ -1,8 +1,25 @@
 import 'package:flutter/material.dart';
 import '../widgets/propose_activity_widgets.dart';
+import '../widgets/propose_activity_form_widgets.dart';
+import 'choose_location_screen.dart';
+import '../models/picked_location.dart';
+import '../../../../core/network/api_client.dart';
+import '../../../../core/network/api_endpoints.dart';
+import '../../../../core/network/auth_token_store.dart';
 
 class ProposeActivityScreen extends StatefulWidget {
-  const ProposeActivityScreen({super.key});
+  final int tripId;
+  final int initialDayNumber;
+  final DateTime? tripStartDate;
+  final DateTime? tripEndDate;
+
+  const ProposeActivityScreen({
+    super.key,
+    required this.tripId,
+    required this.initialDayNumber,
+    this.tripStartDate,
+    this.tripEndDate,
+  });
 
   @override
   State<ProposeActivityScreen> createState() => _ProposeActivityScreenState();
@@ -38,6 +55,11 @@ class _ProposeActivityScreenState extends State<ProposeActivityScreen> {
   DateTime? _date;
   TimeOfDay? _time;
 
+  PickedLocation? _pickedLocation;
+
+  late final ApiClient _apiClient;
+  bool _submitting = false;
+
   int _selectedTypeIndex = 0;
 
   final List<ProposeActivityType> _types = const [
@@ -53,6 +75,29 @@ class _ProposeActivityScreenState extends State<ProposeActivityScreen> {
       icon: Icons.directions_car_filled_outlined,
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _apiClient = ApiClient(authTokenProvider: AuthTokenStore.getAccessToken);
+
+    // Prefill date based on the currently selected day (if we can infer it).
+    final start = widget.tripStartDate;
+    final end = widget.tripEndDate;
+    if (start != null) {
+      var offsetDays = ((widget.initialDayNumber - 1).clamp(0, 3650)).toInt();
+
+      if (end != null) {
+        final maxOffset = end.difference(_dateOnly(start)).inDays;
+        if (maxOffset >= 0) {
+          if (offsetDays < 0) offsetDays = 0;
+          if (offsetDays > maxOffset) offsetDays = maxOffset;
+        }
+      }
+
+      _date = _dateOnly(start).add(Duration(days: offsetDays));
+    }
+  }
 
   @override
   void dispose() {
@@ -72,191 +117,198 @@ class _ProposeActivityScreenState extends State<ProposeActivityScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.only(top: 40, bottom: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              ProposeActivityHeader(onBack: () => Navigator.pop(context)),
-              const SizedBox(height: 36),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Loại hoạt động*',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    const SizedBox(height: 9),
-                    ProposeActivityTypeSelector(
-                      green: _green,
-                      surface: _surface,
-                      types: _types,
-                      selectedIndex: _selectedTypeIndex,
-                      onSelect: (index) =>
-                          setState(() => _selectedTypeIndex = index),
-                    ),
-                    const SizedBox(height: 36),
-                    ProposeActivityLabeledTextField(
-                      label: 'Tên hoạt động *',
-                      hintText: 'VD:Sapa- Xứ xở sương mù',
-                      controller: _nameCtrl,
-                      focusNode: _nameFocus,
-                      green: _green,
-                      muted: _muted,
-                      hintColor: _hint,
-                    ),
-                    const SizedBox(height: 36),
-                    ProposeActivityLabeledTextField(
-                      label: 'Mô tả *',
-                      hintText: 'VD:Sapa- Xứ xở sương mù',
-                      controller: _descriptionCtrl,
-                      focusNode: _descriptionFocus,
-                      maxLines: 6,
-                      minHeight: 117,
-                      green: _green,
-                      muted: _muted,
-                      hintColor: _hint,
-                    ),
-                    const SizedBox(height: 24),
-                    ProposeActivityLocationField(
-                      controller: _locationCtrl,
-                      focusNode: _locationFocus,
-                      green: _green,
-                      muted: _muted,
-                      hintColor: _hint,
-                    ),
-                    const SizedBox(height: 18),
-                    _buildDateTimeRow(context),
-                    const SizedBox(height: 24),
-                    ProposeActivityBottomButtons(
-                      onCancel: () => Navigator.pop(context),
-                      onSubmit: () => Navigator.pop(context),
-                      green: _green,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+        child: ProposeActivityBody(
+          green: _green,
+          surface: _surface,
+          muted: _muted,
+          hint: _hint,
+          types: _types,
+          selectedTypeIndex: _selectedTypeIndex,
+          onSelectType: (index) => setState(() => _selectedTypeIndex = index),
+          nameController: _nameCtrl,
+          nameFocusNode: _nameFocus,
+          descriptionController: _descriptionCtrl,
+          descriptionFocusNode: _descriptionFocus,
+          locationController: _locationCtrl,
+          locationFocusNode: _locationFocus,
+          dateText: _date == null ? 'dd/mm/yyyy' : _formatDate(_date!),
+          isDatePlaceholder: _date == null,
+          timeText: _time == null ? '--:--:--' : _formatTime(_time!),
+          isTimePlaceholder: _time == null,
+          onPickDate: _pickDate,
+          onPickTime: _pickTime,
+          onPickLocation: _pickLocation,
+          onCancel: () => Navigator.pop(context),
+          onSubmit: _submitting ? null : _handleSubmit,
         ),
       ),
     );
   }
 
-  Widget _buildDateTimeRow(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildPickerField(
-            context: context,
-            label: 'Ngày *',
-            labelIcon: Icons.calendar_month_outlined,
-            value: _date == null ? 'dd/mm/yyyy' : _formatDate(_date!),
-            isPlaceholder: _date == null,
-            trailingIcon: Icons.calendar_month_outlined,
-            onTap: () async {
-              final now = DateTime.now();
-              final picked = await showDatePicker(
-                context: context,
-                initialDate: _date ?? now,
-                firstDate: DateTime(now.year - 5),
-                lastDate: DateTime(now.year + 5),
-              );
-              if (picked == null) return;
-              setState(() => _date = picked);
-            },
-          ),
-        ),
-        const SizedBox(width: 19),
-        Expanded(
-          child: _buildPickerField(
-            context: context,
-            label: 'Giờ *',
-            labelIcon: Icons.access_time,
-            value: _time == null ? '--:--:--' : _formatTime(_time!),
-            isPlaceholder: _time == null,
-            trailingIcon: Icons.access_time,
-            onTap: () async {
-              final picked = await showTimePicker(
-                context: context,
-                initialTime: _time ?? TimeOfDay.now(),
-              );
-              if (picked == null) return;
-              setState(() => _time = picked);
-            },
-          ),
-        ),
-      ],
+  Future<void> _pickLocation() async {
+    final selected = await Navigator.of(context).push<PickedLocation>(
+      MaterialPageRoute(builder: (_) => const ChooseLocationScreen()),
     );
+    if (selected == null) return;
+    setState(() {
+      _pickedLocation = selected;
+      _locationCtrl.text = selected.label;
+    });
   }
 
-  Widget _buildPickerField({
-    required BuildContext context,
-    required String label,
-    required IconData labelIcon,
-    required String value,
-    required bool isPlaceholder,
-    required IconData trailingIcon,
-    required VoidCallback onTap,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(labelIcon, size: 24, color: Colors.black),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 14,
-                height: 20 / 14,
-                color: Colors.black,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: _muted.withOpacity(0.3), width: 1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 14,
-                      height: 20 / 14,
-                      color: isPlaceholder ? _hint : Colors.black,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                Icon(trailingIcon, size: 20, color: Colors.black),
-              ],
-            ),
-          ),
-        ),
-      ],
+  Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final start = widget.tripStartDate;
+    final end = widget.tripEndDate;
+
+    // Constrain to the trip duration if available.
+    final firstDate = start != null ? _dateOnly(start) : DateTime(now.year - 5);
+    final lastDate = end != null ? _dateOnly(end) : DateTime(now.year + 5);
+
+    final effectiveFirst = lastDate.isBefore(firstDate) ? lastDate : firstDate;
+    final effectiveLast = lastDate.isBefore(firstDate) ? firstDate : lastDate;
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: (_date != null)
+          ? _dateOnly(_date!)
+          : (start != null ? _dateOnly(start) : now),
+      firstDate: effectiveFirst,
+      lastDate: effectiveLast,
     );
+    if (picked == null) return;
+    setState(() => _date = picked);
+  }
+
+  Future<void> _pickTime() async {
+    if (_date == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng chọn ngày trước.')),
+      );
+      return;
+    }
+
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _time ?? TimeOfDay.now(),
+    );
+    if (picked == null) return;
+    setState(() => _time = picked);
+  }
+
+  void _handleSubmit() {
+    _submit();
+  }
+
+  Future<void> _submit() async {
+    if (_submitting) return;
+
+    final title = _nameCtrl.text.trim();
+    final description = _descriptionCtrl.text.trim();
+    final locationText = _locationCtrl.text.trim();
+    final selectedTime = _time;
+
+    void showError(String message) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
+
+    if (title.isEmpty) {
+      showError('Vui lòng nhập tên hoạt động.');
+      return;
+    }
+    if (description.isEmpty) {
+      showError('Vui lòng nhập mô tả.');
+      return;
+    }
+    if (locationText.isEmpty) {
+      showError('Vui lòng chọn địa điểm.');
+      return;
+    }
+    if (selectedTime == null) {
+      showError('Vui lòng chọn giờ.');
+      return;
+    }
+
+    final targetDayNumber = _resolveTargetDayNumber();
+
+    if (!_isDayNumberInTripRange(targetDayNumber)) {
+      showError('Ngày chọn phải nằm trong thời gian chuyến đi.');
+      return;
+    }
+
+    setState(() => _submitting = true);
+    try {
+      final dayRes = await _apiClient.post<dynamic>(
+        ApiEndpoints.itineraryCreateDay,
+        queryParameters: <String, dynamic>{
+          'trip_id': widget.tripId,
+          'day_number': targetDayNumber,
+        },
+      );
+
+      final dayId = _extractDayId(dayRes.data);
+      if (dayId == null) {
+        throw Exception('Không lấy được day_id từ server.');
+      }
+
+      final picked = _pickedLocation;
+      await _apiClient.post<dynamic>(
+        ApiEndpoints.itineraryActivities,
+        data: <String, dynamic>{
+          'day_id': dayId,
+          'title': title,
+          'description': description,
+          'location': locationText,
+          'location_lat': picked?.latitude.toString(),
+          'location_long': picked?.longitude.toString(),
+          'start_time': _formatTime(selectedTime),
+        },
+      );
+
+      if (!mounted) return;
+      Navigator.of(context).pop<int>(targetDayNumber);
+    } catch (e) {
+      showError(e.toString());
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
+
+  int _resolveTargetDayNumber() {
+    final start = widget.tripStartDate;
+    final selectedDate = _date;
+    if (start == null || selectedDate == null) return widget.initialDayNumber;
+
+    final diffDays = _dateOnly(
+      selectedDate,
+    ).difference(_dateOnly(start)).inDays;
+    final day = diffDays + 1;
+    if (day <= 0) return widget.initialDayNumber;
+    return day;
+  }
+
+  bool _isDayNumberInTripRange(int dayNumber) {
+    final start = widget.tripStartDate;
+    final end = widget.tripEndDate;
+    if (start == null || end == null) return true; // best-effort
+    final totalDays = end.difference(_dateOnly(start)).inDays + 1;
+    if (totalDays <= 0) return true;
+    return dayNumber >= 1 && dayNumber <= totalDays;
+  }
+
+  DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  int? _extractDayId(dynamic raw) {
+    if (raw is! Map) return null;
+    final data = raw['data'];
+    if (data is! Map) return null;
+    final id = data['id'];
+    if (id is int) return id;
+    if (id is num) return id.toInt();
+    return null;
   }
 
   String _formatDate(DateTime date) {
