@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 class ChecklistCategoryCard extends StatelessWidget {
 	final ChecklistCategoryData data;
 	final ValueChanged<int>? onItemTap;
+	final ValueChanged<int>? onItemLongPress;
 	final EdgeInsetsGeometry margin;
 
 	const ChecklistCategoryCard({
 		super.key,
 		required this.data,
 		this.onItemTap,
+		this.onItemLongPress,
 		this.margin = const EdgeInsets.symmetric(horizontal: 15),
 	});
 
@@ -42,6 +44,7 @@ class ChecklistCategoryCard extends StatelessWidget {
 							child: ChecklistItemRow(
 								data: item,
 								onTap: onItemTap == null ? null : () => onItemTap!.call(index),
+								onLongPress: onItemLongPress == null ? null : () => onItemLongPress!.call(index),
 							),
 						);
 					}),
@@ -54,13 +57,20 @@ class ChecklistCategoryCard extends StatelessWidget {
 class ChecklistItemRow extends StatelessWidget {
 	final ChecklistItemData data;
 	final VoidCallback? onTap;
+	final VoidCallback? onLongPress;
 
-	const ChecklistItemRow({super.key, required this.data, this.onTap});
+	const ChecklistItemRow({
+		super.key,
+		required this.data,
+		this.onTap,
+		this.onLongPress,
+	});
 
 	@override
 	Widget build(BuildContext context) {
 		return InkWell(
 			onTap: onTap,
+			onLongPress: onLongPress,
 			borderRadius: BorderRadius.circular(12),
 			child: Padding(
 				padding: const EdgeInsets.all(10),
@@ -175,20 +185,26 @@ class ChecklistCategoryData {
 }
 
 class ChecklistItemData {
+  final int? id;
 	final String title;
 	final bool isChecked;
+	final int? assigneeId;
 	final String? assigneeName;
 
 	const ChecklistItemData({
+		this.id,
 		required this.title,
 		this.isChecked = false,
+		this.assigneeId,
 		this.assigneeName,
 	});
 
-	ChecklistItemData copyWith({String? title, bool? isChecked, String? assigneeName}) {
+	ChecklistItemData copyWith({int? id, String? title, bool? isChecked, int? assigneeId, String? assigneeName}) {
 		return ChecklistItemData(
+			id: id ?? this.id,
 			title: title ?? this.title,
 			isChecked: isChecked ?? this.isChecked,
+			assigneeId: assigneeId ?? this.assigneeId,
 			assigneeName: assigneeName ?? this.assigneeName,
 		);
 	}
