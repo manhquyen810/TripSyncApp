@@ -50,7 +50,7 @@ class DocumentCategoryFilters extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             _CategoryCard(
-              title: 'CCCD',
+              title: 'Giấy tờ',
               subtitle: '${countForCategory(DocumentCategory.cccd)} tài liệu',
               iconAsset: iconAssetForCategory(DocumentCategory.cccd),
               isSelected: selectedCategory == DocumentCategory.cccd,
@@ -58,7 +58,7 @@ class DocumentCategoryFilters extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             _CategoryCard(
-              title: 'Xe Khách',
+              title: 'Vé xe',
               subtitle: '${countForCategory(DocumentCategory.bus)} tài liệu',
               iconAsset: iconAssetForCategory(DocumentCategory.bus),
               isSelected: selectedCategory == DocumentCategory.bus,

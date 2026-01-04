@@ -95,6 +95,9 @@ class ApiClient {
   }
 
   Future<Options?> _withAuth(Options? options) async {
+    final extra = options?.extra;
+    if (extra != null && extra['skipAuth'] == true) return options;
+
     final tokenProvider = _authTokenProvider;
     if (tokenProvider == null) return options;
 
@@ -124,6 +127,15 @@ class ApiClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
+          if (options.extra['skipAuth'] == true) {
+            AppLogger.d(
+              '➡️ ${options.method} ${options.baseUrl}${options.path}',
+              tag: 'API',
+            );
+            handler.next(options);
+            return;
+          }
+
           if (authTokenProvider != null &&
               (options.headers['Authorization'] == null ||
                   (options.headers['Authorization'] as String?)?.isEmpty ==

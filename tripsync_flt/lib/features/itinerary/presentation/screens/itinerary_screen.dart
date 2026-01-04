@@ -133,7 +133,7 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
               ),
 
               // Bottom Navigation
-              const TripBottomNavigation(currentIndex: 0),
+              TripBottomNavigation(currentIndex: 0, trip: widget.trip),
             ],
           ),
         ),

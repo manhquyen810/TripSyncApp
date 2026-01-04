@@ -5,9 +5,15 @@ import '../../features/trip/domain/entities/trip.dart';
 
 class TripBottomNavigation extends StatelessWidget {
   final int currentIndex;
+  final Trip? trip;
   final Function(int)? onTap;
 
-  const TripBottomNavigation({super.key, this.currentIndex = 0, this.onTap});
+  const TripBottomNavigation({
+    super.key,
+    this.currentIndex = 0,
+    this.trip,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +76,7 @@ class TripBottomNavigation extends StatelessWidget {
     }
 
     final routeArgs = ModalRoute.of(context)?.settings.arguments;
-    final Trip? tripArg = routeArgs is Trip ? routeArgs : null;
+    final Trip? tripArg = trip ?? (routeArgs is Trip ? routeArgs : null);
 
     void showNotReady(String label) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -96,7 +102,11 @@ class TripBottomNavigation extends StatelessWidget {
         }
         return;
       case 1:
-        goTo(AppRoutes.documents, arguments: tripArg);
+        if (tripArg != null) {
+          goTo(AppRoutes.documents, arguments: tripArg);
+        } else {
+          goTo(AppRoutes.home);
+        }
         return;
       case 2:
         if (tripArg != null) {
