@@ -97,8 +97,6 @@ class TripListLoader {
       final fallbackCover =
           TripCoverImages.assets[i % TripCoverImages.assets.length];
 
-      final tripId = tripKey != null ? int.tryParse(tripKey) : null;
-
       trips.add(
         Trip(
           id: tripId,
