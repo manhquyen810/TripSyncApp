@@ -219,6 +219,7 @@ class ProposeActivityLocationField extends StatelessWidget {
   final Color green;
   final Color muted;
   final Color hintColor;
+  final VoidCallback? onMapTap;
 
   const ProposeActivityLocationField({
     super.key,
@@ -227,6 +228,7 @@ class ProposeActivityLocationField extends StatelessWidget {
     required this.green,
     required this.muted,
     required this.hintColor,
+    this.onMapTap,
   });
 
   @override
@@ -287,16 +289,23 @@ class ProposeActivityLocationField extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF3F4F6),
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
                       borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.all(10),
-                    child: const Icon(
-                      Icons.map_outlined,
-                      size: 20,
-                      color: Colors.black,
+                      onTap: onMapTap,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF3F4F6),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.all(10),
+                        child: const Icon(
+                          Icons.map_outlined,
+                          size: 20,
+                          color: Colors.black,
+                        ),
+                      ),
                     ),
                   ),
                 ],

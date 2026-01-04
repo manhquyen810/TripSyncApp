@@ -32,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   late final AuthRepository _authRepository;
   String _userName = 'nghiemqsang02';
+  String? _userAvatarUrl;
 
   bool _hasShownLoadError = false;
 
@@ -58,9 +59,13 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final raw = await _authRepository.me();
       final name = _extractUserName(raw);
+      final avatarUrl = _extractUserAvatarUrl(raw);
       if (!mounted) return;
       if (name != null && name.trim().isNotEmpty) {
         setState(() => _userName = name.trim());
+      }
+      if (avatarUrl != null && avatarUrl.trim().isNotEmpty) {
+        setState(() => _userAvatarUrl = avatarUrl.trim());
       }
     } on ApiException {
       // Ignore: user may not be logged in yet.
@@ -77,6 +82,18 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final v = raw['name'] ?? raw['username'] ?? raw['email'];
+    if (v is String && v.trim().isNotEmpty) return v;
+    return null;
+  }
+
+  String? _extractUserAvatarUrl(Map<String, dynamic> raw) {
+    final data = raw['data'];
+    if (data is Map<String, dynamic>) {
+      final v = data['avatar_url'] ?? data['avatarUrl'];
+      if (v is String && v.trim().isNotEmpty) return v;
+    }
+
+    final v = raw['avatar_url'] ?? raw['avatarUrl'];
     if (v is String && v.trim().isNotEmpty) return v;
     return null;
   }
@@ -161,6 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             HomeHeader(
                               userName: _userName,
+                              avatarUrl: _userAvatarUrl,
                               padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
                               onProfileTap: () {
                                 Navigator.of(context).pushNamed('/my-profile');
@@ -207,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     builder: (context) =>
                                         const AllTripsScreen(),
                                   ),
-                                );
+                                ).then((_) => _refreshTrips());
                               },
                             ),
 
@@ -297,6 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 location: trip.location,
                 imageUrl: trip.imageUrl,
                 memberCount: trip.memberCount,
+                memberAvatarUrls: trip.memberAvatarUrls,
                 memberColors: trip.memberColors
                     .map(
                       (color) =>
@@ -306,9 +325,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 cardWidth: cardWidth,
                 imageHeight: imageHeight,
                 onTap: () {
-                  Navigator.of(
-                    context,
-                  ).pushNamed(AppRoutes.itinerary, arguments: trip);
+                  Navigator.of(context)
+                      .pushNamed(AppRoutes.itinerary, arguments: trip)
+                      .then((changed) {
+                        if (changed == true) {
+                          _refreshTrips();
+                        }
+                      });
                 },
               ),
             );

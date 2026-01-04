@@ -15,6 +15,24 @@ class TripRepositoryImpl implements TripRepository {
   }
 
   @override
+  Future<Map<String, dynamic>> getTripDetail({required int tripId}) {
+    return _remote.getTripDetail(tripId: tripId);
+  }
+
+  @override
+  Future<Map<String, dynamic>> listTripMembers({required int tripId}) {
+    return _remote.listTripMembers(tripId: tripId);
+  }
+
+  @override
+  Future<Map<String, dynamic>> addTripMember({
+    required int tripId,
+    required String userEmail,
+  }) {
+    return _remote.addTripMember(tripId: tripId, userEmail: userEmail);
+  }
+
+  @override
   Future<Map<String, dynamic>> createTrip({
     required String name,
     required String destination,
@@ -70,6 +88,11 @@ class TripRepositoryImpl implements TripRepository {
       tripId: tripId,
       payload: <String, dynamic>{'cover_image_url': coverImageUrl},
     );
+  }
+
+  @override
+  Future<Map<String, dynamic>> deleteTrip({required int tripId}) {
+    return _remote.deleteTrip(tripId: tripId);
   }
 
   String _extractUploadedUrl(Map<String, dynamic> raw) {
