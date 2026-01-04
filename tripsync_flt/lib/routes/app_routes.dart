@@ -13,7 +13,6 @@ import '../features/checklist/presentation/screens/checklist_screen.dart';
 import '../features/expense/presentation/screens/expense_screen_dynamic.dart';
 import '../features/documents/presentation/screens/document_management_screen.dart';
 import '../features/trip/domain/entities/trip.dart';
-import '../features/home/presentation/models/profile_data.dart';
 
 class AppRoutes {
   static const start = "/";
@@ -36,7 +35,10 @@ class AppRoutes {
     register: (_) => const RegisterScreen(),
     home: (_) => const HomeScreen(),
     createTrip: (_) => const CreateTripScreen(),
-    documents: (_) => const DocumentManagementScreen(),
+    documents: (context) {
+      final trip = ModalRoute.of(context)!.settings.arguments as Trip;
+      return DocumentManagementScreen(trip: trip);
+    },
     editProfile: (context) {
       final args = ModalRoute.of(context)?.settings.arguments;
       return EditProfileScreen(initialData: args is ProfileData ? args : null);

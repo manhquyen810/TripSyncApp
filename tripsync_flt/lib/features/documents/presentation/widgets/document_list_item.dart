@@ -5,14 +5,14 @@ import '../models/document_item.dart';
 class DocumentListItem extends StatelessWidget {
   final DocumentItem doc;
   final String categoryTitle;
-  final VoidCallback onMorePressed;
+  final VoidCallback onDownloadPressed;
   final VoidCallback? onTap;
 
   const DocumentListItem({
     super.key,
     required this.doc,
     required this.categoryTitle,
-    required this.onMorePressed,
+    required this.onDownloadPressed,
     this.onTap,
   });
 
@@ -123,9 +123,9 @@ class DocumentListItem extends StatelessWidget {
                 ),
               ),
               IconButton(
-                onPressed: onMorePressed,
+                onPressed: onDownloadPressed,
                 icon: Icon(
-                  Icons.more_vert,
+                  Icons.download_for_offline_outlined,
                   color: Colors.grey[600],
                   size: 24,
                 ),

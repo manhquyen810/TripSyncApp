@@ -158,7 +158,7 @@ class ExpenseScreen extends StatelessWidget {
                 ),
               ),
             ),
-            TripBottomNavigation(currentIndex: 2),
+            TripBottomNavigation(currentIndex: 2, trip: trip),
           ],
         ),
       ),

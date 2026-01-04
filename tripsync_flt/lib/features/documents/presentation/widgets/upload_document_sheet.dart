@@ -19,13 +19,16 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
   DocumentCategory _selectedType = DocumentCategory.flight;
   PlatformFile? _selectedFile;
 
-  static const int _maxBytes = 20 * 1024 * 1024;
+  static const int _maxBytes = 10 * 1024 * 1024;
   static const List<String> _allowedExtensions = [
     'jpg',
     'jpeg',
     'png',
     'pdf',
     'webp',
+    'doc',
+    'docx',
+    'txt',
   ];
 
   String _typeIconAsset(DocumentCategory category) {
@@ -41,6 +44,27 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
       case DocumentCategory.all:
         return 'assets/icons/document.png';
     }
+  }
+
+  DocumentCategory _guessCategoryFromFilename(String filename) {
+    final name = filename.toLowerCase();
+
+    bool hasAny(List<String> keywords) => keywords.any(name.contains);
+
+    if (hasAny(['cccd', 'cmnd', 'passport', 'visa', 'id', 'identity', 'giay to'])) {
+      return DocumentCategory.cccd;
+    }
+    if (hasAny(['hotel', 'booking', 'reservation', 'voucher', 'khach san'])) {
+      return DocumentCategory.hotel;
+    }
+    if (hasAny(['flight', 'boarding', 'air', 'vietjet', 'bamboo', 'vna', 'airlines', 've may bay'])) {
+      return DocumentCategory.flight;
+    }
+    if (hasAny(['bus', 'xe', 'coach', 'train', 'tau', 'xe khach'])) {
+      return DocumentCategory.bus;
+    }
+
+    return _selectedType;
   }
 
   @override
@@ -136,7 +160,7 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
                       Expanded(
                         child: _buildTypeChip(
                           iconAsset: _typeIconAsset(DocumentCategory.bus),
-                          label: 'Vé Xe Khách',
+                          label: 'Vé xe',
                           value: DocumentCategory.bus,
                         ),
                       ),
@@ -144,7 +168,7 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
                       Expanded(
                         child: _buildTypeChip(
                           iconAsset: _typeIconAsset(DocumentCategory.cccd),
-                          label: 'CCCD',
+                          label: 'Giấy tờ tùy thân',
                           value: DocumentCategory.cccd,
                         ),
                       ),
@@ -270,7 +294,7 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
             ],
             const SizedBox(height: 12),
             const Text(
-              'Hỗ trợ: JPG,PNG,PDF,WEBP(tối đa 20MB)',
+              'Hỗ trợ: JPG,PNG,PDF,WEBP,DOC,DOCX,TXT (tối đa 10MB)',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
@@ -301,11 +325,14 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
       return;
     }
     if (file.size > _maxBytes) {
-      _showSnack('File vượt quá 20MB.');
+      _showSnack('File vượt quá 10MB.');
       return;
     }
 
-    setState(() => _selectedFile = file);
+    setState(() {
+      _selectedFile = file;
+      _selectedType = _guessCategoryFromFilename(file.name);
+    });
   }
 
   void _onUploadPressed() {
