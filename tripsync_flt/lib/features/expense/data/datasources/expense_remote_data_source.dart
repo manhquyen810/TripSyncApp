@@ -16,6 +16,7 @@ abstract class ExpenseRemoteDataSource {
     String? category,
     required int payerId,
     required List<int> involvedUserIds,
+    required DateTime expenseDate,
   });
   Future<void> createSettlement({
     required int tripId,
@@ -59,10 +60,6 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
     if (data is Map) {
       final innerData = data['data'];
       
-      if (innerData is List) {
-        return BalanceResponseModel.fromSettlementList(innerData);
-      }
-      
       if (innerData is Map) {
         return BalanceResponseModel.fromJson(innerData as Map<String, dynamic>);
       }
@@ -70,11 +67,7 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
       return BalanceResponseModel.fromJson(Map<String, dynamic>.from(data));
     }
     
-    if (data is List) {
-      return BalanceResponseModel.fromSettlementList(data);
-    }
-    
-    throw Exception('Failed to load balances');
+    throw Exception('Failed to load balances: Invalid response format');
   }
 
   @override
@@ -103,6 +96,7 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
     String? category,
     required int payerId,
     required List<int> involvedUserIds,
+    required DateTime expenseDate,
   }) async {
     final body = {
       'trip_id': tripId,
@@ -113,6 +107,7 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
       'currency': 'VND',
       'split_method': 'equal',
       'involved_user_ids': involvedUserIds,
+      'expense_date': expenseDate.toIso8601String(),
     };
 
     final response = await _client.post<dynamic>(

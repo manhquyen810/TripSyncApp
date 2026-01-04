@@ -21,6 +21,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final Set<int> selectedMemberIds = {};
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
+  DateTime selectedDateTime = DateTime.now();
   
   late final ExpenseRepositoryImpl _repository;
   late Future<List<TripMember>> _membersFuture;
@@ -75,6 +76,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     _buildDescriptionSection(),
                     const SizedBox(height: 30),
                     _buildAmountSection(),
+                    const SizedBox(height: 30),
+                    _buildDateTimeSection(),
                     const SizedBox(height: 30),
                     _buildPayerSection(),
                     const SizedBox(height: 30),
@@ -246,6 +249,64 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               borderSide: const BorderSide(color: Color(0xFF00C950)),
             ),
             contentPadding: const EdgeInsets.all(15),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateTimeSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Thời gian chi tiêu*',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 16),
+        GestureDetector(
+          onTap: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: selectedDateTime,
+              firstDate: DateTime(2020),
+              lastDate: DateTime.now().add(const Duration(days: 365)),
+            );
+            if (date != null) {
+              if (!mounted) return;
+              final time = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.fromDateTime(selectedDateTime),
+              );
+              if (time != null) {
+                setState(() {
+                  selectedDateTime = DateTime(
+                    date.year,
+                    date.month,
+                    date.day,
+                    time.hour,
+                    time.minute,
+                  );
+                });
+              }
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xFF9A9A9A)),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.calendar_today, size: 20, color: Color(0xFF9A9A9A)),
+                const SizedBox(width: 12),
+                Text(
+                  '${selectedDateTime.day}/${selectedDateTime.month}/${selectedDateTime.year} - ${selectedDateTime.hour.toString().padLeft(2, '0')}:${selectedDateTime.minute.toString().padLeft(2, '0')}',
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -506,6 +567,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         category: selectedCategory,
         payerId: selectedPayerId!,
         involvedUserIds: selectedMemberIds.toList(),
+        expenseDate: selectedDateTime,
       );
 
       if (!mounted) return;

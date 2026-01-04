@@ -14,6 +14,7 @@ abstract class ExpenseRepository {
     String? category,
     required int payerId,
     required List<int> involvedUserIds,
+    required DateTime expenseDate,
   });
   Future<void> createSettlement({
     required int tripId,

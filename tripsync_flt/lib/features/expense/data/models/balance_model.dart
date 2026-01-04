@@ -31,19 +31,30 @@ class BalanceModel {
 class BalanceResponseModel {
   final double totalExpense;
   final List<BalanceModel> balances;
+  final List<Map<String, dynamic>> settlements;
 
   BalanceResponseModel({
     required this.totalExpense,
     required this.balances,
+    this.settlements = const [],
   });
 
   factory BalanceResponseModel.fromJson(Map<String, dynamic> json) {
+    final settlementsList = (json['settlements'] as List?)?.map((s) {
+      return {
+        'from_user_name': s['from_user']?['name'] ?? 'Unknown',
+        'to_user_name': s['to_user']?['name'] ?? 'Unknown',
+        'amount': (s['amount'] as num?)?.toDouble() ?? 0.0,
+      };
+    }).toList() ?? [];
+
     return BalanceResponseModel(
       totalExpense: (json['total_expense'] as num?)?.toDouble() ?? 0.0,
       balances: (json['balances'] as List?)
               ?.map((b) => BalanceModel.fromJson(b))
               .toList() ??
           [],
+      settlements: settlementsList,
     );
   }
 
@@ -93,6 +104,11 @@ class BalanceResponseModel {
     return BalanceResponse(
       totalExpense: totalExpense,
       balances: balances.map((b) => b.toEntity()).toList(),
+      settlements: settlements.map((s) => SettlementSummary(
+        fromUserName: s['from_user_name'] as String,
+        toUserName: s['to_user_name'] as String,
+        amount: s['amount'] as double,
+      )).toList(),
     );
   }
 }

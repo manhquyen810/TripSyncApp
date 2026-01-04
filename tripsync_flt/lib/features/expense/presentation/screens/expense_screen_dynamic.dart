@@ -16,6 +16,7 @@ import '../widgets/balance_item.dart';
 import '../widgets/expense_history_item.dart';
 import '../widgets/payment_request_item.dart';
 import '../widgets/total_expense_card.dart';
+import '../widgets/debt_detail_dialog.dart';
 import 'add_expense_screen.dart';
 
 class ExpenseScreen extends StatefulWidget {
@@ -119,206 +120,226 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                     return const Center(child: Text('Không có dữ liệu'));
                   }
 
-                  final expenses = data['expenses'] as List<Expense>;
-                  final balanceResponse = data['balances'] as BalanceResponse;
-                  final settlements = data['settlements'] as List<Settlement>;
+                  return FutureBuilder<int?>(
+                    future: AuthTokenStore.getUserId(),
+                    builder: (context, userSnapshot) {
+                      final currentUserId = userSnapshot.data;
 
-                  final balances = balanceResponse.balances;
-                  final totalExpense = balanceResponse.totalExpense;
-                  
-                  final currentUserBalance = balances.isNotEmpty
-                      ? balances.first.balance
-                      : 0.0;
+                      final expenses = data['expenses'] as List<Expense>;
+                      final balanceResponse = data['balances'] as BalanceResponse;
+                      final settlements = data['settlements'] as List<Settlement>;
 
-                  return RefreshIndicator(
-                    onRefresh: () async {
-                      _loadData();
-                    },
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.only(bottom: 110),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 16),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 19),
-                            child: TotalExpenseCard(
-                              totalAmount: _formatCurrency(totalExpense),
-                              owedAmount: _formatCurrency(
-                                currentUserBalance.abs(),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 19),
-                            child: AddExpenseButton(
-                              onTap: () async {
-                                final result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AddExpenseScreen(
-                                      tripId: widget.trip.id!,
-                                    ),
+                      final balances = balanceResponse.balances;
+                      final totalExpense = balanceResponse.totalExpense;
+                      
+                      final currentUserBalance = currentUserId != null
+                          ? balances.firstWhere(
+                              (b) => b.userId == currentUserId,
+                              orElse: () => Balance(userId: currentUserId, name: '', balance: 0.0),
+                            ).balance
+                          : 0.0;
+
+                      return RefreshIndicator(
+                        onRefresh: () async {
+                          _loadData();
+                        },
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.only(bottom: 110),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 16),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 19),
+                                child: TotalExpenseCard(
+                                  totalAmount: _formatCurrency(totalExpense),
+                                  owedAmount: _formatCurrency(
+                                    currentUserBalance.abs(),
                                   ),
-                                );
-                                if (result == true) {
-                                  _loadData();
-                                }
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 26),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 19),
-                            child: Text(
-                              'Đề hòa, cần thanh toán:',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          if (settlements.isEmpty)
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 19),
-                              child: Text(
-                                'Chưa có thanh toán nào',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.textSecondary,
+                                  isPositiveBalance: currentUserBalance >= 0,
+                                  onDetailTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => DebtDetailDialog(
+                                        settlements: balanceResponse.settlements,
+                                        formatCurrency: _formatCurrency,
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
-                            )
-                          else
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              child: Column(
-                                children: settlements
-                                    .map(
-                                      (s) => Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 16),
-                                        child: PaymentRequestItem(
-                                          fromName: s.fromUserName,
-                                          toName: s.toUserName,
-                                          amount: _formatCurrency(s.amount),
-                                          isPaid: true,
+                              const SizedBox(height: 18),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 19),
+                                child: AddExpenseButton(
+                                  onTap: () async {
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AddExpenseScreen(
+                                          tripId: widget.trip.id!,
                                         ),
                                       ),
-                                    )
-                                    .toList(),
-                              ),
-                            ),
-                          const SizedBox(height: 26),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 19),
-                            child: Text(
-                              'Lịch sử chi tiêu',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          if (expenses.isEmpty)
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 19),
-                              child: Text(
-                                'Chưa có chi tiêu nào',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.textSecondary,
+                                    );
+                                    if (result == true) {
+                                      _loadData();
+                                    }
+                                  },
                                 ),
                               ),
-                            )
-                          else
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              child: Column(
-                                children: expenses
-                                    .map(
-                                      (e) => Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 12),
-                                        child: ExpenseHistoryItem(
-                                          title: e.description ?? 'Chi tiêu',
-                                          payer: e.payerName,
-                                          splitCount: e.splits.length,
-                                          totalAmount:
-                                              _formatCurrency(e.amount),
-                                          perPersonAmount: e.splits.isNotEmpty
-                                              ? '${_formatCurrency(e.splits.first.amountOwed)}/người'
-                                              : '',
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
+                              const SizedBox(height: 26),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 19),
+                                child: Text(
+                                  'Đề hòa, cần thanh toán:',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
                               ),
-                            ),
-                          const SizedBox(height: 26),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Số dư từng người',
+                              const SizedBox(height: 16),
+                              if (settlements.isEmpty)
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 19),
+                                  child: Text(
+                                    'Chưa có thanh toán nào',
                                     style: TextStyle(
                                       fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textPrimary,
+                                      color: AppColors.textSecondary,
                                     ),
                                   ),
-                                  const SizedBox(height: 18),
-                                  if (balances.isEmpty)
-                                    const Text(
-                                      'Chưa có dữ liệu',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    )
-                                  else
-                                    ...balances.asMap().entries.map((entry) {
-                                      final isLast =
-                                          entry.key == balances.length - 1;
-                                      final balance = entry.value;
-                                      return Column(
-                                        children: [
-                                          BalanceItem(
-                                            name: balance.name,
-                                            amount: balance.balance >= 0
-                                                ? '+${_formatCurrency(balance.balance)}'
-                                                : '-${_formatCurrency(balance.balance.abs())}',
-                                            isPositive: balance.balance >= 0,
+                                )
+                              else
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 12),
+                                  child: Column(
+                                    children: settlements
+                                        .map(
+                                          (s) => Padding(
+                                            padding:
+                                                const EdgeInsets.only(bottom: 16),
+                                            child: PaymentRequestItem(
+                                              fromName: s.fromUserName,
+                                              toName: s.toUserName,
+                                              amount: _formatCurrency(s.amount),
+                                              isPaid: true,
+                                            ),
                                           ),
-                                          if (!isLast)
-                                            const SizedBox(height: 14),
-                                        ],
-                                      );
-                                    }).toList(),
-                                ],
+                                        )
+                                        .toList(),
+                                  ),
+                                ),
+                              const SizedBox(height: 26),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 19),
+                                child: Text(
+                                  'Lịch sử chi tiêu',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(height: 16),
+                              if (expenses.isEmpty)
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 19),
+                                  child: Text(
+                                    'Chưa có chi tiêu nào',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                )
+                              else
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 12),
+                                  child: Column(
+                                    children: expenses
+                                        .map(
+                                          (e) => Padding(
+                                            padding:
+                                                const EdgeInsets.only(bottom: 12),
+                                            child: ExpenseHistoryItem(
+                                              title: e.description ?? 'Chi tiêu',
+                                              payer: e.payerName,
+                                              splitCount: e.splits.length,
+                                              totalAmount:
+                                                  _formatCurrency(e.amount),
+                                              perPersonAmount: e.splits.isNotEmpty
+                                                  ? '${_formatCurrency(e.splits.first.amountOwed)}/người'
+                                                  : '',
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                  ),
+                                ),
+                              const SizedBox(height: 26),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Số dư từng người',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 18),
+                                      if (balances.isEmpty)
+                                        const Text(
+                                          'Chưa có dữ liệu',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: AppColors.textSecondary,
+                                          ),
+                                        )
+                                      else
+                                        ...balances.asMap().entries.map((entry) {
+                                          final isLast =
+                                              entry.key == balances.length - 1;
+                                          final balance = entry.value;
+                                          return Column(
+                                            children: [
+                                              BalanceItem(
+                                                name: balance.name,
+                                                amount: balance.balance >= 0
+                                                    ? '+${_formatCurrency(balance.balance)}'
+                                                    : '-${_formatCurrency(balance.balance.abs())}',
+                                                isPositive: balance.balance >= 0,
+                                              ),
+                                              if (!isLast)
+                                                const SizedBox(height: 14),
+                                            ],
+                                          );
+                                        }).toList(),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
