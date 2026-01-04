@@ -3,10 +3,21 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../routes/app_routes.dart';
 import '../../../../shared/widgets/add_floating_button.dart';
 import '../../../../shared/widgets/trip_bottom_navigation.dart';
+import '../../../../core/network/api_client.dart';
+import '../../../../core/network/auth_token_store.dart';
+import '../../../../core/network/exceptions.dart';
 import '../../../home/presentation/widgets/member_avatar.dart';
 import '../../../trip/domain/entities/trip.dart';
+import '../../../trip/data/datasources/trip_remote_data_source.dart';
+import '../../../trip/data/repositories/trip_repository_impl.dart';
+import '../../../trip/domain/repositories/trip_repository.dart';
+import '../../data/datasources/checklist_remote_data_source.dart';
+import '../../data/models/checklist_item_dto.dart';
+import '../../data/repositories/checklist_repository_impl.dart';
+import '../../domain/repositories/checklist_repository.dart';
 import '../widgets/checklist_category_card.dart';
 import 'add_checklist_item_screen.dart';
 
@@ -21,71 +32,141 @@ class ChecklistScreen extends StatefulWidget {
 
 class _ChecklistScreenState extends State<ChecklistScreen> {
   late List<ChecklistCategoryData> _categories;
+  late final ChecklistRepository _checklistRepository;
+  late final TripRepository _tripRepository;
+  bool _isLoading = true;
+
+  Map<int, String> _userNameById = <int, String>{};
+  Map<String, int> _userIdByName = <String, int>{};
+
+  static const List<String> _categoryOrder = <String>[
+    'Thiết yếu',
+    'Quần áo',
+    'Thiết bị điện tử',
+    'Vệ sinh cá nhân',
+    'Khác',
+  ];
+
+  static const String _metaPrefix = '[[ts:';
+  static const String _metaSuffix = ']]';
 
   Trip get trip => widget.trip;
 
   @override
   void initState() {
     super.initState();
-    _categories = const <ChecklistCategoryData>[
-      ChecklistCategoryData(
-        title: 'Thiết yếu',
-        items: [
-          ChecklistItemData(title: 'Thuốc say xe', assigneeName: 'Minh Anh'),
-          ChecklistItemData(title: 'Kem chống nắng', assigneeName: 'Sáng'),
-          ChecklistItemData(title: 'Áo ấm', assigneeName: 'Quyền'),
-        ],
-      ),
-      ChecklistCategoryData(
-        title: 'Quần áo',
-        items: [
-          ChecklistItemData(title: 'Áo ấm', assigneeName: 'Minh Anh'),
-          ChecklistItemData(title: 'Áo mưa', assigneeName: 'Sáng'),
-          ChecklistItemData(title: 'Khăn', assigneeName: 'Quyền'),
-        ],
-      ),
-      ChecklistCategoryData(
-        title: 'Thiết bị điện tử',
-        items: [
-          ChecklistItemData(title: 'Sạc dự phòng', assigneeName: 'Minh Anh'),
-          ChecklistItemData(title: 'Loa bluetooth', assigneeName: 'Sáng'),
-          ChecklistItemData(title: 'Tai nghe', assigneeName: 'Quyền'),
-        ],
-      ),
-      ChecklistCategoryData(
-        title: 'Vệ sinh cá nhân',
-        items: [
-          ChecklistItemData(
-            title: 'Giấy ướt lau mặt',
-            assigneeName: 'Minh Anh',
-          ),
-          ChecklistItemData(title: 'Xịt thơm', assigneeName: 'Sáng'),
-          ChecklistItemData(title: 'Kem đánh răng', assigneeName: 'Quyền'),
-        ],
-      ),
-      ChecklistCategoryData(
-        title: 'Khác',
-        items: [
-          ChecklistItemData(
-            title: 'Giấy ướt lau mặt',
-            assigneeName: 'Minh Anh',
-          ),
-          ChecklistItemData(title: 'Xịt thơm', assigneeName: 'Sáng'),
-          ChecklistItemData(title: 'Kem đánh răng', assigneeName: 'Quyền'),
-        ],
-      ),
-    ];
+
+    _categories = const <ChecklistCategoryData>[];
+
+    final authedClient = ApiClient(
+      authTokenProvider: AuthTokenStore.getAccessToken,
+    );
+
+    _checklistRepository = ChecklistRepositoryImpl(
+      ChecklistRemoteDataSourceImpl(authedClient),
+    );
+    _tripRepository = TripRepositoryImpl(
+      TripRemoteDataSourceImpl(authedClient),
+    );
+
+    _loadChecklist();
   }
 
-  void _toggleItem(int categoryIndex, int itemIndex) {
-    setState(() {
-      final category = _categories[categoryIndex];
-      final items = List<ChecklistItemData>.from(category.items);
-      final oldItem = items[itemIndex];
-      items[itemIndex] = oldItem.copyWith(isChecked: !oldItem.isChecked);
-      _categories = List<ChecklistCategoryData>.from(_categories);
-      _categories[categoryIndex] = category.copyWith(items: items);
-    });
+  Future<void> _loadChecklist() async {
+    final tripId = trip.id;
+    if (tripId == null) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Không thể tải checklist (thiếu trip_id)')),
+      );
+      return;
+    }
+
+    if (mounted) setState(() => _isLoading = true);
+
+    try {
+      final itemsFuture = _checklistRepository.listTripChecklist(tripId: tripId);
+      final membersFuture = _tripRepository.listTripMembers(tripId: tripId);
+
+      final items = await itemsFuture;
+      final rawMembers = await membersFuture;
+      final userNameById = _extractUserNameById(rawMembers);
+      final userIdByName = <String, int>{
+        for (final e in userNameById.entries) e.value: e.key,
+      };
+
+      final categories = _buildCategories(items);
+
+      if (!mounted) return;
+      setState(() {
+        _userNameById = userNameById;
+        _userIdByName = userIdByName;
+        _categories = categories;
+        _isLoading = false;
+      });
+    } catch (err) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+
+      final msg = switch (err) {
+        TimeoutException() => 'Server đang khởi động, thử lại sau vài giây',
+        UnauthorizedException() => 'Vui lòng đăng nhập để xem checklist',
+        ApiException() => err.message,
+        _ => 'Không tải được checklist',
+      };
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    }
+  }
+
+  Future<void> _toggleItem(int categoryIndex, int itemIndex) async {
+    final category = _categories[categoryIndex];
+    final item = category.items[itemIndex];
+    final itemId = item.id;
+    if (itemId == null) {
+      setState(() {
+        final items = List<ChecklistItemData>.from(category.items);
+        items[itemIndex] = item.copyWith(isChecked: !item.isChecked);
+        _categories = List<ChecklistCategoryData>.from(_categories);
+        _categories[categoryIndex] = category.copyWith(items: items);
+      });
+      return;
+    }
+
+    final next = !item.isChecked;
+    try {
+      final updated = await _checklistRepository.toggleItem(
+        itemId: itemId,
+        isDone: next,
+      );
+
+      final decoded = _decodeContent(updated.content);
+      final assigneeName = _resolveAssigneeName(
+        assigneeId: updated.assigneeId,
+        fallback: decoded.assigneeName,
+      );
+
+      setState(() {
+        final items = List<ChecklistItemData>.from(category.items);
+        items[itemIndex] = item.copyWith(
+          isChecked: updated.isDone,
+          title: decoded.title,
+          assigneeId: updated.assigneeId,
+          assigneeName: assigneeName,
+        );
+        _categories = List<ChecklistCategoryData>.from(_categories);
+        _categories[categoryIndex] = category.copyWith(items: items);
+      });
+    } catch (err) {
+      if (!mounted) return;
+      final msg = switch (err) {
+        TimeoutException() => 'Server đang khởi động, thử lại sau vài giây',
+        UnauthorizedException() => 'Vui lòng đăng nhập để cập nhật checklist',
+        ApiException() => err.message,
+        _ => 'Không cập nhật được checklist',
+      };
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    }
   }
 
   void _showAddItemDialog() {
@@ -97,28 +178,207 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
         insetPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 100),
         child: AddChecklistItemScreen(
           onAdd: (itemName, category, assignee) {
-            setState(() {
-              final categoryIndex = _categories.indexWhere(
-                (c) => c.title == category,
-              );
-              if (categoryIndex != -1) {
-                final cat = _categories[categoryIndex];
-                final newItems = List<ChecklistItemData>.from(cat.items)
-                  ..add(
-                    ChecklistItemData(
-                      title: itemName,
-                      isChecked: false,
-                      assigneeName: assignee,
-                    ),
-                  );
-                _categories = List<ChecklistCategoryData>.from(_categories);
-                _categories[categoryIndex] = cat.copyWith(items: newItems);
-              }
-            });
+            _addItem(itemName: itemName, category: category, assigneeName: assignee);
           },
+          members: _userNameById.values.toList(growable: false),
         ),
       ),
     );
+  }
+
+  void _showItemActions({
+    required int categoryIndex,
+    required int itemIndex,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.edit),
+                title: const Text('Sửa'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showEditItemDialog(
+                    categoryIndex: categoryIndex,
+                    itemIndex: itemIndex,
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: const Text('Xóa'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _confirmDeleteItem(
+                    categoryIndex: categoryIndex,
+                    itemIndex: itemIndex,
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showEditItemDialog({
+    required int categoryIndex,
+    required int itemIndex,
+  }) {
+    final category = _categories[categoryIndex];
+    final item = category.items[itemIndex];
+    if (item.id == null) return;
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 100),
+        child: AddChecklistItemScreen(
+          initialItemName: item.title,
+          initialCategory: category.title,
+          initialAssignee: item.assigneeName,
+          headerText: 'Sửa món đồ',
+          submitText: 'Lưu',
+          onAdd: (itemName, newCategory, assigneeName) {
+            _updateItem(
+              itemId: item.id!,
+              itemName: itemName,
+              category: newCategory,
+              assigneeName: assigneeName,
+            );
+          },
+          members: _userNameById.values.toList(growable: false),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _confirmDeleteItem({
+    required int categoryIndex,
+    required int itemIndex,
+  }) async {
+    final category = _categories[categoryIndex];
+    final item = category.items[itemIndex];
+    if (item.id == null) return;
+
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Xóa checklist'),
+        content: Text('Xóa "${item.title}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Hủy'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Xóa'),
+          ),
+        ],
+      ),
+    );
+
+    if (ok != true) return;
+    await _deleteItem(itemId: item.id!);
+  }
+
+  Future<void> _updateItem({
+    required int itemId,
+    required String itemName,
+    required String category,
+    required String? assigneeName,
+  }) async {
+    final content = _encodeContent(
+      title: itemName,
+      category: category,
+      assigneeName: assigneeName,
+    );
+    final assigneeId = assigneeName == null ? null : _userIdByName[assigneeName];
+
+    if (mounted) setState(() => _isLoading = true);
+    try {
+      await _checklistRepository.updateItem(
+        itemId: itemId,
+        content: content,
+        assigneeId: assigneeId,
+      );
+      await _loadChecklist();
+    } catch (err) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      final msg = switch (err) {
+        TimeoutException() => 'Server đang khởi động, thử lại sau vài giây',
+        UnauthorizedException() => 'Vui lòng đăng nhập để cập nhật checklist',
+        ApiException() => err.message,
+        _ => 'Không cập nhật được checklist',
+      };
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    }
+  }
+
+  Future<void> _deleteItem({required int itemId}) async {
+    if (mounted) setState(() => _isLoading = true);
+    try {
+      await _checklistRepository.deleteItem(itemId: itemId);
+      await _loadChecklist();
+    } catch (err) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      final msg = switch (err) {
+        TimeoutException() => 'Server đang khởi động, thử lại sau vài giây',
+        UnauthorizedException() => 'Vui lòng đăng nhập để xóa checklist',
+        ApiException() => err.message,
+        _ => 'Không xóa được checklist',
+      };
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    }
+  }
+
+  Future<void> _addItem({
+    required String itemName,
+    required String category,
+    required String? assigneeName,
+  }) async {
+    final tripId = trip.id;
+    if (tripId == null) return;
+
+    final content = _encodeContent(
+      title: itemName,
+      category: category,
+      assigneeName: assigneeName,
+    );
+    final assigneeId = assigneeName == null ? null : _userIdByName[assigneeName];
+
+    if (mounted) setState(() => _isLoading = true);
+    try {
+      await _checklistRepository.addItem(
+        tripId: tripId,
+        content: content,
+        assigneeId: assigneeId,
+      );
+      await _loadChecklist();
+    } catch (err) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      final msg = switch (err) {
+        TimeoutException() => 'Server đang khởi động, thử lại sau vài giây',
+        UnauthorizedException() => 'Vui lòng đăng nhập để thêm checklist',
+        ApiException() => err.message,
+        _ => 'Không thêm được checklist',
+      };
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    }
   }
 
   double get _progress {
@@ -133,8 +393,6 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final trip = widget.trip;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF6F7F9),
       body: SafeArea(
@@ -153,6 +411,11 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                     const SizedBox(height: 41),
                     _buildAddItemCta(),
                     const SizedBox(height: 41),
+                    if (_isLoading)
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 41),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
                     ..._categories.asMap().entries.map((entry) {
                       final categoryIndex = entry.key;
                       final category = entry.value;
@@ -162,15 +425,19 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                           data: category,
                           onItemTap: (itemIndex) =>
                               _toggleItem(categoryIndex, itemIndex),
+                          onItemLongPress: (itemIndex) => _showItemActions(
+                            categoryIndex: categoryIndex,
+                            itemIndex: itemIndex,
+                          ),
                         ),
                       );
-                    }).toList(),
+                    }),
                     const SizedBox(height: 80),
                   ],
                 ),
               ),
             ),
-            TripBottomNavigation(currentIndex: 3),
+            TripBottomNavigation(currentIndex: 3, trip: trip),
           ],
         ),
       ),
@@ -184,7 +451,10 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => Navigator.pop(context),
+            onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
+              AppRoutes.home,
+              (route) => false,
+            ),
             child: Container(
               width: 43,
               height: 43,
@@ -240,124 +510,64 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     );
   }
 
-  Widget _buildTripImageCard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: SizedBox(
-          height: 235,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              _buildCoverImage(widget.trip.imageUrl),
-              Positioned(
-                left: 11,
-                bottom: 10,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.trip.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Row(
-                      children: [
-                        Image.asset(
-                          'assets/icons/location.png',
-                          width: 20,
-                          height: 20,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          widget.trip.location,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCoverImage(String rawUrl) {
-    final url = _coerceCoverUrl(rawUrl);
-    final placeholder = Container(
-      color: Colors.grey.shade300,
-      alignment: Alignment.center,
-      child: const Icon(Icons.image, size: 50),
-    );
-
-    if (url.isEmpty) return placeholder;
-
-    if (url.startsWith('assets/')) {
-      return Image.asset(
-        url,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => placeholder,
-      );
-    }
-
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return Image.network(
-        url,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => placeholder,
-      );
-    }
-
-    if (kIsWeb) return placeholder;
-
-    return Image.file(
-      File(url),
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) => placeholder,
-    );
-  }
-
-  String _coerceCoverUrl(String raw) {
-    var value = raw.trim();
-    if (value.isEmpty) return value;
-
-    if (value.startsWith('assets/')) {
-      final rest = value.substring('assets/'.length);
-      if (_looksLikeEncodedHttpUrl(rest)) value = rest;
-    }
-
-    for (var i = 0; i < 2; i++) {
-      if (!_looksLikeEncodedHttpUrl(value)) break;
-      try {
-        value = Uri.decodeFull(value).trim();
-      } catch (_) {
-        break;
-      }
-    }
-
-    return value;
-  }
-
-  bool _looksLikeEncodedHttpUrl(String value) {
-    final lower = value.toLowerCase();
-    return lower.startsWith('http%3a') ||
-        lower.startsWith('https%3a') ||
-        lower.startsWith('http%253a') ||
-        lower.startsWith('https%253a');
-  }
+	Widget _buildTripImageCard() {
+		return Padding(
+			padding: const EdgeInsets.symmetric(horizontal: 15),
+			child: ClipRRect(
+				borderRadius: BorderRadius.circular(24),
+				child: Container(
+					height: 235,
+					decoration: BoxDecoration(
+						image: DecorationImage(
+							image: AssetImage(widget.trip.imageUrl),
+							fit: BoxFit.cover,
+						),
+					),
+					child: Stack(
+						children: [
+							Positioned(
+								left: 11,
+								bottom: 10,
+								child: Column(
+									crossAxisAlignment: CrossAxisAlignment.start,
+									children: [
+										Text(
+											widget.trip.title,
+											style: const TextStyle(
+												fontSize: 16,
+												fontWeight: FontWeight.w600,
+												color: Colors.white,
+											),
+											maxLines: 1,
+											overflow: TextOverflow.ellipsis,
+										),
+										Row(
+											children: [
+												Image.asset(
+													'assets/icons/location.png',
+													width: 20,
+													height: 20,
+													color: Colors.white,
+												),
+												const SizedBox(width: 4),
+												Text(
+													widget.trip.location,
+													style: const TextStyle(
+														fontSize: 14,
+														color: Colors.white,
+													),
+												),
+											],
+										),
+									],
+								),
+							),
+						],
+					),
+				),
+			),
+		);
+	}
 
   Widget _buildMemberInfo() {
     return Padding(
@@ -383,8 +593,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                     color: Color(int.parse(color.replaceFirst('#', '0xFF'))),
                     size: 25,
                   ),
-                )
-                .toList(),
+                ),
           ],
         ),
       ),
@@ -459,4 +668,161 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
       ),
     );
   }
+
+  List<ChecklistCategoryData> _buildCategories(
+    List<ChecklistItemDto> items,
+  ) {
+    final grouped = <String, List<ChecklistItemData>>{
+      for (final c in _categoryOrder) c: <ChecklistItemData>[],
+    };
+
+    for (final item in items) {
+      final decoded = _decodeContent(item.content);
+      final category = decoded.category ?? _inferCategory(decoded.title);
+      final key = grouped.containsKey(category) ? category : 'Khác';
+
+      final assigneeName = _resolveAssigneeName(
+        assigneeId: item.assigneeId,
+        fallback: decoded.assigneeName,
+      );
+
+      grouped[key]!.add(
+        ChecklistItemData(
+          id: item.id,
+          title: decoded.title,
+          isChecked: item.isDone,
+          assigneeId: item.assigneeId,
+          assigneeName: assigneeName,
+        ),
+      );
+    }
+
+    return _categoryOrder
+        .map((c) => ChecklistCategoryData(title: c, items: grouped[c]!))
+        .where((c) => c.items.isNotEmpty)
+        .toList(growable: false);
+  }
+
+  String _resolveAssigneeName({
+    required int? assigneeId,
+    required String? fallback,
+  }) {
+    if (assigneeId == null) return fallback ?? 'Chưa gán';
+    return _userNameById[assigneeId] ?? fallback ?? 'User $assigneeId';
+  }
+
+  String _inferCategory(String title) {
+    final t = title.toLowerCase();
+    if (t.contains('thuốc') || t.contains('kem') || t.contains('chống nắng') || t.contains('say')) {
+      return 'Thiết yếu';
+    }
+    if (t.contains('áo') || t.contains('quần') || t.contains('khăn') || t.contains('mũ') || t.contains('giày')) {
+      return 'Quần áo';
+    }
+    if (t.contains('sạc') || t.contains('loa') || t.contains('tai nghe') || t.contains('điện thoại')) {
+      return 'Thiết bị điện tử';
+    }
+    if (t.contains('kem đánh răng') || t.contains('bàn chải') || t.contains('xịt') || t.contains('giấy ướt') || t.contains('rửa')) {
+      return 'Vệ sinh cá nhân';
+    }
+    return 'Khác';
+  }
+
+  String _encodeContent({
+    required String title,
+    required String category,
+    required String? assigneeName,
+  }) {
+    final safeTitle = title.trim();
+    final fields = <String, String>{'cat': category.trim()};
+    final a = assigneeName?.trim();
+    if (a != null && a.isNotEmpty) fields['assignee'] = a;
+
+    final meta = fields.entries.map((e) => '${e.key}=${e.value}').join(';');
+    return '$_metaPrefix$meta$_metaSuffix $safeTitle'.trim();
+  }
+
+  _DecodedContent _decodeContent(String raw) {
+    final s = raw.trim();
+    if (!s.startsWith(_metaPrefix)) {
+      return _DecodedContent(title: s);
+    }
+    final end = s.indexOf(_metaSuffix);
+    if (end < 0) return _DecodedContent(title: s);
+
+    final meta = s.substring(_metaPrefix.length, end);
+    final rest = s.substring(end + _metaSuffix.length).trim();
+
+    String? category;
+    String? assigneeName;
+    for (final part in meta.split(';')) {
+      final kv = part.split('=');
+      if (kv.length != 2) continue;
+      final k = kv[0].trim();
+      final v = kv[1].trim();
+      if (k == 'cat' && v.isNotEmpty) category = v;
+      if (k == 'assignee' && v.isNotEmpty) assigneeName = v;
+    }
+
+    return _DecodedContent(
+      title: rest.isEmpty ? s : rest,
+      category: category,
+      assigneeName: assigneeName,
+    );
+  }
+
+  Map<int, String> _extractUserNameById(Map<String, dynamic> raw) {
+    final data = raw['data'];
+    if (data is! List) return <int, String>{};
+
+    int? readInt(dynamic v) {
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      if (v is String) return int.tryParse(v);
+      return null;
+    }
+
+    String? readString(dynamic v) {
+      if (v is String) {
+        final s = v.trim();
+        return s.isEmpty ? null : s;
+      }
+      return null;
+    }
+
+    final out = <int, String>{};
+    for (final item in data) {
+      if (item is! Map) continue;
+      final map = Map<String, dynamic>.from(item);
+
+      final nestedUser = map['user'];
+      final userMap = nestedUser is Map ? Map<String, dynamic>.from(nestedUser) : null;
+
+      final id = readInt((userMap ?? map)['id']) ?? readInt(map['user_id']);
+      if (id == null) continue;
+
+      final name =
+          readString((userMap ?? map)['name']) ??
+          readString((userMap ?? map)['full_name']) ??
+          readString((userMap ?? map)['email']);
+
+      if (name != null) {
+        out[id] = name;
+      }
+    }
+
+    return out;
+  }
+}
+
+class _DecodedContent {
+  final String title;
+  final String? category;
+  final String? assigneeName;
+
+  const _DecodedContent({
+    required this.title,
+    this.category,
+    this.assigneeName,
+  });
 }

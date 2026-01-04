@@ -2,8 +2,24 @@ import 'package:flutter/material.dart';
 
 class AddChecklistItemScreen extends StatefulWidget {
   final Function(String itemName, String category, String? assignee)? onAdd;
+  final List<String>? members;
 
-  const AddChecklistItemScreen({super.key, this.onAdd});
+  final String? initialItemName;
+  final String? initialCategory;
+  final String? initialAssignee;
+  final String? headerText;
+  final String? submitText;
+
+  const AddChecklistItemScreen({
+    super.key,
+    this.onAdd,
+    this.members,
+    this.initialItemName,
+    this.initialCategory,
+    this.initialAssignee,
+    this.headerText,
+    this.submitText,
+  });
 
   @override
   State<AddChecklistItemScreen> createState() => _AddChecklistItemScreenState();
@@ -14,12 +30,16 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
   String? _selectedCategory;
   String? _selectedAssignee;
 
-  final _members = [
-    {'name': 'Nguyễn Văn A', 'avatar': Icons.person},
-    {'name': 'Trần Thị B', 'avatar': Icons.person},
-    {'name': 'Lê Văn C', 'avatar': Icons.person},
-    {'name': 'Phạm Thị D', 'avatar': Icons.person},
-  ];
+  List<String> get _memberNames {
+    final fromParent = widget.members;
+    if (fromParent != null && fromParent.isNotEmpty) return fromParent;
+    return const <String>[
+      'Nguyễn Văn A',
+      'Trần Thị B',
+      'Lê Văn C',
+      'Phạm Thị D',
+    ];
+  }
 
   final _categories = [
     {'name': 'Thiết yếu', 'color': Color(0xFFE7000B), 'icon': Icons.warning},
@@ -28,6 +48,14 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
     {'name': 'Thiết bị điện tử', 'color': Color(0xFFFFA1E0), 'icon': Icons.devices},
     {'name': 'Khác', 'color': Color(0xFF65758B), 'icon': Icons.more_horiz},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _itemNameController.text = widget.initialItemName?.trim() ?? '';
+    _selectedCategory = widget.initialCategory;
+    _selectedAssignee = widget.initialAssignee;
+  }
 
   @override
   void dispose() {
@@ -70,7 +98,7 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
             const SizedBox(height: 16),
             ListView.builder(
               shrinkWrap: true,
-              itemCount: _members.length + 1,
+              itemCount: _memberNames.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return ListTile(
@@ -94,26 +122,26 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
                     },
                   );
                 }
-                final member = _members[index - 1];
+                final memberName = _memberNames[index - 1];
                 return ListTile(
                   leading: CircleAvatar(
                     backgroundColor: const Color(0xFF55ACEE),
-                    child: Icon(member['avatar'] as IconData, color: Colors.white),
+                    child: const Icon(Icons.person, color: Colors.white),
                   ),
                   title: Text(
-                    member['name'] as String,
+                    memberName,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       fontFamily: 'Poppins',
                     ),
                   ),
-                  trailing: _selectedAssignee == member['name']
+                  trailing: _selectedAssignee == memberName
                       ? const Icon(Icons.check, color: Color(0xFF00C950))
                       : null,
                   onTap: () {
                     setState(() {
-                      _selectedAssignee = member['name'] as String;
+                      _selectedAssignee = memberName;
                     });
                     Navigator.pop(context);
                   },
@@ -178,10 +206,10 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
             ),
           ),
           const SizedBox(width: 10),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Thêm món đồ cần mang',
-              style: TextStyle(
+              widget.headerText ?? 'Thêm món đồ cần mang',
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Poppins',
@@ -359,9 +387,9 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
-          child: const Text(
-            'Thêm món đồ',
-            style: TextStyle(
+          child: Text(
+            widget.submitText ?? 'Thêm món đồ',
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
               fontFamily: 'Inter',
