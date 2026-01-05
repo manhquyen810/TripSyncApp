@@ -163,7 +163,8 @@ class ExpenseScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: AddFloatingButton(
-        onPressed: () => Navigator.pushNamed(context, AppRoutes.addExpense),
+        onPressed: () =>
+            Navigator.pushNamed(context, AppRoutes.addExpense, arguments: trip),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
