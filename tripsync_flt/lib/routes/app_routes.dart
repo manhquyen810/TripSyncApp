@@ -38,7 +38,12 @@ class AppRoutes {
     home: (_) => const HomeScreen(),
     createTrip: (_) => const CreateTripScreen(),
     documents: (context) {
-      final trip = ModalRoute.of(context)!.settings.arguments as Trip;
+      final trip = ModalRoute.of(context)?.settings.arguments as Trip?;
+      if (trip == null) {
+        return const Scaffold(
+          body: Center(child: Text('Không tìm thấy chuyến đi')),
+        );
+      }
       return DocumentManagementScreen(trip: trip);
     },
     editProfile: (context) {
@@ -48,15 +53,25 @@ class AppRoutes {
     myProfile: (_) => const MyProfileScreen(),
     settings: (_) => const SettingsScreen(),
     itinerary: (context) {
-      final trip = ModalRoute.of(context)!.settings.arguments as Trip;
+      final trip = ModalRoute.of(context)?.settings.arguments as Trip?;
+      if (trip == null) {
+        return const Scaffold(
+          body: Center(child: Text('Không tìm thấy chuyến đi')),
+        );
+      }
       return TripItineraryScreen(trip: trip);
     },
     checklist: (context) {
-      final trip = ModalRoute.of(context)!.settings.arguments as Trip;
+      final trip = ModalRoute.of(context)?.settings.arguments as Trip?;
+      if (trip == null) {
+        return const Scaffold(
+          body: Center(child: Text('Không tìm thấy chuyến đi')),
+        );
+      }
       return ChecklistScreen(trip: trip);
     },
     expense: (context) {
-      final trip = ModalRoute.of(context)!.settings.arguments as Trip?;
+      final trip = ModalRoute.of(context)?.settings.arguments as Trip?;
       if (trip == null) {
         return const Scaffold(
           body: Center(child: Text('Không tìm thấy chuyến đi')),
