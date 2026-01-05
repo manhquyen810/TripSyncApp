@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/auth_token_store.dart';
 import '../../../../core/network/exceptions.dart';
+import '../../../../core/storage/secure_storage_service.dart';
 import '../../data/datasources/auth_remote_data_source.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -26,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isLoginSelected = true;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isSubmitting = false;
+  bool _rememberMe = false;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -36,6 +39,18 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     _authRepository = AuthRepositoryImpl(AuthRemoteDataSourceImpl(ApiClient()));
+    _loadSavedEmail();
+  }
+
+  Future<void> _loadSavedEmail() async {
+    if (kIsWeb) return;
+    try {
+      final savedEmail = await SecureStorageService.getSavedEmail();
+      if (savedEmail != null && savedEmail.isNotEmpty) {
+        emailController.text = savedEmail;
+        setState(() => _rememberMe = true);
+      }
+    } catch (_) {}
   }
 
   @override
@@ -73,6 +88,16 @@ class _LoginScreenState extends State<LoginScreen> {
       final token = _extractAccessToken(raw);
       if (token != null) {
         await AuthTokenStore.saveAccessToken(token);
+        // Skip secure storage on web
+        if (!kIsWeb) {
+          if (_rememberMe) {
+            await SecureStorageService.saveToken(token);
+            await SecureStorageService.saveEmail(email);
+          } else {
+            await SecureStorageService.deleteToken();
+            await SecureStorageService.deleteSavedEmail();
+          }
+        }
       }
 
       final message =
@@ -202,6 +227,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         onForgotPassword: _handleForgotPassword,
                         onLogin: _handleLogin,
                         isLoading: _isSubmitting,
+                        rememberMe: _rememberMe,
+                        onRememberMeChanged: (v) => setState(() => _rememberMe = v),
                       ),
                     ),
                   ],

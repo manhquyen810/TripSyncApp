@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../../../shared/styles/app_colors.dart';
 import '../../../../core/network/auth_token_store.dart';
+import '../../../../core/storage/secure_storage_service.dart';
 import '../../../../routes/app_routes.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -138,6 +140,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       child: OutlinedButton.icon(
                         onPressed: () async {
                           await AuthTokenStore.clear();
+                          if (!kIsWeb) {
+                            await SecureStorageService.deleteToken();
+                          }
                           if (!context.mounted) return;
                           Navigator.of(context).pushNamedAndRemoveUntil(
                             AppRoutes.start,
