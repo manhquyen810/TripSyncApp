@@ -227,6 +227,16 @@ class _ProposeActivityScreenState extends State<ProposeActivityScreen> {
       showError('Vui lòng chọn địa điểm.');
       return;
     }
+
+    final picked = _pickedLocation;
+    if (picked == null || picked.label.trim().isEmpty) {
+      showError('Vui lòng bấm “Chọn địa điểm” để lấy tọa độ.');
+      return;
+    }
+    if (picked.label.trim() != locationText) {
+      showError('Địa điểm đã thay đổi. Vui lòng chọn lại để lấy tọa độ.');
+      return;
+    }
     if (selectedTime == null) {
       showError('Vui lòng chọn giờ.');
       return;
@@ -254,16 +264,16 @@ class _ProposeActivityScreenState extends State<ProposeActivityScreen> {
         throw Exception('Không lấy được day_id từ server.');
       }
 
-      final picked = _pickedLocation;
       await _apiClient.post<dynamic>(
         ApiEndpoints.itineraryActivities,
         data: <String, dynamic>{
           'day_id': dayId,
           'title': title,
+          'category': _types[_selectedTypeIndex].label,
           'description': description,
           'location': locationText,
-          'location_lat': picked?.latitude.toString(),
-          'location_long': picked?.longitude.toString(),
+          'location_lat': picked.latitude.toString(),
+          'location_long': picked.longitude.toString(),
           'start_time': _formatTime(selectedTime),
         },
       );
