@@ -1,15 +1,13 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/config/env.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../shared/widgets/add_floating_button.dart';
 import '../../../../shared/widgets/trip_bottom_navigation.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/auth_token_store.dart';
 import '../../../../core/network/exceptions.dart';
-import '../../../home/presentation/widgets/member_avatar.dart';
+import '../../../../shared/styles/app_colors.dart';
 import '../../../trip/domain/entities/trip.dart';
 import '../../../trip/data/datasources/trip_remote_data_source.dart';
 import '../../../trip/data/repositories/trip_repository_impl.dart';
@@ -37,6 +35,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
   bool _isLoading = true;
 
   Map<int, String> _userNameById = <int, String>{};
+  Map<int, String> _userAvatarUrlById = <int, String>{};
   Map<String, int> _userIdByName = <String, int>{};
 
   static const List<String> _categoryOrder = <String>[
@@ -92,6 +91,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
       final items = await itemsFuture;
       final rawMembers = await membersFuture;
       final userNameById = _extractUserNameById(rawMembers);
+      final userAvatarUrlById = _extractUserAvatarUrlById(rawMembers);
       final userIdByName = <String, int>{
         for (final e in userNameById.entries) e.value: e.key,
       };
@@ -101,6 +101,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
       if (!mounted) return;
       setState(() {
         _userNameById = userNameById;
+        _userAvatarUrlById = userAvatarUrlById;
         _userIdByName = userIdByName;
         _categories = categories;
         _isLoading = false;
@@ -145,6 +146,8 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
         assigneeId: updated.assigneeId,
         fallback: decoded.assigneeName,
       );
+      final assigneeAvatarUrl =
+          _resolveAssigneeAvatarUrl(assigneeId: updated.assigneeId);
 
       setState(() {
         final items = List<ChecklistItemData>.from(category.items);
@@ -153,6 +156,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
           title: decoded.title,
           assigneeId: updated.assigneeId,
           assigneeName: assigneeName,
+          assigneeAvatarUrl: assigneeAvatarUrl,
         );
         _categories = List<ChecklistCategoryData>.from(_categories);
         _categories[categoryIndex] = category.copyWith(items: items);
@@ -169,20 +173,33 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     }
   }
 
-  void _showAddItemDialog() {
-    showDialog(
+  void _showAddItemSheet() {
+    showModalBottomSheet(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.5),
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 100),
-        child: AddChecklistItemScreen(
-          onAdd: (itemName, category, assignee) {
-            _addItem(itemName: itemName, category: category, assigneeName: assignee);
-          },
-          members: _userNameById.values.toList(growable: false),
-        ),
-      ),
+      isScrollControlled: true,
+      barrierColor: Colors.black.withOpacity(0.2),
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.66,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            child: Material(
+              color: Colors.white,
+              child: AddChecklistItemScreen(
+                onAdd: (itemName, category, assignee) {
+                  _addItem(
+                    itemName: itemName,
+                    category: category,
+                    assigneeName: assignee,
+                  );
+                },
+                members: _userNameById.values.toList(growable: false),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -237,29 +254,38 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     final item = category.items[itemIndex];
     if (item.id == null) return;
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.5),
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 100),
-        child: AddChecklistItemScreen(
-          initialItemName: item.title,
-          initialCategory: category.title,
-          initialAssignee: item.assigneeName,
-          headerText: 'Sửa món đồ',
-          submitText: 'Lưu',
-          onAdd: (itemName, newCategory, assigneeName) {
-            _updateItem(
-              itemId: item.id!,
-              itemName: itemName,
-              category: newCategory,
-              assigneeName: assigneeName,
-            );
-          },
-          members: _userNameById.values.toList(growable: false),
-        ),
-      ),
+      isScrollControlled: true,
+      barrierColor: Colors.black.withOpacity(0.2),
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.66,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            child: Material(
+              color: Colors.white,
+              child: AddChecklistItemScreen(
+                initialItemName: item.title,
+                initialCategory: category.title,
+                initialAssignee: item.assigneeName,
+                headerText: 'Sửa món đồ cần mang',
+                submitText: 'Lưu',
+                onAdd: (itemName, newCategory, assigneeName) {
+                  _updateItem(
+                    itemId: item.id!,
+                    itemName: itemName,
+                    category: newCategory,
+                    assigneeName: assigneeName,
+                  );
+                },
+                members: _userNameById.values.toList(growable: false),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -271,26 +297,64 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     final item = category.items[itemIndex];
     if (item.id == null) return;
 
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Xóa checklist'),
-        content: Text('Xóa "${item.title}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Hủy'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Xóa'),
-          ),
-        ],
-      ),
-    );
-
+    final ok = await _confirmChecklistDeleteDialog(itemTitle: item.title);
     if (ok != true) return;
     await _deleteItem(itemId: item.id!);
+  }
+
+  Future<bool> _confirmChecklistDeleteDialog({required String itemTitle}) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        final shape = RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        );
+        return AlertDialog(
+          title: const Text('Xóa checklist?'),
+          content: Text('Bạn có chắc muốn xóa "$itemTitle" không?'),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 44,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        shape: shape,
+                        foregroundColor: AppColors.textPrimary,
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Hủy'),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: SizedBox(
+                    height: 44,
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        shape: shape,
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Xóa'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+
+    return confirmed == true;
   }
 
   Future<void> _updateItem({
@@ -404,23 +468,21 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                 child: Column(
                   children: [
                     _buildTripImageCard(),
-                    const SizedBox(height: 4),
-                    _buildMemberInfo(),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 15),
                     _buildPreparationProgress(_progress),
-                    const SizedBox(height: 41),
+                    const SizedBox(height: 7),
                     _buildAddItemCta(),
-                    const SizedBox(height: 41),
+                    const SizedBox(height: 7),
                     if (_isLoading)
                       const Padding(
-                        padding: EdgeInsets.only(bottom: 41),
+                        padding: EdgeInsets.symmetric(vertical: 24),
                         child: Center(child: CircularProgressIndicator()),
                       ),
                     ..._categories.asMap().entries.map((entry) {
                       final categoryIndex = entry.key;
                       final category = entry.value;
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 41),
+                        padding: const EdgeInsets.only(bottom: 20),
                         child: ChecklistCategoryCard(
                           data: category,
                           onItemTap: (itemIndex) =>
@@ -429,10 +491,23 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                             categoryIndex: categoryIndex,
                             itemIndex: itemIndex,
                           ),
+							onConfirmDelete: (itemIndex) async {
+								final item = category.items[itemIndex];
+								if (item.id == null) return false;
+								return _confirmChecklistDeleteDialog(
+									itemTitle: item.title,
+								);
+							},
+							onDelete: (itemIndex) {
+								final item = category.items[itemIndex];
+								final id = item.id;
+								if (id == null) return;
+								_deleteItem(itemId: id);
+							},
                         ),
                       );
                     }),
-                    const SizedBox(height: 80),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -441,7 +516,8 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
           ],
         ),
       ),
-      floatingActionButton: AddFloatingButton(onPressed: _showAddItemDialog),
+      floatingActionButton: AddFloatingButton(onPressed: _showAddItemSheet),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
@@ -569,37 +645,6 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
 		);
 	}
 
-  Widget _buildMemberInfo() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Image.asset('assets/icons/group.png', width: 24, height: 24),
-            const SizedBox(width: 6),
-            Text(
-              '${widget.trip.memberCount} thành viên',
-              style: const TextStyle(fontSize: 14, color: Colors.black),
-            ),
-            const Spacer(),
-            ...widget.trip.memberColors
-                .map(
-                  (color) => MemberAvatar(
-                    color: Color(int.parse(color.replaceFirst('#', '0xFF'))),
-                    size: 25,
-                  ),
-                ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildPreparationProgress(double progress) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -645,12 +690,12 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: GestureDetector(
-        onTap: _showAddItemDialog,
+        onTap: _showAddItemSheet,
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.3),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(12),
           ),
           child: const Center(
@@ -685,6 +730,8 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
         assigneeId: item.assigneeId,
         fallback: decoded.assigneeName,
       );
+      final assigneeAvatarUrl =
+          _resolveAssigneeAvatarUrl(assigneeId: item.assigneeId);
 
       grouped[key]!.add(
         ChecklistItemData(
@@ -693,6 +740,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
           isChecked: item.isDone,
           assigneeId: item.assigneeId,
           assigneeName: assigneeName,
+          assigneeAvatarUrl: assigneeAvatarUrl,
         ),
       );
     }
@@ -709,6 +757,11 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
   }) {
     if (assigneeId == null) return fallback ?? 'Chưa gán';
     return _userNameById[assigneeId] ?? fallback ?? 'User $assigneeId';
+  }
+
+  String? _resolveAssigneeAvatarUrl({required int? assigneeId}) {
+    if (assigneeId == null) return null;
+    return _userAvatarUrlById[assigneeId];
   }
 
   String _inferCategory(String title) {
@@ -812,6 +865,82 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     }
 
     return out;
+  }
+
+  Map<int, String> _extractUserAvatarUrlById(Map<String, dynamic> raw) {
+    final data = raw['data'];
+    if (data is! List) return <int, String>{};
+
+    int? readInt(dynamic v) {
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      if (v is String) return int.tryParse(v);
+      return null;
+    }
+
+    String? readString(dynamic v) {
+      if (v is String) {
+        final s = v.trim();
+        return s.isEmpty ? null : s;
+      }
+      return null;
+    }
+
+    const avatarKeys = <String>[
+      'avatar_url',
+      'avatarUrl',
+      'avatar',
+      'photo_url',
+      'photoUrl',
+      'photo',
+      'profile_image_url',
+      'profileImageUrl',
+      'profile_picture_url',
+      'profilePictureUrl',
+      'image_url',
+      'imageUrl',
+    ];
+
+    final out = <int, String>{};
+    for (final item in data) {
+      if (item is! Map) continue;
+      final map = Map<String, dynamic>.from(item);
+
+      final nestedUser = map['user'] ?? map['profile'] ?? map['member'];
+      final userMap = nestedUser is Map ? Map<String, dynamic>.from(nestedUser) : null;
+
+      final id = readInt((userMap ?? map)['id']) ?? readInt(map['user_id']);
+      if (id == null) continue;
+
+      String? avatar;
+      for (final key in avatarKeys) {
+        final v = (userMap ?? map)[key] ?? map[key];
+        final s = readString(v);
+        if (s == null) continue;
+        if (s.toLowerCase() == 'null') continue;
+        avatar = s;
+        break;
+      }
+
+      if (avatar != null) {
+        out[id] = _normalizeMediaUrl(avatar);
+      }
+    }
+
+    return out;
+  }
+
+  String _normalizeMediaUrl(String url) {
+    final trimmed = url.trim();
+    if (trimmed.isEmpty) return trimmed;
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    if (trimmed.startsWith('//')) return 'https:$trimmed';
+    if (trimmed.startsWith('assets/')) return trimmed;
+
+    if (trimmed.startsWith('/')) return '${Env.apiBaseUrl}$trimmed';
+    return '${Env.apiBaseUrl}/$trimmed';
   }
 }
 

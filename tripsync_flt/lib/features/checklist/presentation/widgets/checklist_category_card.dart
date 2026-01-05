@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../../shared/styles/app_colors.dart';
+
 class ChecklistCategoryCard extends StatelessWidget {
 	final ChecklistCategoryData data;
 	final ValueChanged<int>? onItemTap;
 	final ValueChanged<int>? onItemLongPress;
+	final Future<bool> Function(int itemIndex)? onConfirmDelete;
+	final ValueChanged<int>? onDelete;
 	final EdgeInsetsGeometry margin;
 
 	const ChecklistCategoryCard({
@@ -11,6 +15,8 @@ class ChecklistCategoryCard extends StatelessWidget {
 		required this.data,
 		this.onItemTap,
 		this.onItemLongPress,
+		this.onConfirmDelete,
+		this.onDelete,
 		this.margin = const EdgeInsets.symmetric(horizontal: 15),
 	});
 
@@ -45,6 +51,8 @@ class ChecklistCategoryCard extends StatelessWidget {
 								data: item,
 								onTap: onItemTap == null ? null : () => onItemTap!.call(index),
 								onLongPress: onItemLongPress == null ? null : () => onItemLongPress!.call(index),
+								onConfirmDelete: onConfirmDelete == null ? null : () => onConfirmDelete!.call(index),
+								onDelete: onDelete == null ? null : () => onDelete!.call(index),
 							),
 						);
 					}),
@@ -58,17 +66,21 @@ class ChecklistItemRow extends StatelessWidget {
 	final ChecklistItemData data;
 	final VoidCallback? onTap;
 	final VoidCallback? onLongPress;
+	final Future<bool> Function()? onConfirmDelete;
+	final VoidCallback? onDelete;
 
 	const ChecklistItemRow({
 		super.key,
 		required this.data,
 		this.onTap,
 		this.onLongPress,
+		this.onConfirmDelete,
+		this.onDelete,
 	});
 
 	@override
 	Widget build(BuildContext context) {
-		return InkWell(
+		final content = InkWell(
 			onTap: onTap,
 			onLongPress: onLongPress,
 			borderRadius: BorderRadius.circular(12),
@@ -95,11 +107,38 @@ class ChecklistItemRow extends StatelessWidget {
 						),
 						if (data.assigneeName != null) ...[
 							const SizedBox(width: 10),
-							_AssigneeChip(name: data.assigneeName!),
+							_AssigneeChip(
+								name: data.assigneeName!,
+								avatarUrl: data.assigneeAvatarUrl,
+							),
 						],
 					],
 				),
 			),
+		);
+
+		final canSwipeDelete =
+			onConfirmDelete != null && onDelete != null && data.id != null;
+		if (!canSwipeDelete) return content;
+
+		return Dismissible(
+			key: ValueKey<String>('checklist-item-${data.id}'),
+			direction: DismissDirection.endToStart,
+			confirmDismiss: (direction) async {
+				if (direction != DismissDirection.endToStart) return false;
+				return onConfirmDelete!.call();
+			},
+			onDismissed: (_) => onDelete!.call(),
+			background: Container(
+				alignment: Alignment.centerRight,
+				padding: const EdgeInsets.only(right: 16),
+				decoration: BoxDecoration(
+					color: AppColors.primary,
+					borderRadius: BorderRadius.circular(12),
+				),
+				child: const Icon(Icons.delete, color: Colors.white),
+			),
+			child: content,
 		);
 	}
 }
@@ -127,8 +166,9 @@ class _ChecklistCheckbox extends StatelessWidget {
 
 class _AssigneeChip extends StatelessWidget {
 	final String name;
+	final String? avatarUrl;
 
-	const _AssigneeChip({required this.name});
+	const _AssigneeChip({required this.name, this.avatarUrl});
 
 	@override
 	Widget build(BuildContext context) {
@@ -140,19 +180,7 @@ class _AssigneeChip extends StatelessWidget {
 			child: Row(
 				mainAxisSize: MainAxisSize.min,
 				children: [
-					SizedBox(
-						width: 18,
-						height: 18,
-						child: Image.asset(
-							'assets/icons/person.png',
-							width: 18,
-							height: 18,
-							fit: BoxFit.contain,
-							errorBuilder: (context, error, stackTrace) {
-								return const Icon(Icons.person, size: 18, color: Colors.black);
-							},
-						),
-					),
+					_buildAvatar(),
 					const SizedBox(width: 8),
 					Text(
 						name,
@@ -165,6 +193,43 @@ class _AssigneeChip extends StatelessWidget {
 						overflow: TextOverflow.ellipsis,
 					),
 				],
+			),
+		);
+	}
+
+	Widget _buildAvatar() {
+		final url = avatarUrl?.trim();
+		return Container(
+			width: 18,
+			height: 18,
+			decoration: BoxDecoration(
+				shape: BoxShape.circle,
+				color: Colors.grey.shade200,
+			),
+			child: ClipOval(
+				child: (url != null && url.isNotEmpty)
+						? Image.network(
+							url,
+							fit: BoxFit.cover,
+							errorBuilder: (context, error, stackTrace) {
+								return _fallbackAvatar();
+							},
+						)
+						: _fallbackAvatar(),
+			),
+		);
+	}
+
+	Widget _fallbackAvatar() {
+		return Center(
+			child: Image.asset(
+				'assets/icons/person.png',
+				width: 14,
+				height: 14,
+				fit: BoxFit.contain,
+				errorBuilder: (context, error, stackTrace) {
+					return const Icon(Icons.person, size: 14, color: Colors.black);
+				},
 			),
 		);
 	}
@@ -190,6 +255,7 @@ class ChecklistItemData {
 	final bool isChecked;
 	final int? assigneeId;
 	final String? assigneeName;
+	final String? assigneeAvatarUrl;
 
 	const ChecklistItemData({
 		this.id,
@@ -197,15 +263,17 @@ class ChecklistItemData {
 		this.isChecked = false,
 		this.assigneeId,
 		this.assigneeName,
+		this.assigneeAvatarUrl,
 	});
 
-	ChecklistItemData copyWith({int? id, String? title, bool? isChecked, int? assigneeId, String? assigneeName}) {
+	ChecklistItemData copyWith({int? id, String? title, bool? isChecked, int? assigneeId, String? assigneeName, String? assigneeAvatarUrl}) {
 		return ChecklistItemData(
 			id: id ?? this.id,
 			title: title ?? this.title,
 			isChecked: isChecked ?? this.isChecked,
 			assigneeId: assigneeId ?? this.assigneeId,
 			assigneeName: assigneeName ?? this.assigneeName,
+			assigneeAvatarUrl: assigneeAvatarUrl ?? this.assigneeAvatarUrl,
 		);
 	}
 }

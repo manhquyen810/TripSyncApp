@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../../../../routes/app_routes.dart';
 import '../../../../shared/styles/app_colors.dart';
 import '../../../../shared/widgets/add_floating_button.dart';
 import '../../../../shared/widgets/trip_bottom_navigation.dart';
 import '../../../../shared/widgets/trip_header.dart';
 import '../../../trip/domain/entities/trip.dart';
+
+import 'add_expense_screen.dart';
 
 import '../widgets/add_expense_button.dart';
 import '../widgets/balance_item.dart';
@@ -163,7 +164,21 @@ class ExpenseScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: AddFloatingButton(
-        onPressed: () => Navigator.pushNamed(context, AppRoutes.addExpense),
+        onPressed: () {
+          final tripId = trip.id;
+          if (tripId == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Không thể thêm chi tiêu (thiếu trip_id)')),
+            );
+            return;
+          }
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AddExpenseScreen(tripId: tripId),
+            ),
+          );
+        },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
