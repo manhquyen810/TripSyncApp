@@ -6,6 +6,7 @@ class ExpenseHistoryItem extends StatelessWidget {
   final int splitCount;
   final String totalAmount;
   final String perPersonAmount;
+  final String? category;
   final VoidCallback? onTap;
 
   const ExpenseHistoryItem({
@@ -15,8 +16,26 @@ class ExpenseHistoryItem extends StatelessWidget {
     required this.splitCount,
     required this.totalAmount,
     required this.perPersonAmount,
+    this.category,
     this.onTap,
   });
+
+  IconData _getCategoryIcon() {
+    switch (category) {
+      case 'food':
+        return Icons.restaurant;
+      case 'flight':
+        return Icons.flight;
+      case 'transportation':
+        return Icons.directions_bus;
+      case 'accommodation':
+        return Icons.hotel;
+      case 'other':
+        return Icons.more_horiz;
+      default:
+        return Icons.payment;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +56,11 @@ class ExpenseHistoryItem extends StatelessWidget {
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.flight, size: 24, color: Colors.black),
+              child: Icon(
+                _getCategoryIcon(),
+                size: 24,
+                color: Colors.black,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
