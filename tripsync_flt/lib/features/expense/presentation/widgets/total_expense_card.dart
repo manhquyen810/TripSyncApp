@@ -21,10 +21,7 @@ class TotalExpenseCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFF3B91A8),
-            Color(0xFF4CA5E0),
-          ],
+          colors: [Color(0xFF3B91A8), Color(0xFF4CA5E0)],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
@@ -70,9 +67,12 @@ class TotalExpenseCard extends StatelessWidget {
                 GestureDetector(
                   onTap: onDetailTap,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withAlpha(51),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Text(

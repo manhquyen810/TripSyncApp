@@ -5,18 +5,13 @@ import '../../../../core/network/exceptions.dart';
 import '../../data/datasources/auth_remote_data_source.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../widgets/forgot_password/forgot_password_header.dart';
 import '../widgets/forgot_password/email_input_step.dart';
 import '../widgets/forgot_password/otp_verification_step.dart';
 import '../widgets/forgot_password/reset_password_step.dart';
 import '../widgets/forgot_password/success_dialog.dart';
 import '../../../../shared/widgets/top_toast.dart';
 
-enum ForgotPasswordStep {
-  emailInput,
-  otpVerification,
-  resetPassword,
-}
+enum ForgotPasswordStep { emailInput, otpVerification, resetPassword }
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -30,8 +25,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool _isSubmitting = false;
 
   final TextEditingController emailController = TextEditingController();
-  final List<TextEditingController> otpControllers =
-      List.generate(5, (_) => TextEditingController());
+  final List<TextEditingController> otpControllers = List.generate(
+    5,
+    (_) => TextEditingController(),
+  );
   final TextEditingController newPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
@@ -178,7 +175,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           barrierDismissible: false,
           builder: (context) => const SuccessDialog(
             title: 'Hoàn thành',
-            message: 'Mật khẩu của bạn đã được thay đổi.\nNhấn vào tiếp tục để đăng nhập.',
+            message:
+                'Mật khẩu của bạn đã được thay đổi.\nNhấn vào tiếp tục để đăng nhập.',
             buttonText: 'Tiếp tục',
           ),
         );
@@ -222,7 +220,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         for (var controller in otpControllers) {
           controller.clear();
         }
-        
+
         showTopToast(
           context,
           message: 'Mã xác minh đã được gửi lại',
@@ -262,7 +260,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   height: 30,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0xFF1D1D1D), width: 1.5),
+                    border: Border.all(
+                      color: const Color(0xFF1D1D1D),
+                      width: 1.5,
+                    ),
                   ),
                   child: IconButton(
                     padding: EdgeInsets.zero,
@@ -276,12 +277,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         Navigator.pop(context);
                       } else {
                         setState(() {
-                          if (_currentStep == ForgotPasswordStep.otpVerification) {
+                          if (_currentStep ==
+                              ForgotPasswordStep.otpVerification) {
                             for (var controller in otpControllers) {
                               controller.clear();
                             }
                             _currentStep = ForgotPasswordStep.emailInput;
-                          } else if (_currentStep == ForgotPasswordStep.resetPassword) {
+                          } else if (_currentStep ==
+                              ForgotPasswordStep.resetPassword) {
                             _currentStep = ForgotPasswordStep.otpVerification;
                           }
                         });

@@ -6,10 +6,7 @@ import '../models/document_item.dart';
 class UploadDocumentSheet extends StatefulWidget {
   final void Function(PlatformFile file, DocumentCategory category) onUploaded;
 
-  const UploadDocumentSheet({
-    super.key,
-    required this.onUploaded,
-  });
+  const UploadDocumentSheet({super.key, required this.onUploaded});
 
   @override
   State<UploadDocumentSheet> createState() => _UploadDocumentSheetState();
@@ -51,13 +48,30 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
 
     bool hasAny(List<String> keywords) => keywords.any(name.contains);
 
-    if (hasAny(['cccd', 'cmnd', 'passport', 'visa', 'id', 'identity', 'giay to'])) {
+    if (hasAny([
+      'cccd',
+      'cmnd',
+      'passport',
+      'visa',
+      'id',
+      'identity',
+      'giay to',
+    ])) {
       return DocumentCategory.cccd;
     }
     if (hasAny(['hotel', 'booking', 'reservation', 'voucher', 'khach san'])) {
       return DocumentCategory.hotel;
     }
-    if (hasAny(['flight', 'boarding', 'air', 'vietjet', 'bamboo', 'vna', 'airlines', 've may bay'])) {
+    if (hasAny([
+      'flight',
+      'boarding',
+      'air',
+      'vietjet',
+      'bamboo',
+      'vna',
+      'airlines',
+      've may bay',
+    ])) {
       return DocumentCategory.flight;
     }
     if (hasAny(['bus', 'xe', 'coach', 'train', 'tau', 'xe khach'])) {
@@ -347,7 +361,9 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
 
   void _showSnack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Widget _buildTypeChip({
@@ -357,7 +373,7 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
   }) {
     final isSelected = _selectedType == value;
     final backgroundColor = isSelected
-      ? AppColors.blue.withValues(alpha: 0.25)
+        ? AppColors.blue.withValues(alpha: 0.25)
         : AppColors.buttonBackground;
     final foregroundColor = isSelected ? AppColors.blue : AppColors.textPrimary;
 

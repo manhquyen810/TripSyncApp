@@ -80,10 +80,11 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
         Navigator.of(context).pop(_membersChanged);
-        return false;
       },
       child: Scaffold(
         backgroundColor: AppColors.background,
@@ -754,8 +755,9 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
-      if (!mounted) return;
-      setState(() => _busyActivityIds.remove(activityId));
+      if (mounted) {
+        setState(() => _busyActivityIds.remove(activityId));
+      }
     }
   }
 
@@ -776,8 +778,9 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
-      if (!mounted) return;
-      setState(() => _busyActivityIds.remove(activityId));
+      if (mounted) {
+        setState(() => _busyActivityIds.remove(activityId));
+      }
     }
   }
 
@@ -838,8 +841,9 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
-      if (!mounted) return;
-      setState(() => _busyActivityIds.remove(activityId));
+      if (mounted) {
+        setState(() => _busyActivityIds.remove(activityId));
+      }
     }
   }
 

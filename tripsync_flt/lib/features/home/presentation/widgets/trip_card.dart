@@ -39,7 +39,7 @@ class TripCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(24),
-              child: Container(
+              child: SizedBox(
                 height: imageHeight,
                 child: Stack(
                   children: [
@@ -56,7 +56,7 @@ class TripCard extends StatelessWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              Colors.black.withOpacity(0.6),
+                              Colors.black.withAlpha(153),
                             ],
                           ),
                         ),
@@ -202,7 +202,7 @@ class TripCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.grey.shade500,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withOpacity(0.9), width: 2),
+        border: Border.all(color: Colors.white.withAlpha(230), width: 2),
       ),
       alignment: Alignment.center,
       child: Text(
@@ -227,12 +227,13 @@ class TripCard extends StatelessWidget {
       child: const Icon(Icons.image, size: 50),
     );
 
-    if (url.isEmpty)
+    if (url.isEmpty) {
       return SizedBox(
         width: cardWidth,
         height: imageHeight,
         child: placeholder,
       );
+    }
 
     if (url.startsWith('assets/')) {
       return Image.asset(

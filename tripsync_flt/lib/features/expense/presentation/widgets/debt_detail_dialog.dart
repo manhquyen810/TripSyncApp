@@ -14,9 +14,7 @@ class DebtDetailDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 400),
         padding: const EdgeInsets.all(24),
@@ -51,10 +49,7 @@ class DebtDetailDialog extends StatelessWidget {
                 child: Center(
                   child: Text(
                     'Không có khoản thanh toán nào',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ),
               )
@@ -120,7 +115,7 @@ class DebtDetailDialog extends StatelessWidget {
                     ),
                   ),
                 );
-              }).toList(),
+              }),
           ],
         ),
       ),

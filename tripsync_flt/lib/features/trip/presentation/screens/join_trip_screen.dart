@@ -115,7 +115,7 @@ class _JoinTripScreenState extends State<JoinTripScreen> {
 
       for (final item in data) {
         if (item is! Map) continue;
-        final json = Map<String, dynamic>.from(item as Map);
+        final json = Map<String, dynamic>.from(item);
         final code = (json['invite_code'] ?? '').toString().trim();
         if (code == inviteCode) {
           final end = (json['end_date'] ?? '').toString();
@@ -131,7 +131,7 @@ class _JoinTripScreenState extends State<JoinTripScreen> {
   DateTime? _extractTripEndDate(Map<String, dynamic> raw) {
     final data = raw['data'];
     if (data is! Map) return null;
-    final end = (data as Map)['end_date'];
+    final end = (data)['end_date'];
     if (end == null) return null;
     return _tryParseIsoDate(end.toString());
   }
@@ -157,7 +157,7 @@ class _JoinTripScreenState extends State<JoinTripScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.5),
+      backgroundColor: Colors.black.withAlpha(128),
       body: Center(
         child: Container(
           width: MediaQuery.of(context).size.width - 24,
@@ -202,7 +202,7 @@ class _JoinTripScreenState extends State<JoinTripScreen> {
 Future<bool?> showJoinTripDialog(BuildContext context) {
   return showDialog<bool>(
     context: context,
-    barrierColor: Colors.black.withOpacity(0.5),
+    barrierColor: Colors.black.withAlpha(128),
     builder: (context) => const JoinTripScreen(),
   );
 }

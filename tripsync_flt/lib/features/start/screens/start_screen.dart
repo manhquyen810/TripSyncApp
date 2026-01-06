@@ -56,10 +56,9 @@ class _StartScreenState extends State<StartScreen> {
       if (!mounted) return;
 
       // Token is valid, navigate straight to Home.
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.home,
-        (route) => false,
-      );
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
     } on ApiException {
       await AuthTokenStore.clear();
       _finishCheckingAndMaybeOpenLogin();

@@ -424,10 +424,11 @@ class _TripMemberManagementScreenState
   Widget build(BuildContext context) {
     final trip = widget.trip;
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
         Navigator.of(context).pop(_membersChanged);
-        return false;
       },
       child: Scaffold(
         backgroundColor: AppColors.background,

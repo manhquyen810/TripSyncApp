@@ -52,7 +52,7 @@ class AllTripsSearchBar extends StatelessWidget {
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(
-              color: borderColor.withOpacity(0.55),
+              color: borderColor.withAlpha((0.55 * 255).round()),
               width: 1,
             ),
           ),

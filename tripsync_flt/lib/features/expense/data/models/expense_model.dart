@@ -40,8 +40,8 @@ class ExpenseModel {
       expenseDate: json['expense_date'],
       splits: json['splits'] != null
           ? (json['splits'] as List)
-              .map((s) => ExpenseSplitModel.fromJson(s))
-              .toList()
+                .map((s) => ExpenseSplitModel.fromJson(s))
+                .toList()
           : null,
       payer: json['payer'] != null ? PayerModel.fromJson(json['payer']) : null,
     );
@@ -99,10 +99,7 @@ class PayerModel {
   PayerModel({required this.id, required this.name});
 
   factory PayerModel.fromJson(Map<String, dynamic> json) {
-    return PayerModel(
-      id: json['id'],
-      name: json['name'],
-    );
+    return PayerModel(id: json['id'], name: json['name']);
   }
 }
 
@@ -113,9 +110,6 @@ class UserModel {
   UserModel({required this.id, required this.name});
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
-      id: json['id'],
-      name: json['name'],
-    );
+    return UserModel(id: json['id'], name: json['name']);
   }
 }

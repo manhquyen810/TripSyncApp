@@ -22,7 +22,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
   DateTime selectedDateTime = DateTime.now();
-  
+
   late final ExpenseRepositoryImpl _repository;
   late Future<List<TripMember>> _membersFuture;
   bool _isSubmitting = false;
@@ -172,7 +172,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(category['icon'] as IconData, size: 24, color: Colors.black),
+                    Icon(
+                      category['icon'] as IconData,
+                      size: 24,
+                      color: Colors.black,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       category['name'] as String,
@@ -299,7 +303,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.calendar_today, size: 20, color: Color(0xFF9A9A9A)),
+                const Icon(
+                  Icons.calendar_today,
+                  size: 20,
+                  color: Color(0xFF9A9A9A),
+                ),
                 const SizedBox(width: 12),
                 Text(
                   '${selectedDateTime.day}/${selectedDateTime.month}/${selectedDateTime.year} - ${selectedDateTime.hour.toString().padLeft(2, '0')}:${selectedDateTime.minute.toString().padLeft(2, '0')}',
@@ -312,8 +320,6 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       ],
     );
   }
-
-
 
   Widget _buildPayerSection() {
     return Column(
@@ -330,13 +336,13 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CircularProgressIndicator();
             }
-            
+
             if (snapshot.hasError || !snapshot.hasData) {
               return const Text('Không thể tải danh sách thành viên');
             }
-            
+
             final members = snapshot.data!;
-            
+
             return Wrap(
               spacing: 12,
               runSpacing: 12,
@@ -410,13 +416,13 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CircularProgressIndicator();
             }
-            
+
             if (snapshot.hasError || !snapshot.hasData) {
               return const Text('Không thể tải danh sách thành viên');
             }
-            
+
             final members = snapshot.data!;
-            
+
             return Wrap(
               spacing: 12,
               runSpacing: 12,
@@ -530,28 +536,48 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
   Future<void> _handleSubmit() async {
     if (selectedCategory == null) {
-      showTopToast(context, message: 'Vui lòng chọn danh mục', type: TopToastType.error);
+      showTopToast(
+        context,
+        message: 'Vui lòng chọn danh mục',
+        type: TopToastType.error,
+      );
       return;
     }
 
     if (descriptionController.text.trim().isEmpty) {
-      showTopToast(context, message: 'Vui lòng nhập mô tả', type: TopToastType.error);
+      showTopToast(
+        context,
+        message: 'Vui lòng nhập mô tả',
+        type: TopToastType.error,
+      );
       return;
     }
 
     final amount = double.tryParse(amountController.text.trim());
     if (amount == null || amount <= 0) {
-      showTopToast(context, message: 'Vui lòng nhập số tiền hợp lệ', type: TopToastType.error);
+      showTopToast(
+        context,
+        message: 'Vui lòng nhập số tiền hợp lệ',
+        type: TopToastType.error,
+      );
       return;
     }
 
     if (selectedPayerId == null) {
-      showTopToast(context, message: 'Vui lòng chọn người đã trả', type: TopToastType.error);
+      showTopToast(
+        context,
+        message: 'Vui lòng chọn người đã trả',
+        type: TopToastType.error,
+      );
       return;
     }
 
     if (selectedMemberIds.isEmpty) {
-      showTopToast(context, message: 'Vui lòng chọn người tham gia', type: TopToastType.error);
+      showTopToast(
+        context,
+        message: 'Vui lòng chọn người tham gia',
+        type: TopToastType.error,
+      );
       return;
     }
 
@@ -572,7 +598,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
       if (!mounted) return;
 
-      showTopToast(context, message: 'Thêm chi tiêu thành công', type: TopToastType.success);
+      showTopToast(
+        context,
+        message: 'Thêm chi tiêu thành công',
+        type: TopToastType.success,
+      );
       Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;

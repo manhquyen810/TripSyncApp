@@ -23,7 +23,7 @@ class MemberAvatar extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withOpacity(0.9), width: 2),
+        border: Border.all(color: Colors.white.withAlpha(230), width: 2),
       ),
       child: (normalizedUrl != null && normalizedUrl.isNotEmpty)
           ? ClipOval(child: _buildImage(normalizedUrl))

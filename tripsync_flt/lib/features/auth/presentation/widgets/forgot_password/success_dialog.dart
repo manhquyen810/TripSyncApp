@@ -16,9 +16,7 @@ class SuccessDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
@@ -31,11 +29,7 @@ class SuccessDialog extends StatelessWidget {
                 color: Color(0xFF00D756),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.check,
-                color: Colors.white,
-                size: 40,
-              ),
+              child: const Icon(Icons.check, color: Colors.white, size: 40),
             ),
 
             const SizedBox(height: 24),

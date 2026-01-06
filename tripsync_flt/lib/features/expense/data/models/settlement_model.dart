@@ -55,10 +55,7 @@ class FromUserModel {
   FromUserModel({required this.id, required this.name});
 
   factory FromUserModel.fromJson(Map<String, dynamic> json) {
-    return FromUserModel(
-      id: json['id'],
-      name: json['name'],
-    );
+    return FromUserModel(id: json['id'], name: json['name']);
   }
 }
 
@@ -69,9 +66,6 @@ class ToUserModel {
   ToUserModel({required this.id, required this.name});
 
   factory ToUserModel.fromJson(Map<String, dynamic> json) {
-    return ToUserModel(
-      id: json['id'],
-      name: json['name'],
-    );
+    return ToUserModel(id: json['id'], name: json['name']);
   }
 }

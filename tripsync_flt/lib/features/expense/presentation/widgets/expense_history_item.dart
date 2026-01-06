@@ -37,11 +37,7 @@ class ExpenseHistoryItem extends StatelessWidget {
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(
-                Icons.flight,
-                size: 24,
-                color: Colors.black,
-              ),
+              child: const Icon(Icons.flight, size: 24, color: Colors.black),
             ),
             const SizedBox(width: 14),
             Expanded(

@@ -37,14 +37,14 @@ class _OtpVerificationStepState extends State<OtpVerificationStep> {
   String _maskEmail(String email) {
     final parts = email.split('@');
     if (parts.length != 2) return email;
-    
+
     final username = parts[0];
     final domain = parts[1];
-    
+
     if (username.length <= 3) {
       return '${username[0]}***@$domain';
     }
-    
+
     final visibleChars = username.substring(0, 3);
     return '$visibleChars***@$domain';
   }
@@ -53,18 +53,12 @@ class _OtpVerificationStepState extends State<OtpVerificationStep> {
     if (value.length == 1 && index < 4) {
       _focusNodes[index + 1].requestFocus();
     }
-    
+
     if (index == 4 && value.length == 1) {
       final allFilled = widget.otpControllers.every((c) => c.text.isNotEmpty);
       if (allFilled && !widget.isLoading) {
         widget.onVerify();
       }
-    }
-  }
-
-  void _onOtpBackspace(int index) {
-    if (index > 0 && widget.otpControllers[index].text.isEmpty) {
-      _focusNodes[index - 1].requestFocus();
     }
   }
 
@@ -74,9 +68,10 @@ class _OtpVerificationStepState extends State<OtpVerificationStep> {
       children: [
         ForgotPasswordHeader(
           title: 'Kiểm tra email',
-          description: 'Đã gửi email với mã xác minh đến\n${_maskEmail(widget.email)}\nNhập mã dưới đây',
+          description:
+              'Đã gửi email với mã xác minh đến\n${_maskEmail(widget.email)}\nNhập mã dưới đây',
         ),
-        
+
         const SizedBox(height: 48),
 
         Row(
@@ -99,9 +94,7 @@ class _OtpVerificationStepState extends State<OtpVerificationStep> {
                   color: Color(0xFFFF3B30),
                   height: 1.33,
                 ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: InputDecoration(
                   counterText: '',
                   contentPadding: EdgeInsets.zero,
@@ -137,7 +130,7 @@ class _OtpVerificationStepState extends State<OtpVerificationStep> {
             );
           }),
         ),
-        
+
         const SizedBox(height: 24),
 
         SizedBox(
@@ -185,14 +178,14 @@ class _OtpVerificationStepState extends State<OtpVerificationStep> {
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 14,
-                  color: widget.isLoading 
-                      ? const Color(0xFF6A7282) 
+                  color: widget.isLoading
+                      ? const Color(0xFF6A7282)
                       : const Color(0xFF72BF83),
                   fontWeight: FontWeight.w600,
                   height: 1.43,
                   decoration: TextDecoration.underline,
-                  decorationColor: widget.isLoading 
-                      ? const Color(0xFF6A7282) 
+                  decorationColor: widget.isLoading
+                      ? const Color(0xFF6A7282)
                       : const Color(0xFF72BF83),
                 ),
               ),
