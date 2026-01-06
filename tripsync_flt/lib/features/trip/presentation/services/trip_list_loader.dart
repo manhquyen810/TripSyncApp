@@ -310,10 +310,14 @@ class TripListLoader {
     const avatarKeys = <String>[
       'avatar_url',
       'avatarUrl',
+      'avatar',
       'photo_url',
       'photoUrl',
+      'photo',
       'profile_image_url',
       'profileImageUrl',
+      'profile_picture_url',
+      'profilePictureUrl',
       'image_url',
       'imageUrl',
     ];
@@ -329,8 +333,8 @@ class TripListLoader {
       for (final key in avatarKeys) {
         final v = m[key] ?? userMap?[key];
         if (v == null) continue;
-        final s = v.toString().trim();
-        if (s.isEmpty || s.toLowerCase() == 'null') continue;
+        final s = _coerceUrlString(v);
+        if (s == null) continue;
         found = s;
         break;
       }
@@ -350,6 +354,34 @@ class TripListLoader {
       if (a[i] != b[i]) return false;
     }
     return true;
+  }
+
+  static String? _coerceUrlString(dynamic value) {
+    if (value == null) return null;
+    if (value is String) {
+      final s = value.trim();
+      if (s.isEmpty || s.toLowerCase() == 'null') return null;
+      return s;
+    }
+
+    // Some APIs may return: { url: "..." } or { secure_url: "..." }
+    if (value is Map) {
+      final map = Map<String, dynamic>.from(value);
+      for (final key in const <String>[
+        'url',
+        'secure_url',
+        'secureUrl',
+        'path',
+        'file_url',
+        'fileUrl',
+      ]) {
+        final v = map[key];
+        final s = v is String ? v.trim() : null;
+        if (s != null && s.isNotEmpty && s.toLowerCase() != 'null') return s;
+      }
+    }
+
+    return null;
   }
 
   static int _estimateDays(String start, String end) {
@@ -447,10 +479,14 @@ class TripListLoader {
     const avatarKeys = <String>[
       'avatar_url',
       'avatarUrl',
+      'avatar',
       'photo_url',
       'photoUrl',
+      'photo',
       'profile_image_url',
       'profileImageUrl',
+      'profile_picture_url',
+      'profilePictureUrl',
       'image_url',
       'imageUrl',
     ];
@@ -475,8 +511,8 @@ class TripListLoader {
         for (final key in avatarKeys) {
           final v = m[key] ?? userMap?[key];
           if (v == null) continue;
-          final s = v.toString().trim();
-          if (s.isEmpty || s.toLowerCase() == 'null') continue;
+          final s = _coerceUrlString(v);
+          if (s == null) continue;
           found = s;
           break;
         }

@@ -86,7 +86,9 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
       final membersFuture = _tripRepository.listTripMembers(tripId: tripId);
 
       final docs = await docsFuture;
-      final userNameById = _extractUserNameById(await membersFuture);
+      final membersRaw = await membersFuture;
+      final userNameById = _extractUserNameById(membersRaw);
+      final userAvatarUrlById = _extractUserAvatarUrlById(membersRaw);
 
       // Cache list for offline use (best-effort).
       try {
@@ -109,6 +111,7 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
           id: d.id,
           title: filename,
           author: userNameById[d.uploaderId] ?? 'User ${d.uploaderId}',
+          authorAvatarUrl: userAvatarUrlById[d.uploaderId],
           date: _formatDate(d.createdAt),
           iconAsset: _categoryIconAsset(category),
           category: category,
@@ -143,6 +146,7 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
                 id: d.id,
                 title: filename,
                 author: 'User ${d.uploaderId}',
+                authorAvatarUrl: null,
                 date: _formatDate(d.createdAt),
                 iconAsset: _categoryIconAsset(category),
                 category: category,
@@ -223,6 +227,52 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
 
       if (name != null) {
         out[id] = name;
+      }
+    }
+
+    return out;
+  }
+
+  Map<int, String> _extractUserAvatarUrlById(Map<String, dynamic> raw) {
+    final data = raw['data'];
+    if (data is! List) return <int, String>{};
+
+    int? readInt(dynamic v) {
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      if (v is String) return int.tryParse(v);
+      return null;
+    }
+
+    String? readString(dynamic v) {
+      if (v is String) {
+        final s = v.trim();
+        return s.isEmpty ? null : s;
+      }
+      return null;
+    }
+
+    final out = <int, String>{};
+    for (final item in data) {
+      if (item is! Map) continue;
+      final map = Map<String, dynamic>.from(item);
+
+      final nestedUser = map['user'];
+      final userMap = nestedUser is Map ? Map<String, dynamic>.from(nestedUser) : null;
+
+      final id = readInt((userMap ?? map)['id']) ?? readInt(map['user_id']);
+      if (id == null) continue;
+
+      final avatarUrl =
+          readString((userMap ?? map)['avatar_url']) ??
+          readString((userMap ?? map)['avatarUrl']) ??
+          readString((userMap ?? map)['photo_url']) ??
+          readString((userMap ?? map)['photoUrl']) ??
+          readString((userMap ?? map)['profile_picture']) ??
+          readString((userMap ?? map)['profilePicture']);
+
+      if (avatarUrl != null) {
+        out[id] = avatarUrl;
       }
     }
 
@@ -701,6 +751,7 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
       id: current.id,
       title: current.title,
       author: current.author,
+      authorAvatarUrl: current.authorAvatarUrl,
       date: current.date,
       iconAsset: current.iconAsset,
       category: current.category,

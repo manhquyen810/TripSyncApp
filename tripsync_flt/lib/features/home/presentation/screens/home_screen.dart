@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/config/env.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/auth_token_store.dart';
 import '../../../../core/network/exceptions.dart';
@@ -90,12 +91,25 @@ class _HomeScreenState extends State<HomeScreen> {
     final data = raw['data'];
     if (data is Map<String, dynamic>) {
       final v = data['avatar_url'] ?? data['avatarUrl'];
-      if (v is String && v.trim().isNotEmpty) return v;
+      if (v is String && v.trim().isNotEmpty) return _normalizeMediaUrl(v);
     }
 
     final v = raw['avatar_url'] ?? raw['avatarUrl'];
-    if (v is String && v.trim().isNotEmpty) return v;
+    if (v is String && v.trim().isNotEmpty) return _normalizeMediaUrl(v);
     return null;
+  }
+
+  String _normalizeMediaUrl(String url) {
+    final trimmed = url.trim();
+    if (trimmed.isEmpty) return trimmed;
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    if (trimmed.startsWith('//')) return 'https:$trimmed';
+    if (trimmed.startsWith('assets/')) return trimmed;
+
+    if (trimmed.startsWith('/')) return '${Env.apiBaseUrl}$trimmed';
+    return '${Env.apiBaseUrl}/$trimmed';
   }
 
   void _refreshTrips() {

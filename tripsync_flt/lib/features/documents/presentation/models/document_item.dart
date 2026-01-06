@@ -4,6 +4,7 @@ class DocumentItem {
   final int? id;
   final String title;
   final String author;
+  final String? authorAvatarUrl;
   final String date;
   final String iconAsset;
   final DocumentCategory category;
@@ -16,6 +17,7 @@ class DocumentItem {
     this.id,
     required this.title,
     required this.author,
+    this.authorAvatarUrl,
     required this.date,
     required this.iconAsset,
     required this.category,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../home/presentation/widgets/member_avatar.dart';
+
 class ChecklistCategoryCard extends StatelessWidget {
 	final ChecklistCategoryData data;
 	final ValueChanged<int>? onItemTap;
@@ -85,7 +87,10 @@ class ChecklistItemRow extends StatelessWidget {
 						),
 						if (data.assigneeName != null) ...[
 							const SizedBox(width: 10),
-							_AssigneeChip(name: data.assigneeName!),
+							_AssigneeChip(
+								name: data.assigneeName!,
+								avatarUrl: data.assigneeAvatarUrl,
+							),
 						],
 					],
 				),
@@ -117,8 +122,9 @@ class _ChecklistCheckbox extends StatelessWidget {
 
 class _AssigneeChip extends StatelessWidget {
 	final String name;
+	final String? avatarUrl;
 
-	const _AssigneeChip({required this.name});
+	const _AssigneeChip({required this.name, this.avatarUrl});
 
 	@override
 	Widget build(BuildContext context) {
@@ -130,18 +136,10 @@ class _AssigneeChip extends StatelessWidget {
 			child: Row(
 				mainAxisSize: MainAxisSize.min,
 				children: [
-					SizedBox(
-						width: 18,
-						height: 18,
-						child: Image.asset(
-							'assets/icons/person.png',
-							width: 18,
-							height: 18,
-							fit: BoxFit.contain,
-							errorBuilder: (context, error, stackTrace) {
-								return const Icon(Icons.person, size: 18, color: Colors.black);
-							},
-						),
+					MemberAvatar(
+						color: Colors.grey.shade300,
+						imageUrl: avatarUrl,
+						size: 18,
 					),
 					const SizedBox(width: 8),
 					Text(
@@ -178,18 +176,21 @@ class ChecklistItemData {
 	final String title;
 	final bool isChecked;
 	final String? assigneeName;
+	final String? assigneeAvatarUrl;
 
 	const ChecklistItemData({
 		required this.title,
 		this.isChecked = false,
 		this.assigneeName,
+		this.assigneeAvatarUrl,
 	});
 
-	ChecklistItemData copyWith({String? title, bool? isChecked, String? assigneeName}) {
+	ChecklistItemData copyWith({String? title, bool? isChecked, String? assigneeName, String? assigneeAvatarUrl}) {
 		return ChecklistItemData(
 			title: title ?? this.title,
 			isChecked: isChecked ?? this.isChecked,
 			assigneeName: assigneeName ?? this.assigneeName,
+			assigneeAvatarUrl: assigneeAvatarUrl ?? this.assigneeAvatarUrl,
 		);
 	}
 }
