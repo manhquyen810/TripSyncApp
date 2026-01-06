@@ -276,6 +276,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                               perPersonAmount: e.splits.isNotEmpty
                                                   ? '${_formatCurrency(e.splits.first.amountOwed)}/người'
                                                   : '',
+                                              category: e.category,
                                             ),
                                           ),
                                         )
