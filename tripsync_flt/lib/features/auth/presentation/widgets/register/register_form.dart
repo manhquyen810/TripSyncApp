@@ -41,7 +41,6 @@ class _RegisterFormState extends State<RegisterForm> {
     fontSize: 16,
     color: Color(0x800A0A0A),
   );
-  static const _hintColor = Color(0xFF0A0A0A);
   static const _borderColor = Color(0xFFE5E7EB);
   static const _iconColor = Color(0xFF99A1AF);
   static const _borderRadius = BorderRadius.all(Radius.circular(16));
@@ -52,7 +51,7 @@ class _RegisterFormState extends State<RegisterForm> {
   static const _checkboxShape = RoundedRectangleBorder(
     borderRadius: BorderRadius.all(Radius.circular(4)),
   );
-  
+
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
@@ -69,10 +68,7 @@ class _RegisterFormState extends State<RegisterForm> {
             children: [
               const Padding(
                 padding: EdgeInsets.only(bottom: 3),
-                child: Text(
-                  'Họ và tên',
-                  style: _labelStyle,
-                ),
+                child: Text('Họ và tên', style: _labelStyle),
               ),
               TextFormField(
                 controller: widget.fullNameController,
@@ -114,10 +110,7 @@ class _RegisterFormState extends State<RegisterForm> {
             children: [
               const Padding(
                 padding: EdgeInsets.only(bottom: 3),
-                child: Text(
-                  'Email',
-                  style: _labelStyle,
-                ),
+                child: Text('Email', style: _labelStyle),
               ),
               TextFormField(
                 controller: widget.emailController,
@@ -159,10 +152,7 @@ class _RegisterFormState extends State<RegisterForm> {
             children: [
               const Padding(
                 padding: EdgeInsets.only(bottom: 3),
-                child: Text(
-                  'Mật khẩu',
-                  style: _labelStyle,
-                ),
+                child: Text('Mật khẩu', style: _labelStyle),
               ),
               TextFormField(
                 controller: widget.passwordController,
@@ -219,10 +209,7 @@ class _RegisterFormState extends State<RegisterForm> {
             children: [
               const Padding(
                 padding: EdgeInsets.only(bottom: 3),
-                child: Text(
-                  'Xác nhận mật khẩu',
-                  style: _labelStyle,
-                ),
+                child: Text('Xác nhận mật khẩu', style: _labelStyle),
               ),
               TextFormField(
                 controller: widget.confirmPasswordController,
@@ -275,7 +262,6 @@ class _RegisterFormState extends State<RegisterForm> {
             ],
           ),
           const SizedBox(height: 16),
-
 
           Row(
             children: [

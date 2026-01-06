@@ -254,7 +254,7 @@ class ProposeActivityPickerField extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border.all(color: muted.withOpacity(0.3), width: 1),
+              border: Border.all(color: muted.withAlpha(77), width: 1),
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

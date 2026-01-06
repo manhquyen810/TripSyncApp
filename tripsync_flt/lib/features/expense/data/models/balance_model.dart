@@ -20,11 +20,7 @@ class BalanceModel {
   }
 
   Balance toEntity() {
-    return Balance(
-      userId: userId,
-      name: name,
-      balance: balance,
-    );
+    return Balance(userId: userId, name: name, balance: balance);
   }
 }
 
@@ -40,17 +36,20 @@ class BalanceResponseModel {
   });
 
   factory BalanceResponseModel.fromJson(Map<String, dynamic> json) {
-    final settlementsList = (json['settlements'] as List?)?.map((s) {
-      return {
-        'from_user_name': s['from_user']?['name'] ?? 'Unknown',
-        'to_user_name': s['to_user']?['name'] ?? 'Unknown',
-        'amount': (s['amount'] as num?)?.toDouble() ?? 0.0,
-      };
-    }).toList() ?? [];
+    final settlementsList =
+        (json['settlements'] as List?)?.map((s) {
+          return {
+            'from_user_name': s['from_user']?['name'] ?? 'Unknown',
+            'to_user_name': s['to_user']?['name'] ?? 'Unknown',
+            'amount': (s['amount'] as num?)?.toDouble() ?? 0.0,
+          };
+        }).toList() ??
+        [];
 
     return BalanceResponseModel(
       totalExpense: (json['total_expense'] as num?)?.toDouble() ?? 0.0,
-      balances: (json['balances'] as List?)
+      balances:
+          (json['balances'] as List?)
               ?.map((b) => BalanceModel.fromJson(b))
               .toList() ??
           [],
@@ -87,28 +86,31 @@ class BalanceResponseModel {
     }
 
     final balances = balanceMap.entries
-        .map((e) => BalanceModel(
-              userId: e.key,
-              name: nameMap[e.key] ?? 'Unknown',
-              balance: e.value,
-            ))
+        .map(
+          (e) => BalanceModel(
+            userId: e.key,
+            name: nameMap[e.key] ?? 'Unknown',
+            balance: e.value,
+          ),
+        )
         .toList();
 
-    return BalanceResponseModel(
-      totalExpense: total,
-      balances: balances,
-    );
+    return BalanceResponseModel(totalExpense: total, balances: balances);
   }
 
   BalanceResponse toEntity() {
     return BalanceResponse(
       totalExpense: totalExpense,
       balances: balances.map((b) => b.toEntity()).toList(),
-      settlements: settlements.map((s) => SettlementSummary(
-        fromUserName: s['from_user_name'] as String,
-        toUserName: s['to_user_name'] as String,
-        amount: s['amount'] as double,
-      )).toList(),
+      settlements: settlements
+          .map(
+            (s) => SettlementSummary(
+              fromUserName: s['from_user_name'] as String,
+              toUserName: s['to_user_name'] as String,
+              amount: s['amount'] as double,
+            ),
+          )
+          .toList(),
     );
   }
 }

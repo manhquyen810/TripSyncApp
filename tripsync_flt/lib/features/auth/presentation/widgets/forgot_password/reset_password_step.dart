@@ -32,9 +32,10 @@ class _ResetPasswordStepState extends State<ResetPasswordStep> {
       children: [
         const ForgotPasswordHeader(
           title: 'Đặt mật khẩu mới',
-          description: 'Tạo mật khẩu mới.\nĐảm bảo mật khẩu này khác với mật khẩu trước\nđó để đảm bảo an toàn',
+          description:
+              'Tạo mật khẩu mới.\nĐảm bảo mật khẩu này khác với mật khẩu trước\nđó để đảm bảo an toàn',
         ),
-        
+
         const SizedBox(height: 48),
 
         Form(
@@ -124,7 +125,7 @@ class _ResetPasswordStepState extends State<ResetPasswordStep> {
                   return null;
                 },
               ),
-              
+
               const SizedBox(height: 16),
 
               TextFormField(
@@ -210,7 +211,7 @@ class _ResetPasswordStepState extends State<ResetPasswordStep> {
                   return null;
                 },
               ),
-              
+
               const SizedBox(height: 24),
 
               SizedBox(

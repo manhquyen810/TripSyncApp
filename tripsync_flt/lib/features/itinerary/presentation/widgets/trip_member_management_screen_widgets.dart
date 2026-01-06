@@ -158,18 +158,11 @@ class _TripMemberStatsRow extends StatelessWidget {
 class _StatCard extends StatelessWidget {
   final String title;
   final String mainValue;
-  final String? badgeText;
 
-  const _StatCard({
-    required this.title,
-    required this.mainValue,
-    this.badgeText,
-  });
+  const _StatCard({required this.title, required this.mainValue});
 
   @override
   Widget build(BuildContext context) {
-    final showBadge = badgeText != null && badgeText!.trim().isNotEmpty;
-
     return Container(
       padding: const EdgeInsets.all(17),
       decoration: BoxDecoration(
@@ -206,28 +199,6 @@ class _StatCard extends StatelessWidget {
                   height: 1.3,
                 ),
               ),
-              if (showBadge) ...[
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFDCFCE7),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    badgeText!,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF22C55E),
-                      height: 1.3,
-                    ),
-                  ),
-                ),
-              ],
             ],
           ),
         ],

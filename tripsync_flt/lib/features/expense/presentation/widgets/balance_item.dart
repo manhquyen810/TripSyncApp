@@ -25,11 +25,7 @@ class BalanceItem extends StatelessWidget {
                 color: Colors.orange,
                 borderRadius: BorderRadius.circular(9),
               ),
-              child: const Icon(
-                Icons.person,
-                size: 14,
-                color: Colors.white,
-              ),
+              child: const Icon(Icons.person, size: 14, color: Colors.white),
             ),
             const SizedBox(width: 9),
             Text(
@@ -45,17 +41,16 @@ class BalanceItem extends StatelessWidget {
               amount,
               style: TextStyle(
                 fontSize: 14,
-                color: isPositive ? const Color(0xFF00C950) : const Color(0xFFDF1F32),
+                color: isPositive
+                    ? const Color(0xFF00C950)
+                    : const Color(0xFFDF1F32),
                 fontFamily: 'Poppins',
               ),
             ),
           ],
         ),
         const SizedBox(height: 10),
-        Container(
-          height: 1,
-          color: Colors.grey[300],
-        ),
+        Container(height: 1, color: Colors.grey[300]),
       ],
     );
   }

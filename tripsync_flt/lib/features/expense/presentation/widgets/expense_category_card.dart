@@ -23,7 +23,9 @@ class ExpenseCategoryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(
-            color: isSelected ? const Color(0xFF00C950) : const Color(0xFF99A1AF),
+            color: isSelected
+                ? const Color(0xFF00C950)
+                : const Color(0xFF99A1AF),
             width: 1,
           ),
           borderRadius: BorderRadius.circular(12),

@@ -44,7 +44,7 @@ class _LoginFormState extends State<LoginForm> {
     borderRadius: _borderRadius,
     borderSide: BorderSide(color: Color(0xFFE5E7EB)),
   );
-  
+
   bool _obscurePassword = true;
 
   @override
@@ -60,10 +60,7 @@ class _LoginFormState extends State<LoginForm> {
             children: [
               const Padding(
                 padding: EdgeInsets.only(bottom: 3),
-                child: Text(
-                  'Email',
-                  style: _labelStyle,
-                ),
+                child: Text('Email', style: _labelStyle),
               ),
               TextFormField(
                 controller: widget.emailController,
@@ -103,10 +100,7 @@ class _LoginFormState extends State<LoginForm> {
             children: [
               const Padding(
                 padding: EdgeInsets.only(bottom: 3),
-                child: Text(
-                  'Mật khẩu',
-                  style: _labelStyle,
-                ),
+                child: Text('Mật khẩu', style: _labelStyle),
               ),
               TextFormField(
                 controller: widget.passwordController,
@@ -166,7 +160,9 @@ class _LoginFormState extends State<LoginForm> {
                     height: 20,
                     child: Checkbox(
                       value: widget.rememberMe,
-                      onChanged: widget.isLoading ? null : (v) => widget.onRememberMeChanged(v ?? false),
+                      onChanged: widget.isLoading
+                          ? null
+                          : (v) => widget.onRememberMeChanged(v ?? false),
                       activeColor: const Color(0xFF72BF83),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       visualDensity: VisualDensity.compact,

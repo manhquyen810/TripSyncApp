@@ -36,7 +36,7 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
     final response = await _client.get<dynamic>(
       ApiEndpoints.expensesByTrip(tripId),
     );
-    
+
     final data = response.data;
     if (data is List) {
       return data.map((e) => ExpenseModel.fromJson(e)).toList();
@@ -54,19 +54,19 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
     final response = await _client.get<dynamic>(
       ApiEndpoints.expensesBalances(tripId),
     );
-    
+
     final data = response.data;
-    
+
     if (data is Map) {
       final innerData = data['data'];
-      
+
       if (innerData is Map) {
         return BalanceResponseModel.fromJson(innerData as Map<String, dynamic>);
       }
-      
+
       return BalanceResponseModel.fromJson(Map<String, dynamic>.from(data));
     }
-    
+
     throw Exception('Failed to load balances: Invalid response format');
   }
 
@@ -75,7 +75,7 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
     final response = await _client.get<dynamic>(
       ApiEndpoints.expensesSettlements(tripId),
     );
-    
+
     final data = response.data;
     if (data is List) {
       return data.map((s) => SettlementModel.fromJson(s)).toList();
@@ -128,16 +128,9 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
     required int toUserId,
     required double amount,
   }) async {
-    final body = {
-      'trip_id': tripId,
-      'receiver_id': toUserId,
-      'amount': amount,
-    };
+    final body = {'trip_id': tripId, 'receiver_id': toUserId, 'amount': amount};
 
-    await _client.post<dynamic>(
-      ApiEndpoints.expensesSettle,
-      data: body,
-    );
+    await _client.post<dynamic>(ApiEndpoints.expensesSettle, data: body);
   }
 
   @override
@@ -145,7 +138,7 @@ class ExpenseRemoteDataSourceImpl implements ExpenseRemoteDataSource {
     final response = await _client.get<dynamic>(
       '${ApiEndpoints.trips}/$tripId/members',
     );
-    
+
     final data = response.data;
     if (data is List) {
       return data.map((m) => TripMemberModel.fromJson(m)).toList();

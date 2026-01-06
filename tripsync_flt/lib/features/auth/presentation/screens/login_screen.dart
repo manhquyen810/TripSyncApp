@@ -8,7 +8,6 @@ import '../../../../core/storage/secure_storage_service.dart';
 import '../../data/datasources/auth_remote_data_source.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../widgets/login/login_header.dart';
 import '../widgets/login/login_tab_bar.dart';
 import '../widgets/login/login_form.dart';
 import '../widgets/login/login_card.dart';
@@ -228,7 +227,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         onLogin: _handleLogin,
                         isLoading: _isSubmitting,
                         rememberMe: _rememberMe,
-                        onRememberMeChanged: (v) => setState(() => _rememberMe = v),
+                        onRememberMeChanged: (v) =>
+                            setState(() => _rememberMe = v),
                       ),
                     ),
                   ],

@@ -50,12 +50,12 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
   @override
   void initState() {
     super.initState();
-    final authedClient = ApiClient(authTokenProvider: AuthTokenStore.getAccessToken);
+    final authedClient = ApiClient(
+      authTokenProvider: AuthTokenStore.getAccessToken,
+    );
 
     _documentsRepository = DocumentsRepositoryImpl(
-      DocumentsRemoteDataSourceImpl(
-        authedClient,
-      ),
+      DocumentsRemoteDataSourceImpl(authedClient),
     );
 
     _tripRepository = TripRepositoryImpl(
@@ -82,7 +82,9 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final docsFuture = _documentsRepository.listDocumentsByTrip(tripId: tripId);
+      final docsFuture = _documentsRepository.listDocumentsByTrip(
+        tripId: tripId,
+      );
       final membersFuture = _tripRepository.listTripMembers(tripId: tripId);
 
       final docs = await docsFuture;
@@ -96,7 +98,9 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
       final mapped = <DocumentItem>[];
       for (final d in docs) {
         final category = _categoryFromApi(d.category);
-        final filename = d.filename.trim().isEmpty ? 'Document #${d.id}' : d.filename;
+        final filename = d.filename.trim().isEmpty
+            ? 'Document #${d.id}'
+            : d.filename;
         final extension = _extensionFromFilename(filename);
 
         String? localPath;
@@ -106,15 +110,15 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
 
         mapped.add(
           DocumentItem(
-          id: d.id,
-          title: filename,
-          author: userNameById[d.uploaderId] ?? 'User ${d.uploaderId}',
-          date: _formatDate(d.createdAt),
-          iconAsset: _categoryIconAsset(category),
-          category: category,
-          url: d.url,
-          localPath: localPath,
-          extension: extension,
+            id: d.id,
+            title: filename,
+            author: userNameById[d.uploaderId] ?? 'User ${d.uploaderId}',
+            date: _formatDate(d.createdAt),
+            iconAsset: _categoryIconAsset(category),
+            category: category,
+            url: d.url,
+            localPath: localPath,
+            extension: extension,
           ),
         );
       }
@@ -137,7 +141,9 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
             .map((c) {
               final d = c.dto;
               final category = _categoryFromApi(d.category);
-              final filename = d.filename.trim().isEmpty ? 'Document #${d.id}' : d.filename;
+              final filename = d.filename.trim().isEmpty
+                  ? 'Document #${d.id}'
+                  : d.filename;
               final extension = _extensionFromFilename(filename);
               return DocumentItem(
                 id: d.id,
@@ -211,7 +217,9 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
       final map = Map<String, dynamic>.from(item);
 
       final nestedUser = map['user'];
-      final userMap = nestedUser is Map ? Map<String, dynamic>.from(nestedUser) : null;
+      final userMap = nestedUser is Map
+          ? Map<String, dynamic>.from(nestedUser)
+          : null;
 
       final id = readInt((userMap ?? map)['id']) ?? readInt(map['user_id']);
       if (id == null) continue;
@@ -445,7 +453,10 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
     if (bytes.isEmpty) return false;
 
     // JPEG: FF D8 FF
-    if (bytes.length >= 3 && bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF) {
+    if (bytes.length >= 3 &&
+        bytes[0] == 0xFF &&
+        bytes[1] == 0xD8 &&
+        bytes[2] == 0xFF) {
       return true;
     }
 
@@ -483,7 +494,10 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
     if (u.isEmpty) return false;
 
     // Common file extensions.
-    if (u.contains('.pdf') || u.contains('.doc') || u.contains('.docx') || u.contains('.txt')) {
+    if (u.contains('.pdf') ||
+        u.contains('.doc') ||
+        u.contains('.docx') ||
+        u.contains('.txt')) {
       return true;
     }
 
@@ -514,7 +528,9 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
     if (url != null && url.trim().isNotEmpty && _looksLikeNonImageUrl(url)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Tài liệu này không phải ảnh. Hãy tải về để mở bằng ứng dụng khác.'),
+          content: Text(
+            'Tài liệu này không phải ảnh. Hãy tải về để mở bằng ứng dụng khác.',
+          ),
         ),
       );
       return;
@@ -524,17 +540,19 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
     final localPath = doc.localPath;
     if (bytes == null || bytes.isEmpty) {
       if (documentId != null) {
-        final existing = await _offlineStore.getExistingLocalFile(documentId: documentId);
+        final existing = await _offlineStore.getExistingLocalFile(
+          documentId: documentId,
+        );
         if (existing != null) {
-          _showImageDialog(
-            image: Image.file(existing, fit: BoxFit.contain),
-          );
+          _showImageDialog(image: Image.file(existing, fit: BoxFit.contain));
           return;
         }
       }
     }
 
-    if ((bytes == null || bytes.isEmpty) && (url == null || url.trim().isEmpty) && (localPath == null || localPath.trim().isEmpty)) {
+    if ((bytes == null || bytes.isEmpty) &&
+        (url == null || url.trim().isEmpty) &&
+        (localPath == null || localPath.trim().isEmpty)) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
@@ -562,17 +580,24 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
     }
 
     // Otherwise try to download and cache for offline.
-    if (url != null && url.trim().isNotEmpty && documentId != null && trip.id != null) {
+    if (url != null &&
+        url.trim().isNotEmpty &&
+        documentId != null &&
+        trip.id != null) {
       setState(() => _isLoading = true);
       try {
-        final downloaded = await _documentsRepository.downloadBytes(url: url.trim());
+        final downloaded = await _documentsRepository.downloadBytes(
+          url: url.trim(),
+        );
         if (!mounted) return;
 
         if (!_looksLikeImageBytes(downloaded)) {
           setState(() => _isLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Không đọc được ảnh từ link (có thể file không phải ảnh hoặc bị lỗi quyền truy cập).'),
+              content: Text(
+                'Không đọc được ảnh từ link (có thể file không phải ảnh hoặc bị lỗi quyền truy cập).',
+              ),
             ),
           );
           return;
@@ -586,7 +611,9 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
             bytes: downloaded,
           );
 
-          final localPath = await _offlineStore.getLocalPath(documentId: documentId);
+          final localPath = await _offlineStore.getLocalPath(
+            documentId: documentId,
+          );
           if (!mounted) return;
           _replaceDocumentLocalPath(documentId, localPath);
         }
@@ -612,9 +639,9 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
       } catch (err) {
         if (!mounted) return;
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_downloadErrorMessage(err))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(_downloadErrorMessage(err))));
         return;
       }
     }
@@ -623,7 +650,9 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
     if (url == null || url.trim().isEmpty) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Không có file offline và không có URL để tải.')),
+        const SnackBar(
+          content: Text('Không có file offline và không có URL để tải.'),
+        ),
       );
       return;
     }
@@ -774,9 +803,7 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
                         const SizedBox(height: 16),
                         Expanded(
                           child: _isLoading
-                              ? const Center(
-                                  child: CircularProgressIndicator(),
-                                )
+                              ? const Center(child: CircularProgressIndicator())
                               : DocumentsListView(
                                   documents: filteredDocuments,
                                   categoryLabelFor: _categoryLabel,
@@ -981,7 +1008,9 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
       );
 
       // Verify file is really persisted.
-      final saved = await _offlineStore.getExistingLocalFile(documentId: documentId);
+      final saved = await _offlineStore.getExistingLocalFile(
+        documentId: documentId,
+      );
       if (saved == null) {
         if (!mounted) return;
         setState(() => _isLoading = false);
@@ -993,7 +1022,9 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen> {
         return;
       }
 
-      final localPath = await _offlineStore.getLocalPath(documentId: documentId);
+      final localPath = await _offlineStore.getLocalPath(
+        documentId: documentId,
+      );
       if (!mounted) return;
 
       _replaceDocumentLocalPath(documentId, localPath);

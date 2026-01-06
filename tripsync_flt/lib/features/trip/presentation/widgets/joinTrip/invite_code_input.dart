@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class InviteCodeInput extends StatelessWidget {
   final TextEditingController controller;
 
-  const InviteCodeInput({
-    super.key,
-    required this.controller,
-  });
+  const InviteCodeInput({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -45,10 +42,7 @@ class InviteCodeInput extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                color: Color(0xFF00C950),
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: Color(0xFF00C950), width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,

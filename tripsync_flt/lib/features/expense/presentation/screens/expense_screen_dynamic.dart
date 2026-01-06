@@ -45,27 +45,25 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
   void _loadData() {
     if (widget.trip.id == null) return;
-    
+
     setState(() {
-      _dataFuture = Future.wait([
-        _repository.getExpenses(widget.trip.id!),
-        _repository.getBalances(widget.trip.id!),
-        _repository.getSettlements(widget.trip.id!),
-      ]).then((results) {
-        return {
-          'expenses': results[0] as List<Expense>,
-          'balances': results[1] as BalanceResponse,
-          'settlements': results[2] as List<Settlement>,
-        };
-      });
+      _dataFuture =
+          Future.wait([
+            _repository.getExpenses(widget.trip.id!),
+            _repository.getBalances(widget.trip.id!),
+            _repository.getSettlements(widget.trip.id!),
+          ]).then((results) {
+            return {
+              'expenses': results[0] as List<Expense>,
+              'balances': results[1] as BalanceResponse,
+              'settlements': results[2] as List<Settlement>,
+            };
+          });
     });
   }
 
   String _formatCurrency(double amount) {
-    return '${amount.toStringAsFixed(0).replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]}.',
-        )} đ';
+    return '${amount.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ';
   }
 
   @override
@@ -110,9 +108,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(
-                      child: Text('Lỗi: ${snapshot.error}'),
-                    );
+                    return Center(child: Text('Lỗi: ${snapshot.error}'));
                   }
 
                   final data = snapshot.data;
@@ -126,17 +122,25 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                       final currentUserId = userSnapshot.data;
 
                       final expenses = data['expenses'] as List<Expense>;
-                      final balanceResponse = data['balances'] as BalanceResponse;
-                      final settlements = data['settlements'] as List<Settlement>;
+                      final balanceResponse =
+                          data['balances'] as BalanceResponse;
+                      final settlements =
+                          data['settlements'] as List<Settlement>;
 
                       final balances = balanceResponse.balances;
                       final totalExpense = balanceResponse.totalExpense;
-                      
+
                       final currentUserBalance = currentUserId != null
-                          ? balances.firstWhere(
-                              (b) => b.userId == currentUserId,
-                              orElse: () => Balance(userId: currentUserId, name: '', balance: 0.0),
-                            ).balance
+                          ? balances
+                                .firstWhere(
+                                  (b) => b.userId == currentUserId,
+                                  orElse: () => Balance(
+                                    userId: currentUserId,
+                                    name: '',
+                                    balance: 0.0,
+                                  ),
+                                )
+                                .balance
                           : 0.0;
 
                       return RefreshIndicator(
@@ -151,7 +155,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                             children: [
                               const SizedBox(height: 16),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 19),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 19,
+                                ),
                                 child: TotalExpenseCard(
                                   totalAmount: _formatCurrency(totalExpense),
                                   owedAmount: _formatCurrency(
@@ -162,7 +168,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                     showDialog(
                                       context: context,
                                       builder: (context) => DebtDetailDialog(
-                                        settlements: balanceResponse.settlements,
+                                        settlements:
+                                            balanceResponse.settlements,
                                         formatCurrency: _formatCurrency,
                                       ),
                                     );
@@ -171,7 +178,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                               ),
                               const SizedBox(height: 18),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 19),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 19,
+                                ),
                                 child: AddExpenseButton(
                                   onTap: () async {
                                     final result = await Navigator.push(
@@ -214,14 +223,16 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                 )
                               else
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
                                   child: Column(
                                     children: settlements
                                         .map(
                                           (s) => Padding(
-                                            padding:
-                                                const EdgeInsets.only(bottom: 16),
+                                            padding: const EdgeInsets.only(
+                                              bottom: 16,
+                                            ),
                                             child: PaymentRequestItem(
                                               fromName: s.fromUserName,
                                               toName: s.toUserName,
@@ -259,21 +270,26 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                 )
                               else
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
                                   child: Column(
                                     children: expenses
                                         .map(
                                           (e) => Padding(
-                                            padding:
-                                                const EdgeInsets.only(bottom: 12),
+                                            padding: const EdgeInsets.only(
+                                              bottom: 12,
+                                            ),
                                             child: ExpenseHistoryItem(
-                                              title: e.description ?? 'Chi tiêu',
+                                              title:
+                                                  e.description ?? 'Chi tiêu',
                                               payer: e.payerName,
                                               splitCount: e.splits.length,
-                                              totalAmount:
-                                                  _formatCurrency(e.amount),
-                                              perPersonAmount: e.splits.isNotEmpty
+                                              totalAmount: _formatCurrency(
+                                                e.amount,
+                                              ),
+                                              perPersonAmount:
+                                                  e.splits.isNotEmpty
                                                   ? '${_formatCurrency(e.splits.first.amountOwed)}/người'
                                                   : '',
                                               category: e.category,
@@ -285,7 +301,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                 ),
                               const SizedBox(height: 26),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
                                 child: Container(
                                   width: double.infinity,
                                   padding: const EdgeInsets.all(20),
@@ -294,7 +312,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       const Text(
                                         'Số dư từng người',
@@ -314,7 +333,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                           ),
                                         )
                                       else
-                                        ...balances.asMap().entries.map((entry) {
+                                        ...balances.asMap().entries.map((
+                                          entry,
+                                        ) {
                                           final isLast =
                                               entry.key == balances.length - 1;
                                           final balance = entry.value;
@@ -325,13 +346,14 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                                 amount: balance.balance >= 0
                                                     ? '+${_formatCurrency(balance.balance)}'
                                                     : '-${_formatCurrency(balance.balance.abs())}',
-                                                isPositive: balance.balance >= 0,
+                                                isPositive:
+                                                    balance.balance >= 0,
                                               ),
                                               if (!isLast)
                                                 const SizedBox(height: 14),
                                             ],
                                           );
-                                        }).toList(),
+                                        }),
                                     ],
                                   ),
                                 ),
@@ -354,9 +376,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
           final result = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddExpenseScreen(
-                tripId: widget.trip.id!,
-              ),
+              builder: (context) => AddExpenseScreen(tripId: widget.trip.id!),
             ),
           );
           if (result == true) {

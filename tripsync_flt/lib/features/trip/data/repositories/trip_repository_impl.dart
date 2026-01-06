@@ -100,7 +100,7 @@ class TripRepositoryImpl implements TripRepository {
     if (data is String && data.isNotEmpty) return _normalizeUrl(data);
 
     if (data is Map) {
-      final map = Map<String, dynamic>.from(data as Map);
+      final map = Map<String, dynamic>.from(data);
       const candidates = <String>[
         'url',
         'file_url',
@@ -122,7 +122,7 @@ class TripRepositoryImpl implements TripRepository {
       for (final containerKey in const <String>['file', 'document', 'result']) {
         final nested = map[containerKey];
         if (nested is Map) {
-          final nestedMap = Map<String, dynamic>.from(nested as Map);
+          final nestedMap = Map<String, dynamic>.from(nested);
           for (final key in candidates) {
             final v = nestedMap[key];
             if (v is String && v.isNotEmpty) return _normalizeUrl(v);

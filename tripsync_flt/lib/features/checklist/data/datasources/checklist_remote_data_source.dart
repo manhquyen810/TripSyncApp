@@ -56,9 +56,7 @@ class ChecklistRemoteDataSourceImpl implements ChecklistRemoteDataSource {
   }) async {
     final response = await _client.post<dynamic>(
       ApiEndpoints.checklistToggleItem(itemId),
-      queryParameters: <String, dynamic>{
-        'is_done': isDone,
-      },
+      queryParameters: <String, dynamic>{'is_done': isDone},
     );
 
     return _asJsonMap(response.data);
@@ -101,9 +99,7 @@ class ChecklistRemoteDataSourceImpl implements ChecklistRemoteDataSource {
 
   @override
   Future<void> deleteItem({required int itemId}) async {
-    await _client.delete<dynamic>(
-      ApiEndpoints.checklistItemDetail(itemId),
-    );
+    await _client.delete<dynamic>(ApiEndpoints.checklistItemDetail(itemId));
   }
 }
 

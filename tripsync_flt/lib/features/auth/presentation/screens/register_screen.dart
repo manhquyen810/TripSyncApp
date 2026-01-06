@@ -6,7 +6,6 @@ import '../../../../core/network/exceptions.dart';
 import '../../data/datasources/auth_remote_data_source.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../widgets/login/login_header.dart';
 import '../widgets/login/login_tab_bar.dart';
 import '../widgets/login/login_card.dart';
 import '../widgets/register/register_form.dart';
@@ -109,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    
+
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -179,7 +178,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                         Expanded(
                           child: SingleChildScrollView(
-                            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                            keyboardDismissBehavior:
+                                ScrollViewKeyboardDismissBehavior.onDrag,
                             child: RegisterForm(
                               formKey: _formKey,
                               fullNameController: fullNameController,

@@ -177,14 +177,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final hasBytes = bytes != null && bytes.isNotEmpty;
     final effectiveFilename = (filename?.trim().isNotEmpty ?? false)
         ? filename!.trim()
-        : (hasPath ? trimmedPath!.split(RegExp(r'[\\/]+')).last : 'avatar');
+        : (hasPath ? trimmedPath.split(RegExp(r'[\\/]+')).last : 'avatar');
 
     if (!hasPath && !hasBytes) {
       throw ArgumentError('Either filePath or bytes must be provided');
     }
 
     final multipart = hasBytes
-        ? MultipartFile.fromBytes(bytes!, filename: effectiveFilename)
+        ? MultipartFile.fromBytes(bytes, filename: effectiveFilename)
         : await MultipartFile.fromFile(
             trimmedPath!,
             filename: effectiveFilename,
@@ -256,7 +256,7 @@ String _extractUploadedUrl(Map<String, dynamic> raw) {
   if (data is String && data.trim().isNotEmpty) return data.trim();
 
   if (data is Map) {
-    final map = Map<String, dynamic>.from(data as Map);
+    final map = Map<String, dynamic>.from(data);
     const candidates = <String>[
       'url',
       'file_url',
@@ -278,7 +278,7 @@ String _extractUploadedUrl(Map<String, dynamic> raw) {
     for (final containerKey in const <String>['file', 'document', 'result']) {
       final nested = map[containerKey];
       if (nested is Map) {
-        final nestedMap = Map<String, dynamic>.from(nested as Map);
+        final nestedMap = Map<String, dynamic>.from(nested);
         for (final key in candidates) {
           final v = nestedMap[key];
           if (v is String && v.trim().isNotEmpty) return v.trim();

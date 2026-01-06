@@ -9,7 +9,7 @@ class JoinTripIcon extends StatelessWidget {
       width: 60,
       height: 60,
       decoration: BoxDecoration(
-        color: const Color(0xFFA8E6CF).withOpacity(0.5),
+        color: const Color(0xFFA8E6CF).withAlpha(128),
         shape: BoxShape.circle,
       ),
       child: ClipOval(

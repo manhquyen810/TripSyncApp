@@ -44,8 +44,16 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
   final _categories = [
     {'name': 'Thiết yếu', 'color': Color(0xFFE7000B), 'icon': Icons.list_alt},
     {'name': 'Quần áo', 'color': Color(0xFF55ACEE), 'icon': Icons.checkroom},
-    {'name': 'Vệ sinh cá nhân', 'color': Color(0x8000C950), 'icon': Icons.clean_hands},
-    {'name': 'Thiết bị điện tử', 'color': Color(0xFFFFA1E0), 'icon': Icons.devices},
+    {
+      'name': 'Vệ sinh cá nhân',
+      'color': Color(0x8000C950),
+      'icon': Icons.clean_hands,
+    },
+    {
+      'name': 'Thiết bị điện tử',
+      'color': Color(0xFFFFA1E0),
+      'icon': Icons.devices,
+    },
   ];
 
   @override
@@ -192,11 +200,7 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
               color: const Color(0xFF55ACEE),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
-              Icons.checklist,
-              color: Colors.white,
-              size: 24,
-            ),
+            child: const Icon(Icons.checklist, color: Colors.white, size: 24),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -255,9 +259,15 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFF00C950), width: 2),
+                borderSide: const BorderSide(
+                  color: Color(0xFF00C950),
+                  width: 2,
+                ),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 10,
+              ),
             ),
           ),
         ],
@@ -287,7 +297,9 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
               final isSelected = _selectedCategory == category['name'];
 
               return Padding(
-                padding: EdgeInsets.only(right: index == _categories.length - 1 ? 0 : 27),
+                padding: EdgeInsets.only(
+                  right: index == _categories.length - 1 ? 0 : 27,
+                ),
                 child: _CategoryCard(
                   name: category['name'] as String,
                   color: category['color'] as Color,
@@ -352,7 +364,11 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
                       ),
                     ),
                   ),
-                  const Icon(Icons.arrow_drop_down, size: 20, color: Color(0xFF959DA3)),
+                  const Icon(
+                    Icons.arrow_drop_down,
+                    size: 20,
+                    color: Color(0xFF959DA3),
+                  ),
                 ],
               ),
             ),
@@ -416,7 +432,9 @@ class _CategoryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(
-            color: isSelected ? const Color(0xFF00C950) : const Color(0xFFC8C8C8),
+            color: isSelected
+                ? const Color(0xFF00C950)
+                : const Color(0xFFC8C8C8),
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(12),
@@ -428,7 +446,7 @@ class _CategoryCard extends StatelessWidget {
               width: 36,
               height: 32,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.8),
+                color: color.withAlpha(204),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: Colors.white, size: 20),

@@ -5,11 +5,7 @@ class TripMemberModel {
   final String name;
   final String email;
 
-  TripMemberModel({
-    required this.id,
-    required this.name,
-    required this.email,
-  });
+  TripMemberModel({required this.id, required this.name, required this.email});
 
   factory TripMemberModel.fromJson(Map<String, dynamic> json) {
     return TripMemberModel(
@@ -20,10 +16,6 @@ class TripMemberModel {
   }
 
   TripMember toEntity() {
-    return TripMember(
-      id: id,
-      name: name,
-      email: email,
-    );
+    return TripMember(id: id, name: name, email: email);
   }
 }

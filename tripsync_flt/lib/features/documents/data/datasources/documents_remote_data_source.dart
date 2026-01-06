@@ -46,16 +46,20 @@ class DocumentsRemoteDataSourceImpl implements DocumentsRemoteDataSource {
     }
 
     final trimmedFilename = filename?.trim();
-    final effectiveFilename = (trimmedFilename != null && trimmedFilename.isNotEmpty)
+    final effectiveFilename =
+        (trimmedFilename != null && trimmedFilename.isNotEmpty)
         ? trimmedFilename
         : hasPath
         ? safePath.split(RegExp(r'[\\/]+')).last
-            : 'upload';
+        : 'upload';
 
     final MultipartFile multipart;
     final safeBytes = bytes;
     if (safeBytes != null && safeBytes.isNotEmpty) {
-      multipart = MultipartFile.fromBytes(safeBytes, filename: effectiveFilename);
+      multipart = MultipartFile.fromBytes(
+        safeBytes,
+        filename: effectiveFilename,
+      );
     } else {
       final path = safePath;
       if (path == null || path.isEmpty) {
@@ -66,7 +70,10 @@ class DocumentsRemoteDataSourceImpl implements DocumentsRemoteDataSource {
           'Cannot upload from content URI without bytes. Pick file with withData=true or provide bytes.',
         );
       }
-      multipart = await MultipartFile.fromFile(path, filename: effectiveFilename);
+      multipart = await MultipartFile.fromFile(
+        path,
+        filename: effectiveFilename,
+      );
     }
 
     final form = FormData.fromMap({'file': multipart});
@@ -85,7 +92,9 @@ class DocumentsRemoteDataSourceImpl implements DocumentsRemoteDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> listDocumentsByTrip({required int tripId}) async {
+  Future<Map<String, dynamic>> listDocumentsByTrip({
+    required int tripId,
+  }) async {
     final response = await _client.get<dynamic>(
       ApiEndpoints.documentsByTrip(tripId),
     );
@@ -111,7 +120,8 @@ class DocumentsRemoteDataSourceImpl implements DocumentsRemoteDataSource {
   @override
   Future<Uint8List> downloadBytes({required String url}) async {
     final trimmed = url.trim();
-    final isApiHost = Env.apiBaseUrl.isNotEmpty && trimmed.startsWith(Env.apiBaseUrl);
+    final isApiHost =
+        Env.apiBaseUrl.isNotEmpty && trimmed.startsWith(Env.apiBaseUrl);
     final skipAuth = !isApiHost;
 
     final response = await _client.rawDio.get<List<int>>(

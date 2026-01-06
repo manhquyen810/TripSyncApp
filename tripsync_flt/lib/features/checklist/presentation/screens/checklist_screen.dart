@@ -77,7 +77,9 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
       if (!mounted) return;
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Không thể tải checklist (thiếu trip_id)')),
+        const SnackBar(
+          content: Text('Không thể tải checklist (thiếu trip_id)'),
+        ),
       );
       return;
     }
@@ -85,7 +87,9 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     if (mounted) setState(() => _isLoading = true);
 
     try {
-      final itemsFuture = _checklistRepository.listTripChecklist(tripId: tripId);
+      final itemsFuture = _checklistRepository.listTripChecklist(
+        tripId: tripId,
+      );
       final membersFuture = _tripRepository.listTripMembers(tripId: tripId);
 
       final items = await itemsFuture;
@@ -146,8 +150,9 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
         assigneeId: updated.assigneeId,
         fallback: decoded.assigneeName,
       );
-      final assigneeAvatarUrl =
-          _resolveAssigneeAvatarUrl(assigneeId: updated.assigneeId);
+      final assigneeAvatarUrl = _resolveAssigneeAvatarUrl(
+        assigneeId: updated.assigneeId,
+      );
 
       setState(() {
         final items = List<ChecklistItemData>.from(category.items);
@@ -177,7 +182,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      barrierColor: Colors.black.withOpacity(0.2),
+      barrierColor: Colors.black.withAlpha(51),
       backgroundColor: Colors.transparent,
       builder: (context) {
         return FractionallySizedBox(
@@ -203,10 +208,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     );
   }
 
-  void _showItemActions({
-    required int categoryIndex,
-    required int itemIndex,
-  }) {
+  void _showItemActions({required int categoryIndex, required int itemIndex}) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -257,7 +259,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      barrierColor: Colors.black.withOpacity(0.2),
+      barrierColor: Colors.black.withAlpha(51),
       backgroundColor: Colors.transparent,
       builder: (context) {
         return FractionallySizedBox(
@@ -302,7 +304,9 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     await _deleteItem(itemId: item.id!);
   }
 
-  Future<bool> _confirmChecklistDeleteDialog({required String itemTitle}) async {
+  Future<bool> _confirmChecklistDeleteDialog({
+    required String itemTitle,
+  }) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
@@ -368,7 +372,9 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
       category: category,
       assigneeName: assigneeName,
     );
-    final assigneeId = assigneeName == null ? null : _userIdByName[assigneeName];
+    final assigneeId = assigneeName == null
+        ? null
+        : _userIdByName[assigneeName];
 
     if (mounted) setState(() => _isLoading = true);
     try {
@@ -422,7 +428,9 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
       category: category,
       assigneeName: assigneeName,
     );
-    final assigneeId = assigneeName == null ? null : _userIdByName[assigneeName];
+    final assigneeId = assigneeName == null
+        ? null
+        : _userIdByName[assigneeName];
 
     if (mounted) setState(() => _isLoading = true);
     try {
@@ -491,19 +499,19 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                             categoryIndex: categoryIndex,
                             itemIndex: itemIndex,
                           ),
-							onConfirmDelete: (itemIndex) async {
-								final item = category.items[itemIndex];
-								if (item.id == null) return false;
-								return _confirmChecklistDeleteDialog(
-									itemTitle: item.title,
-								);
-							},
-							onDelete: (itemIndex) {
-								final item = category.items[itemIndex];
-								final id = item.id;
-								if (id == null) return;
-								_deleteItem(itemId: id);
-							},
+                          onConfirmDelete: (itemIndex) async {
+                            final item = category.items[itemIndex];
+                            if (item.id == null) return false;
+                            return _confirmChecklistDeleteDialog(
+                              itemTitle: item.title,
+                            );
+                          },
+                          onDelete: (itemIndex) {
+                            final item = category.items[itemIndex];
+                            final id = item.id;
+                            if (id == null) return;
+                            _deleteItem(itemId: id);
+                          },
                         ),
                       );
                     }),
@@ -527,10 +535,9 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
-              AppRoutes.home,
-              (route) => false,
-            ),
+            onTap: () => Navigator.of(
+              context,
+            ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false),
             child: Container(
               width: 43,
               height: 43,
@@ -586,64 +593,64 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     );
   }
 
-	Widget _buildTripImageCard() {
-		return Padding(
-			padding: const EdgeInsets.symmetric(horizontal: 15),
-			child: ClipRRect(
-				borderRadius: BorderRadius.circular(24),
-				child: Container(
-					height: 235,
-					decoration: BoxDecoration(
-						image: DecorationImage(
-							image: AssetImage(widget.trip.imageUrl),
-							fit: BoxFit.cover,
-						),
-					),
-					child: Stack(
-						children: [
-							Positioned(
-								left: 11,
-								bottom: 10,
-								child: Column(
-									crossAxisAlignment: CrossAxisAlignment.start,
-									children: [
-										Text(
-											widget.trip.title,
-											style: const TextStyle(
-												fontSize: 16,
-												fontWeight: FontWeight.w600,
-												color: Colors.white,
-											),
-											maxLines: 1,
-											overflow: TextOverflow.ellipsis,
-										),
-										Row(
-											children: [
-												Image.asset(
-													'assets/icons/location.png',
-													width: 20,
-													height: 20,
-													color: Colors.white,
-												),
-												const SizedBox(width: 4),
-												Text(
-													widget.trip.location,
-													style: const TextStyle(
-														fontSize: 14,
-														color: Colors.white,
-													),
-												),
-											],
-										),
-									],
-								),
-							),
-						],
-					),
-				),
-			),
-		);
-	}
+  Widget _buildTripImageCard() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Container(
+          height: 235,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(widget.trip.imageUrl),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                left: 11,
+                bottom: 10,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.trip.title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Row(
+                      children: [
+                        Image.asset(
+                          'assets/icons/location.png',
+                          width: 20,
+                          height: 20,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          widget.trip.location,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _buildPreparationProgress(double progress) {
     return Padding(
@@ -714,9 +721,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     );
   }
 
-  List<ChecklistCategoryData> _buildCategories(
-    List<ChecklistItemDto> items,
-  ) {
+  List<ChecklistCategoryData> _buildCategories(List<ChecklistItemDto> items) {
     final grouped = <String, List<ChecklistItemData>>{
       for (final c in _categoryOrder) c: <ChecklistItemData>[],
     };
@@ -730,8 +735,9 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
         assigneeId: item.assigneeId,
         fallback: decoded.assigneeName,
       );
-      final assigneeAvatarUrl =
-          _resolveAssigneeAvatarUrl(assigneeId: item.assigneeId);
+      final assigneeAvatarUrl = _resolveAssigneeAvatarUrl(
+        assigneeId: item.assigneeId,
+      );
 
       grouped[key]!.add(
         ChecklistItemData(
@@ -766,16 +772,30 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
 
   String _inferCategory(String title) {
     final t = title.toLowerCase();
-    if (t.contains('thuốc') || t.contains('kem') || t.contains('chống nắng') || t.contains('say')) {
+    if (t.contains('thuốc') ||
+        t.contains('kem') ||
+        t.contains('chống nắng') ||
+        t.contains('say')) {
       return 'Thiết yếu';
     }
-    if (t.contains('áo') || t.contains('quần') || t.contains('khăn') || t.contains('mũ') || t.contains('giày')) {
+    if (t.contains('áo') ||
+        t.contains('quần') ||
+        t.contains('khăn') ||
+        t.contains('mũ') ||
+        t.contains('giày')) {
       return 'Quần áo';
     }
-    if (t.contains('sạc') || t.contains('loa') || t.contains('tai nghe') || t.contains('điện thoại')) {
+    if (t.contains('sạc') ||
+        t.contains('loa') ||
+        t.contains('tai nghe') ||
+        t.contains('điện thoại')) {
       return 'Thiết bị điện tử';
     }
-    if (t.contains('kem đánh răng') || t.contains('bàn chải') || t.contains('xịt') || t.contains('giấy ướt') || t.contains('rửa')) {
+    if (t.contains('kem đánh răng') ||
+        t.contains('bàn chải') ||
+        t.contains('xịt') ||
+        t.contains('giấy ướt') ||
+        t.contains('rửa')) {
       return 'Vệ sinh cá nhân';
     }
     return 'Khác';
@@ -849,7 +869,9 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
       final map = Map<String, dynamic>.from(item);
 
       final nestedUser = map['user'];
-      final userMap = nestedUser is Map ? Map<String, dynamic>.from(nestedUser) : null;
+      final userMap = nestedUser is Map
+          ? Map<String, dynamic>.from(nestedUser)
+          : null;
 
       final id = readInt((userMap ?? map)['id']) ?? readInt(map['user_id']);
       if (id == null) continue;
@@ -907,7 +929,9 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
       final map = Map<String, dynamic>.from(item);
 
       final nestedUser = map['user'] ?? map['profile'] ?? map['member'];
-      final userMap = nestedUser is Map ? Map<String, dynamic>.from(nestedUser) : null;
+      final userMap = nestedUser is Map
+          ? Map<String, dynamic>.from(nestedUser)
+          : null;
 
       final id = readInt((userMap ?? map)['id']) ?? readInt(map['user_id']);
       if (id == null) continue;

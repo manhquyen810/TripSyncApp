@@ -8,7 +8,9 @@ class ChecklistRepositoryImpl implements ChecklistRepository {
   final ChecklistRemoteDataSource _remote;
 
   @override
-  Future<List<ChecklistItemDto>> listTripChecklist({required int tripId}) async {
+  Future<List<ChecklistItemDto>> listTripChecklist({
+    required int tripId,
+  }) async {
     final raw = await _remote.listTripChecklist(tripId: tripId);
     return _extractItems(raw);
   }
