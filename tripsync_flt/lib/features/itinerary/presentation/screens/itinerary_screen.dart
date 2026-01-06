@@ -4,6 +4,9 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'propose_activity_screen.dart';
+import 'itinerary_map_screen.dart';
+import 'choose_location_screen.dart';
+import '../models/picked_location.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/auth_token_store.dart';
@@ -77,10 +80,11 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
         Navigator.of(context).pop(_membersChanged);
-        return false;
       },
       child: Scaffold(
         backgroundColor: AppColors.background,
@@ -570,7 +574,16 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
               ],
             ),
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => TripItineraryMapScreen(
+                      trip: trip,
+                      initialDayIndex: _selectedDayIndex,
+                    ),
+                  ),
+                );
+              },
               icon: const Icon(
                 Icons.map_outlined,
                 size: 22,
@@ -742,8 +755,9 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
-      if (!mounted) return;
-      setState(() => _busyActivityIds.remove(activityId));
+      if (mounted) {
+        setState(() => _busyActivityIds.remove(activityId));
+      }
     }
   }
 
@@ -764,8 +778,72 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
+      if (mounted) {
+        setState(() => _busyActivityIds.remove(activityId));
+      }
+    }
+  }
+
+  Future<void> _editActivityLocation(_ActivityItem activity) async {
+    final activityId = activity.id;
+    if (activityId == null) return;
+    if (activity.dayId == null) {
       if (!mounted) return;
-      setState(() => _busyActivityIds.remove(activityId));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Không tìm thấy day_id của hoạt động.')),
+      );
+      return;
+    }
+
+    final selected = await Navigator.of(context).push<PickedLocation>(
+      MaterialPageRoute(builder: (_) => const ChooseLocationScreen()),
+    );
+    if (selected == null) return;
+
+    if (_isBusyActivity(activityId)) return;
+    setState(() => _busyActivityIds.add(activityId));
+
+    String? startTime = activity.startTimeRaw;
+    if (startTime != null) {
+      final s = startTime.trim();
+      if (RegExp(r'^\d{1,2}:\d{2}$').hasMatch(s)) {
+        startTime = '$s:00';
+      }
+    }
+
+    try {
+      await _apiClient.put<dynamic>(
+        ApiEndpoints.itineraryActivity(activityId),
+        data: <String, dynamic>{
+          'day_id': activity.dayId,
+          'title': activity.title,
+          if (activity.category.trim().isNotEmpty)
+            'category': activity.category,
+          'description': activity.description,
+          'location': selected.label,
+          'location_lat': selected.latitude.toString(),
+          'location_long': selected.longitude.toString(),
+          if (startTime != null && startTime.trim().isNotEmpty)
+            'start_time': startTime,
+        },
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đã cập nhật tọa độ cho hoạt động.')),
+      );
+      setState(() {
+        _activitiesFuture = _loadActivitiesForSelectedDay();
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      if (mounted) {
+        setState(() => _busyActivityIds.remove(activityId));
+      }
     }
   }
 
@@ -811,6 +889,7 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
       ratioText: (a) => _voteRatioText(a, _memberCount),
       onVote: _voteActivity,
       onConfirm: _confirmActivity,
+      onEditLocation: _editActivityLocation,
     );
   }
 
@@ -821,6 +900,7 @@ typedef _IsBusyFn = bool Function(int activityId);
 typedef _VoteRatioTextFn = String Function(_ActivityItem activity);
 typedef _VoteFn = Future<void> Function(int activityId, String voteType);
 typedef _ConfirmFn = Future<void> Function(int activityId);
+typedef _EditLocationFn = Future<void> Function(_ActivityItem activity);
 
 class _DayActivities {
   final List<_ActivityItem> confirmed;
@@ -845,28 +925,42 @@ class _ActivitiesPayload {
 
 class _ActivityItem {
   final int? id;
+  final int? dayId;
   final String title;
   final String subtitle;
+  final String description;
+  final String category;
   final String location;
   final String timeText;
+  final String? startTimeRaw;
   final String proposedBy;
   final bool isConfirmed;
+  final double? latitude;
+  final double? longitude;
   final int? upvotes;
   final int? totalVotes;
   final String? myVote;
 
   const _ActivityItem({
     this.id,
+    required this.dayId,
     required this.title,
     required this.subtitle,
+    required this.description,
+    required this.category,
     required this.location,
     required this.timeText,
+    required this.startTimeRaw,
     required this.proposedBy,
     required this.isConfirmed,
+    required this.latitude,
+    required this.longitude,
     this.upvotes,
     this.totalVotes,
     this.myVote,
   });
+
+  bool get hasCoordinates => latitude != null && longitude != null;
 
   String get likesText {
     final v = upvotes;
@@ -884,7 +978,13 @@ class _ActivityItem {
 
   static _ActivityItem? fromJson(dynamic raw, {bool? forceConfirmed}) {
     if (raw is! Map) return null;
-    final m = Map<String, dynamic>.from(raw as Map);
+    final outer = Map<String, dynamic>.from(raw);
+
+    final wrapped = outer['activity'] ?? outer['itinerary_activity'];
+    final m = <String, dynamic>{
+      if (wrapped is Map) ...Map<String, dynamic>.from(wrapped),
+      ...outer,
+    };
 
     String pickString(List<String> keys) {
       for (final k in keys) {
@@ -907,6 +1007,17 @@ class _ActivityItem {
       return null;
     }
 
+    double? pickDouble(List<String> keys) {
+      for (final k in keys) {
+        final v = m[k];
+        if (v == null) continue;
+        if (v is num) return v.toDouble();
+        final parsed = double.tryParse(v.toString());
+        if (parsed != null) return parsed;
+      }
+      return null;
+    }
+
     bool pickBool(List<String> keys) {
       for (final k in keys) {
         final v = m[k];
@@ -919,14 +1030,17 @@ class _ActivityItem {
       return false;
     }
 
-    String timeText = pickString(['time', 'start_time', 'startTime']);
+    final startTimeRaw = pickString(['start_time', 'startTime', 'time']);
+    String timeText = startTimeRaw;
     final endTime = pickString(['end_time', 'endTime']);
     if (timeText.isNotEmpty && endTime.isNotEmpty) {
       timeText = '$timeText - $endTime';
     }
 
     final title = pickString(['title', 'name']);
-    final subtitle = pickString(['description', 'subtitle', 'note']);
+    final category = pickString(['category', 'type', 'activity_type']);
+    final description = pickString(['description', 'subtitle', 'note']);
+    final subtitle = category.isNotEmpty ? category : description;
     final location = pickString(['location', 'address', 'place']);
 
     final createdBy = m['created_by'] ?? m['createdBy'] ?? m['creator'];
@@ -952,6 +1066,25 @@ class _ActivityItem {
             status == 'confirmed';
 
     final id = pickInt(['id', 'activity_id', 'activityId']);
+    final dayId = pickInt(['day_id', 'dayId']);
+
+    final latitude = pickDouble([
+      'lat',
+      'latitude',
+      'location_lat',
+      'location_latitude',
+      'locationLatitude',
+    ]);
+    final longitude = pickDouble([
+      'lng',
+      'lon',
+      'longitude',
+      'location_lng',
+      'location_long',
+      'location_lon',
+      'location_longitude',
+      'locationLongitude',
+    ]);
 
     final upvotes = pickInt(['upvotes', 'likes', 'like_count', 'upvote_count']);
     final totalVotes = pickInt(['total_votes', 'votes', 'vote_count']);
@@ -959,12 +1092,18 @@ class _ActivityItem {
 
     return _ActivityItem(
       id: id,
+      dayId: dayId,
       title: title.isEmpty ? 'Hoạt động' : title,
       subtitle: subtitle,
+      description: description,
+      category: category,
       location: location,
       timeText: timeText,
+      startTimeRaw: startTimeRaw.isEmpty ? null : startTimeRaw,
       proposedBy: proposedBy,
       isConfirmed: isConfirmed,
+      latitude: latitude,
+      longitude: longitude,
       upvotes: upvotes,
       totalVotes: totalVotes,
       myVote: myVote.isEmpty ? null : myVote,

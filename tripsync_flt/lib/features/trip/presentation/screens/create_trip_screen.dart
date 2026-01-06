@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:file_picker/file_picker.dart';
-import 'dart:typed_data';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/auth_token_store.dart';
@@ -236,7 +235,7 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
   }
 
   void _handleAddMember() {
-    print('Adding member: ${memberEmailController.text}');
+    debugPrint('Adding member: ${memberEmailController.text}');
   }
 
   Future<void> _handleCreateTrip() async {
@@ -471,17 +470,6 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
     return null;
   }
 
-  String? _selectedCoverAsRemoteUrl() {
-    // Kept for backward-compatibility with existing call sites (if any).
-    // Prefer using _selectedCoverForCreatePayload().
-    final cover = _resolveSelectedCoverPath();
-    if (cover == null) return null;
-    final trimmed = cover.trim();
-    if (trimmed.startsWith('http://') || trimmed.startsWith('https://'))
-      return trimmed;
-    return null;
-  }
-
   String? _selectedCoverForCreatePayload() {
     // We only send values that are valid for all devices:
     // - Remote URLs (http/https)
@@ -513,19 +501,13 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
 
     final data = raw['data'];
     if (data is Map) {
-      final id =
-          (data as Map)['id'] ??
-          (data as Map)['trip_id'] ??
-          (data as Map)['tripId'];
+      final id = (data)['id'] ?? (data)['trip_id'] ?? (data)['tripId'];
       final parsed = _parseId(id);
       if (parsed != null) return parsed;
 
-      final trip = (data as Map)['trip'];
+      final trip = (data)['trip'];
       if (trip is Map) {
-        final nestedId =
-            (trip as Map)['id'] ??
-            (trip as Map)['trip_id'] ??
-            (trip as Map)['tripId'];
+        final nestedId = (trip)['id'] ?? (trip)['trip_id'] ?? (trip)['tripId'];
         return _parseId(nestedId);
       }
     }
@@ -539,19 +521,13 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
 
     final data = raw['data'];
     if (data is Map) {
-      final id =
-          (data as Map)['id'] ??
-          (data as Map)['trip_id'] ??
-          (data as Map)['tripId'];
+      final id = (data)['id'] ?? (data)['trip_id'] ?? (data)['tripId'];
       final parsed = _parseKey(id);
       if (parsed != null) return parsed;
 
-      final trip = (data as Map)['trip'];
+      final trip = (data)['trip'];
       if (trip is Map) {
-        final nestedId =
-            (trip as Map)['id'] ??
-            (trip as Map)['trip_id'] ??
-            (trip as Map)['tripId'];
+        final nestedId = (trip)['id'] ?? (trip)['trip_id'] ?? (trip)['tripId'];
         return _parseKey(nestedId);
       }
     }
@@ -565,17 +541,17 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
 
     final data = raw['data'];
     if (data is Map) {
-      final direct = (data as Map)['invite_code'];
+      final direct = (data)['invite_code'];
       final parsedDirect = _parseKey(direct);
       if (parsedDirect != null) return parsedDirect;
 
-      final trip = (data as Map)['trip'];
+      final trip = (data)['trip'];
       if (trip is Map) {
-        final nested = (trip as Map)['invite_code'];
+        final nested = (trip)['invite_code'];
         final parsedNested = _parseKey(nested);
         if (parsedNested != null) return parsedNested;
 
-        final nestedDirect = (trip as Map)['code'];
+        final nestedDirect = (trip)['code'];
         return _parseKey(nestedDirect);
       }
     }

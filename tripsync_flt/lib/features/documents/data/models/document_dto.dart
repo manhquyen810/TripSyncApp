@@ -44,7 +44,9 @@ class DocumentDto {
       uploaderId: readInt('uploader_id'),
       filename: readString('filename'),
       url: readString('url'),
-      category: json['category'] is String ? (json['category'] as String) : null,
+      category: json['category'] is String
+          ? (json['category'] as String)
+          : null,
       createdAt: readDateTime('created_at'),
     );
   }

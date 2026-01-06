@@ -211,6 +211,7 @@ class _ItinerarySections extends StatelessWidget {
   final _VoteRatioTextFn ratioText;
   final _VoteFn onVote;
   final _ConfirmFn onConfirm;
+  final _EditLocationFn onEditLocation;
 
   const _ItinerarySections({
     required this.tripId,
@@ -220,6 +221,7 @@ class _ItinerarySections extends StatelessWidget {
     required this.ratioText,
     required this.onVote,
     required this.onConfirm,
+    required this.onEditLocation,
   });
 
   @override
@@ -289,11 +291,15 @@ class _ItinerarySections extends StatelessWidget {
                 const _ItineraryEmptySectionText()
               else
                 ...confirmed.map((a) {
+                  final descriptionSubtitle = a.description.trim().isNotEmpty
+                      ? a.description
+                      : a.subtitle;
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 16),
                     child: _ConfirmedActivityCard(
                       title: a.title,
-                      subtitle: a.subtitle,
+                      category: a.category,
+                      subtitle: descriptionSubtitle,
                       time: a.timeText,
                       location: a.location,
                       likes: a.likesText,
@@ -313,11 +319,15 @@ class _ItinerarySections extends StatelessWidget {
               else
                 ...proposed.map((a) {
                   final id = a.id;
+                  final descriptionSubtitle = a.description.trim().isNotEmpty
+                      ? a.description
+                      : a.subtitle;
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 16),
                     child: _ProposedActivityCard(
                       title: a.title,
-                      subtitle: a.subtitle,
+                      category: a.category,
+                      subtitle: descriptionSubtitle,
                       timeRange: a.timeText,
                       location: a.location,
                       ratioText: ratioText(a),
@@ -330,6 +340,9 @@ class _ItinerarySections extends StatelessWidget {
                           ? null
                           : () => onVote(id, 'downvote'),
                       onConfirm: (id == null) ? null : () => onConfirm(id),
+                      onLongPress: (id == null)
+                          ? null
+                          : () => onEditLocation(a),
                     ),
                   );
                 }),
@@ -412,6 +425,7 @@ class _ItinerarySectionHeader extends StatelessWidget {
 
 class _ConfirmedActivityCard extends StatelessWidget {
   final String title;
+  final String category;
   final String subtitle;
   final String time;
   final String location;
@@ -420,6 +434,7 @@ class _ConfirmedActivityCard extends StatelessWidget {
 
   const _ConfirmedActivityCard({
     required this.title,
+    required this.category,
     required this.subtitle,
     required this.time,
     required this.location,
@@ -476,20 +491,38 @@ class _ConfirmedActivityCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  time,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (category.trim().isNotEmpty) ...[
+                    _CategoryChip(
+                      label: category,
+                      backgroundColor: AppColors.primary.withValues(
+                        alpha: 0.10,
+                      ),
+                      textColor: AppColors.primary,
+                    ),
+                    const SizedBox(height: 6),
+                  ],
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      time,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
@@ -602,8 +635,42 @@ class _SmallUserAvatar extends StatelessWidget {
   }
 }
 
+class _CategoryChip extends StatelessWidget {
+  final String label;
+  final Color backgroundColor;
+  final Color textColor;
+
+  const _CategoryChip({
+    required this.label,
+    required this.backgroundColor,
+    required this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: textColor,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+}
+
 class _ProposedActivityCard extends StatelessWidget {
   final String title;
+  final String category;
   final String subtitle;
   final String timeRange;
   final String location;
@@ -613,9 +680,11 @@ class _ProposedActivityCard extends StatelessWidget {
   final VoidCallback? onUpvote;
   final VoidCallback? onDownvote;
   final VoidCallback? onConfirm;
+  final VoidCallback? onLongPress;
 
   const _ProposedActivityCard({
     required this.title,
+    required this.category,
     required this.subtitle,
     required this.timeRange,
     required this.location,
@@ -625,159 +694,175 @@ class _ProposedActivityCard extends StatelessWidget {
     required this.onUpvote,
     required this.onDownvote,
     required this.onConfirm,
+    required this.onLongPress,
   });
 
   @override
   Widget build(BuildContext context) {
     const accent = Color(0xFFFFB74D);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-        border: const Border(left: BorderSide(color: accent, width: 4)),
-      ),
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+    return GestureDetector(
+      onLongPress: isBusy ? null : onLongPress,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 10,
+              offset: Offset(0, 2),
+            ),
+          ],
+          border: const Border(left: BorderSide(color: accent, width: 4)),
+        ),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.schedule,
-                      size: 16,
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 14,
                       color: AppColors.textSecondary,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      timeRange,
-                      style: const TextStyle(
-                        fontSize: 14,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.schedule,
+                        size: 16,
                         color: AppColors.textSecondary,
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on_outlined,
-                      size: 16,
-                      color: AppColors.textSecondary,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        location,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textSecondary,
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          timeRange,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Container(height: 1, color: const Color(0xFFF3F4F6)),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        _VoteButton(
-                          icon: Icons.thumb_up_outlined,
-                          iconColor: myVote == 'upvote'
-                              ? AppColors.blue
-                              : AppColors.textSecondary,
-                          onTap: isBusy ? null : onUpvote,
-                        ),
+                      if (category.trim().isNotEmpty) ...[
                         const SizedBox(width: 8),
-                        _VoteButton(
-                          icon: Icons.thumb_down_outlined,
-                          iconColor: myVote == 'downvote'
-                              ? AppColors.danger
-                              : AppColors.textSecondary,
-                          onTap: isBusy ? null : onDownvote,
+                        _CategoryChip(
+                          label: category,
+                          backgroundColor: accent.withValues(alpha: 0.10),
+                          textColor: accent,
                         ),
                       ],
-                    ),
-                    Text(
-                      ratioText,
-                      style: const TextStyle(
-                        fontSize: 12,
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on_outlined,
+                        size: 16,
                         color: AppColors.textSecondary,
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          location,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Container(height: 1, color: const Color(0xFFF3F4F6)),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          _VoteButton(
+                            icon: Icons.thumb_up_outlined,
+                            iconColor: myVote == 'upvote'
+                                ? AppColors.blue
+                                : AppColors.textSecondary,
+                            onTap: isBusy ? null : onUpvote,
+                          ),
+                          const SizedBox(width: 8),
+                          _VoteButton(
+                            icon: Icons.thumb_down_outlined,
+                            iconColor: myVote == 'downvote'
+                                ? AppColors.danger
+                                : AppColors.textSecondary,
+                            onTap: isBusy ? null : onDownvote,
+                          ),
+                        ],
+                      ),
+                      Text(
+                        ratioText,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          Positioned(
-            top: 8,
-            right: 8,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: isBusy ? null : onConfirm,
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    'Chờ duyệt',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      color: accent,
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: isBusy ? null : onConfirm,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: accent.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'Chờ duyệt',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: accent,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

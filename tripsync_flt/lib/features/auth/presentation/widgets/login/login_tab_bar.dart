@@ -6,16 +6,8 @@ class LoginTabBar extends StatelessWidget {
   final VoidCallback onSignupTap;
 
   static const _selectedShadows = [
-    BoxShadow(
-      color: Color(0x40000000),
-      offset: Offset(0, 2),
-      blurRadius: 4,
-    ),
-    BoxShadow(
-      color: Color(0x1A000000),
-      offset: Offset(0, 4),
-      blurRadius: 6,
-    ),
+    BoxShadow(color: Color(0x40000000), offset: Offset(0, 2), blurRadius: 4),
+    BoxShadow(color: Color(0x1A000000), offset: Offset(0, 4), blurRadius: 6),
   ];
 
   const LoginTabBar({

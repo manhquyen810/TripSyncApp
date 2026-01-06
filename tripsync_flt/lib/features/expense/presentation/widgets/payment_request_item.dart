@@ -33,11 +33,7 @@ class PaymentRequestItem extends StatelessWidget {
               color: Colors.orange,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(
-              Icons.person,
-              size: 12,
-              color: Colors.white,
-            ),
+            child: const Icon(Icons.person, size: 12, color: Colors.white),
           ),
           const SizedBox(width: 15),
           Text(
@@ -50,13 +46,7 @@ class PaymentRequestItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 15),
-          const Text(
-            '→',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.black,
-            ),
-          ),
+          const Text('→', style: TextStyle(fontSize: 14, color: Colors.black)),
           const SizedBox(width: 15),
           Container(
             width: 16,
@@ -65,11 +55,7 @@ class PaymentRequestItem extends StatelessWidget {
               color: Colors.blue,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(
-              Icons.person,
-              size: 12,
-              color: Colors.white,
-            ),
+            child: const Icon(Icons.person, size: 12, color: Colors.white),
           ),
           const SizedBox(width: 15),
           Text(
@@ -101,11 +87,7 @@ class PaymentRequestItem extends StatelessWidget {
               ),
               child: const Row(
                 children: [
-                  Icon(
-                    Icons.check,
-                    size: 20,
-                    color: Colors.white,
-                  ),
+                  Icon(Icons.check, size: 20, color: Colors.white),
                   SizedBox(width: 5),
                   Text(
                     'Đã trả',

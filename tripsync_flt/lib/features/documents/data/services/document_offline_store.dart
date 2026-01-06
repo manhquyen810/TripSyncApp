@@ -49,12 +49,16 @@ class DocumentOfflineStore {
       for (final e in decoded) {
         if (e is Map<String, dynamic>) {
           final dto = DocumentDto.fromJson(e);
-          final localPath = e['local_path'] is String ? (e['local_path'] as String) : null;
+          final localPath = e['local_path'] is String
+              ? (e['local_path'] as String)
+              : null;
           items.add(CachedDocument(dto: dto, localPath: localPath));
         } else if (e is Map) {
           final map = Map<String, dynamic>.from(e);
           final dto = DocumentDto.fromJson(map);
-          final localPath = map['local_path'] is String ? (map['local_path'] as String) : null;
+          final localPath = map['local_path'] is String
+              ? (map['local_path'] as String)
+              : null;
           items.add(CachedDocument(dto: dto, localPath: localPath));
         }
       }
@@ -72,7 +76,10 @@ class DocumentOfflineStore {
     return path;
   }
 
-  Future<void> setLocalPath({required int documentId, required String localPath}) async {
+  Future<void> setLocalPath({
+    required int documentId,
+    required String localPath,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_docPathKey(documentId), localPath);
   }
@@ -103,7 +110,9 @@ class DocumentOfflineStore {
     }
 
     final safeName = _sanitizeFilename(filename);
-    final file = File('${dir.path}${Platform.pathSeparator}${documentId}_$safeName');
+    final file = File(
+      '${dir.path}${Platform.pathSeparator}${documentId}_$safeName',
+    );
     await file.writeAsBytes(bytes, flush: true);
 
     await setLocalPath(documentId: documentId, localPath: file.path);

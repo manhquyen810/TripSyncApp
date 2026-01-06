@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../routes/app_routes.dart';
 import '../styles/app_colors.dart';
 
 class AddFloatingButton extends StatelessWidget {
   final VoidCallback? onPressed;
-  final bool isExpenseScreen;
   final String? routeName;
   final Object? routeArguments;
   final EdgeInsetsGeometry padding;
@@ -13,7 +11,6 @@ class AddFloatingButton extends StatelessWidget {
   const AddFloatingButton({
     super.key,
     this.onPressed,
-    this.isExpenseScreen = false,
     this.routeName,
     this.routeArguments,
     this.padding = const EdgeInsets.only(bottom: 80),
@@ -29,9 +26,7 @@ class AddFloatingButton extends StatelessWidget {
                 routeName!,
                 arguments: routeArguments,
               )
-            : (isExpenseScreen
-                  ? () => Navigator.pushNamed(context, AppRoutes.addExpense)
-                  : null));
+            : null);
 
     return Padding(
       padding: padding,

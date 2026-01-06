@@ -91,8 +91,9 @@ class _CategoryCard extends StatelessWidget {
     final cardColor = isSelected ? AppColors.primary : Colors.white;
     final textColor = isSelected ? Colors.white : AppColors.textPrimary;
     final subtitleColor = isSelected ? Colors.white70 : AppColors.textSecondary;
-    final iconBackgroundColor =
-        isSelected ? Colors.white : AppColors.iconBackground;
+    final iconBackgroundColor = isSelected
+        ? Colors.white
+        : AppColors.iconBackground;
 
     return GestureDetector(
       onTap: onTap,

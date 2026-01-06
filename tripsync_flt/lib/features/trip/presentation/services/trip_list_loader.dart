@@ -56,7 +56,7 @@ class TripListLoader {
     for (var i = 0; i < data.length; i++) {
       final item = data[i];
       if (item is! Map) continue;
-      final json = Map<String, dynamic>.from(item as Map);
+      final json = Map<String, dynamic>.from(item);
       final tripJson = _extractTripJson(json);
 
       final tripKey = _parseTripKey(
@@ -134,7 +134,7 @@ class TripListLoader {
 
     final trip = json['trip'];
     if (trip is Map) {
-      return Map<String, dynamic>.from(trip as Map);
+      return Map<String, dynamic>.from(trip);
     }
 
     return json;
@@ -276,7 +276,7 @@ class TripListLoader {
     if (data is List) {
       list = data;
     } else if (data is Map) {
-      final map = Map<String, dynamic>.from(data as Map);
+      final map = Map<String, dynamic>.from(data);
       for (final key in const <String>[
         'members',
         'participants',
@@ -298,7 +298,7 @@ class TripListLoader {
       if (item is Map<String, dynamic>) {
         out.add(item);
       } else if (item is Map) {
-        out.add(Map<String, dynamic>.from(item as Map));
+        out.add(Map<String, dynamic>.from(item));
       }
     }
     return out;
@@ -326,7 +326,7 @@ class TripListLoader {
     for (final m in members) {
       final nestedUser = m['user'] ?? m['profile'] ?? m['member'];
       final userMap = nestedUser is Map
-          ? Map<String, dynamic>.from(nestedUser as Map)
+          ? Map<String, dynamic>.from(nestedUser)
           : null;
 
       String? found;
@@ -499,12 +499,12 @@ class TripListLoader {
       final urls = <String>[];
       for (final item in members) {
         if (item is! Map) continue;
-        final m = Map<String, dynamic>.from(item as Map);
+        final m = Map<String, dynamic>.from(item);
 
         // Some payloads nest user info.
         final nestedUser = m['user'] ?? m['profile'] ?? m['member'];
         final userMap = nestedUser is Map
-            ? Map<String, dynamic>.from(nestedUser as Map)
+            ? Map<String, dynamic>.from(nestedUser)
             : null;
 
         String? found;
@@ -558,7 +558,7 @@ class TripListLoader {
         containerJson?['owner'] ??
         containerJson?['user'];
     if (owner is Map) {
-      final ownerMap = Map<String, dynamic>.from(owner as Map);
+      final ownerMap = Map<String, dynamic>.from(owner);
       for (final key in avatarKeys) {
         final v = ownerMap[key];
         if (v == null) continue;

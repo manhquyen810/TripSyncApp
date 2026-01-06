@@ -3,54 +3,69 @@ import 'package:flutter/material.dart';
 import '../../../home/presentation/widgets/member_avatar.dart';
 
 class ChecklistCategoryCard extends StatelessWidget {
-	final ChecklistCategoryData data;
-	final ValueChanged<int>? onItemTap;
-	final EdgeInsetsGeometry margin;
+  final ChecklistCategoryData data;
+  final ValueChanged<int>? onItemTap;
+  final ValueChanged<int>? onItemLongPress;
+  final Future<bool> Function(int itemIndex)? onConfirmDelete;
+  final ValueChanged<int>? onDelete;
+  final EdgeInsetsGeometry margin;
 
-	const ChecklistCategoryCard({
-		super.key,
-		required this.data,
-		this.onItemTap,
-		this.margin = const EdgeInsets.symmetric(horizontal: 15),
-	});
+  const ChecklistCategoryCard({
+    super.key,
+    required this.data,
+    this.onItemTap,
+    this.onItemLongPress,
+    this.onConfirmDelete,
+    this.onDelete,
+    this.margin = const EdgeInsets.symmetric(horizontal: 15),
+  });
 
-	@override
-	Widget build(BuildContext context) {
-		return Container(
-			margin: margin,
-			padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
-			decoration: BoxDecoration(
-				color: Colors.white,
-				borderRadius: BorderRadius.circular(12),
-			),
-			child: Column(
-				crossAxisAlignment: CrossAxisAlignment.start,
-				children: [
-					Text(
-						data.title,
-						style: const TextStyle(
-							fontSize: 14,
-							fontWeight: FontWeight.w600,
-							color: Colors.black,
-							fontFamily: 'Poppins',
-						),
-					),
-					const SizedBox(height: 12),
-					...data.items.asMap().entries.map((entry) {
-						final index = entry.key;
-						final item = entry.value;
-						return Padding(
-							padding: EdgeInsets.only(bottom: index == data.items.length - 1 ? 0 : 9),
-							child: ChecklistItemRow(
-								data: item,
-								onTap: onItemTap == null ? null : () => onItemTap!.call(index),
-							),
-						);
-					}),
-				],
-			),
-		);
-	}
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: margin,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            data.title,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+              fontFamily: 'Poppins',
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...data.items.asMap().entries.map((entry) {
+            final index = entry.key;
+            final item = entry.value;
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: index == data.items.length - 1 ? 0 : 9,
+              ),
+              child: ChecklistItemRow(
+                data: item,
+                onTap: onItemTap == null ? null : () => onItemTap!.call(index),
+                onLongPress: onItemLongPress == null
+                    ? null
+                    : () => onItemLongPress!.call(index),
+                onConfirmDelete: onConfirmDelete == null
+                    ? null
+                    : () => onConfirmDelete!.call(index),
+                onDelete: onDelete == null ? null : () => onDelete!.call(index),
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
 }
 
 class ChecklistItemRow extends StatelessWidget {
@@ -100,24 +115,24 @@ class ChecklistItemRow extends StatelessWidget {
 }
 
 class _ChecklistCheckbox extends StatelessWidget {
-	final bool isChecked;
+  final bool isChecked;
 
-	const _ChecklistCheckbox({required this.isChecked});
+  const _ChecklistCheckbox({required this.isChecked});
 
-	@override
-	Widget build(BuildContext context) {
-		return Container(
-			width: 24,
-			height: 24,
-			decoration: BoxDecoration(
-				border: Border.all(color: const Color(0xFF00C950), width: 1),
-				borderRadius: BorderRadius.circular(6),
-			),
-			child: isChecked
-					? const Icon(Icons.check, size: 16, color: Color(0xFF00C950))
-					: null,
-		);
-	}
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFF00C950), width: 1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: isChecked
+          ? const Icon(Icons.check, size: 16, color: Color(0xFF00C950))
+          : null,
+    );
+  }
 }
 
 class _AssigneeChip extends StatelessWidget {
@@ -159,17 +174,20 @@ class _AssigneeChip extends StatelessWidget {
 }
 
 class ChecklistCategoryData {
-	final String title;
-	final List<ChecklistItemData> items;
+  final String title;
+  final List<ChecklistItemData> items;
 
-	const ChecklistCategoryData({required this.title, required this.items});
+  const ChecklistCategoryData({required this.title, required this.items});
 
-	ChecklistCategoryData copyWith({String? title, List<ChecklistItemData>? items}) {
-		return ChecklistCategoryData(
-			title: title ?? this.title,
-			items: items ?? this.items,
-		);
-	}
+  ChecklistCategoryData copyWith({
+    String? title,
+    List<ChecklistItemData>? items,
+  }) {
+    return ChecklistCategoryData(
+      title: title ?? this.title,
+      items: items ?? this.items,
+    );
+  }
 }
 
 class ChecklistItemData {
@@ -195,3 +213,30 @@ class ChecklistItemData {
 	}
 }
 
+  const ChecklistItemData({
+    this.id,
+    required this.title,
+    this.isChecked = false,
+    this.assigneeId,
+    this.assigneeName,
+    this.assigneeAvatarUrl,
+  });
+
+  ChecklistItemData copyWith({
+    int? id,
+    String? title,
+    bool? isChecked,
+    int? assigneeId,
+    String? assigneeName,
+    String? assigneeAvatarUrl,
+  }) {
+    return ChecklistItemData(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      isChecked: isChecked ?? this.isChecked,
+      assigneeId: assigneeId ?? this.assigneeId,
+      assigneeName: assigneeName ?? this.assigneeName,
+      assigneeAvatarUrl: assigneeAvatarUrl ?? this.assigneeAvatarUrl,
+    );
+  }
+}

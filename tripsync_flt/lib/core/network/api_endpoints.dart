@@ -47,11 +47,11 @@ class ApiEndpoints {
 
   static const String documentsUpload = '/documents/upload';
   static String documentsByTrip(int tripId) => '/documents/trip/$tripId';
-    static String documentDetail(int documentId) => '/documents/$documentId';
+  static String documentDetail(int documentId) => '/documents/$documentId';
 
   static const String checklistAddItem = '/checklist/item';
   static String checklistToggleItem(int itemId) =>
       '/checklist/item/$itemId/toggle';
-    static String checklistTrip(int tripId) => '/checklist/trip/$tripId';
-    static String checklistItemDetail(int itemId) => '/checklist/item/$itemId';
+  static String checklistTrip(int tripId) => '/checklist/trip/$tripId';
+  static String checklistItemDetail(int itemId) => '/checklist/item/$itemId';
 }

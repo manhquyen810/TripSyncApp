@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import '../../../../core/network/api_client.dart';
+import '../../../../core/network/auth_token_store.dart';
+import '../../../../shared/widgets/top_toast.dart';
+import '../../data/datasources/expense_remote_data_source.dart';
+import '../../data/repositories/expense_repository_impl.dart';
+import '../../domain/entities/trip_member.dart';
 
 class AddExpenseScreen extends StatefulWidget {
-  const AddExpenseScreen({super.key});
+  final int tripId;
+
+  const AddExpenseScreen({super.key, required this.tripId});
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -9,34 +17,34 @@ class AddExpenseScreen extends StatefulWidget {
 
 class _AddExpenseScreenState extends State<AddExpenseScreen> {
   String? selectedCategory;
-  String? selectedPayer;
-  final List<String> selectedParticipants = [];
-  final Set<String> selectedSplitWith = {};
+  int? selectedPayerId;
+  final Set<int> selectedMemberIds = {};
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
+  DateTime selectedDateTime = DateTime.now();
 
-  final List<Map<String, dynamic>> categories = [
-    {'name': 'Ăn uống', 'icon': Icons.restaurant},
-    {'name': 'Vé máy bay', 'icon': Icons.flight},
-    {'name': 'Vé xe khách', 'icon': Icons.directions_bus},
-    {'name': 'Khách sạn', 'icon': Icons.hotel},
-  ];
+  late final ExpenseRepositoryImpl _repository;
+  late Future<List<TripMember>> _membersFuture;
+  bool _isSubmitting = false;
 
-  final List<String> members = [
-    'Minh Anh',
-    'Lan Chi',
-    'Sáng',
-    'Đức',
-    'Hương',
-    'Nam',
-  ];
+  final Map<String, Map<String, dynamic>> categories = {
+    'food': {'name': 'Ăn uống', 'icon': Icons.restaurant},
+    'flight': {'name': 'Vé máy bay', 'icon': Icons.flight},
+    'transportation': {'name': 'Vé xe khách', 'icon': Icons.directions_bus},
+    'accommodation': {'name': 'Khách sạn', 'icon': Icons.hotel},
+    'other': {'name': 'Khác', 'icon': Icons.more_horiz},
+  };
 
-  final List<Map<String, String>> users = [
-    {'name': 'Minh Anh', 'avatar': '👧'},
-    {'name': 'Tuấn Anh', 'avatar': '👦'},
-    {'name': 'Hải Long', 'avatar': '👨'},
-    {'name': 'Thu Trang', 'avatar': '👩'},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _repository = ExpenseRepositoryImpl(
+      ExpenseRemoteDataSourceImpl(
+        ApiClient(authTokenProvider: AuthTokenStore.getAccessToken),
+      ),
+    );
+    _membersFuture = _repository.getTripMembers(widget.tripId);
+  }
 
   @override
   void dispose() {
@@ -68,6 +76,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     _buildDescriptionSection(),
                     const SizedBox(height: 30),
                     _buildAmountSection(),
+                    const SizedBox(height: 30),
+                    _buildDateTimeSection(),
                     const SizedBox(height: 30),
                     _buildPayerSection(),
                     const SizedBox(height: 30),
@@ -134,12 +144,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         Wrap(
           spacing: 12,
           runSpacing: 12,
-          children: categories.map((category) {
-            final isSelected = selectedCategory == category['name'];
+          children: categories.entries.map((entry) {
+            final key = entry.key;
+            final category = entry.value;
+            final isSelected = selectedCategory == key;
             return GestureDetector(
               onTap: () {
                 setState(() {
-                  selectedCategory = category['name'];
+                  selectedCategory = key;
                 });
               },
               child: Container(
@@ -160,10 +172,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(category['icon'], size: 24, color: Colors.black),
+                    Icon(
+                      category['icon'] as IconData,
+                      size: 24,
+                      color: Colors.black,
+                    ),
                     const SizedBox(width: 8),
                     Text(
-                      category['name'],
+                      category['name'] as String,
                       style: const TextStyle(fontSize: 14),
                     ),
                   ],
@@ -243,6 +259,68 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     );
   }
 
+  Widget _buildDateTimeSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Thời gian chi tiêu*',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 16),
+        GestureDetector(
+          onTap: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: selectedDateTime,
+              firstDate: DateTime(2020),
+              lastDate: DateTime.now().add(const Duration(days: 365)),
+            );
+            if (date != null) {
+              if (!mounted) return;
+              final time = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.fromDateTime(selectedDateTime),
+              );
+              if (time != null) {
+                setState(() {
+                  selectedDateTime = DateTime(
+                    date.year,
+                    date.month,
+                    date.day,
+                    time.hour,
+                    time.minute,
+                  );
+                });
+              }
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xFF9A9A9A)),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.calendar_today,
+                  size: 20,
+                  color: Color(0xFF9A9A9A),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  '${selectedDateTime.day}/${selectedDateTime.month}/${selectedDateTime.year} - ${selectedDateTime.hour.toString().padLeft(2, '0')}:${selectedDateTime.minute.toString().padLeft(2, '0')}',
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildPayerSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,50 +330,72 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 16),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: members.map((member) {
-            final isSelected = selectedPayer == member;
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  selectedPayer = member;
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 16,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: isSelected
-                        ? const Color(0xFF00C950)
-                        : const Color(0xFF99A1AF),
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 18,
-                      height: 18,
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade200,
-                        shape: BoxShape.circle,
-                      ),
+        FutureBuilder<List<TripMember>>(
+          future: _membersFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+
+            if (snapshot.hasError || !snapshot.hasData) {
+              return const Text('Không thể tải danh sách thành viên');
+            }
+
+            final members = snapshot.data!;
+
+            return Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: members.map((member) {
+                final isSelected = selectedPayerId == member.id;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedPayerId = member.id;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 16,
                     ),
-                    const SizedBox(width: 8),
-                    Text(member, style: const TextStyle(fontSize: 14)),
-                  ],
-                ),
-              ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                        color: isSelected
+                            ? const Color(0xFF00C950)
+                            : const Color(0xFF99A1AF),
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (isSelected)
+                          const Icon(
+                            Icons.check_circle,
+                            color: Color(0xFF00C950),
+                            size: 20,
+                          ),
+                        if (isSelected) const SizedBox(width: 6),
+                        Container(
+                          width: 18,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade200,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(member.name, style: const TextStyle(fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
             );
-          }).toList(),
+          },
         ),
       ],
     );
@@ -310,61 +410,76 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 16),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: members.map((member) {
-            final isSelected = selectedParticipants.contains(member);
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  if (isSelected) {
-                    selectedParticipants.remove(member);
-                  } else {
-                    selectedParticipants.add(member);
-                  }
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 16,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: isSelected
-                        ? const Color(0xFF00C950)
-                        : const Color(0xFF99A1AF),
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (isSelected)
-                      const Icon(
-                        Icons.check_circle,
-                        color: Color(0xFF00C950),
-                        size: 20,
-                      ),
-                    if (isSelected) const SizedBox(width: 6),
-                    Container(
-                      width: 18,
-                      height: 18,
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade200,
-                        shape: BoxShape.circle,
-                      ),
+        FutureBuilder<List<TripMember>>(
+          future: _membersFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+
+            if (snapshot.hasError || !snapshot.hasData) {
+              return const Text('Không thể tải danh sách thành viên');
+            }
+
+            final members = snapshot.data!;
+
+            return Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: members.map((member) {
+                final isSelected = selectedMemberIds.contains(member.id);
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      if (isSelected) {
+                        selectedMemberIds.remove(member.id);
+                      } else {
+                        selectedMemberIds.add(member.id);
+                      }
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 16,
                     ),
-                    const SizedBox(width: 8),
-                    Text(member, style: const TextStyle(fontSize: 14)),
-                  ],
-                ),
-              ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                        color: isSelected
+                            ? const Color(0xFF00C950)
+                            : const Color(0xFF99A1AF),
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (isSelected)
+                          const Icon(
+                            Icons.check_circle,
+                            color: Color(0xFF00C950),
+                            size: 20,
+                          ),
+                        if (isSelected) const SizedBox(width: 6),
+                        Container(
+                          width: 18,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade200,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(member.name, style: const TextStyle(fontSize: 14)),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
             );
-          }).toList(),
+          },
         ),
       ],
     );
@@ -375,7 +490,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       children: [
         Expanded(
           child: OutlinedButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: _isSubmitting ? null : () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 12),
               side: const BorderSide(color: Colors.black),
@@ -392,10 +507,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         const SizedBox(width: 16),
         Expanded(
           child: ElevatedButton(
-            onPressed: () {
-              // TODO: Save expense
-              Navigator.pop(context);
-            },
+            onPressed: _isSubmitting ? null : _handleSubmit,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
               padding: const EdgeInsets.symmetric(vertical: 12),
@@ -403,14 +515,105 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text(
-              '+ Thêm chi tiêu',
-              style: TextStyle(fontSize: 14, color: Colors.white),
-            ),
+            child: _isSubmitting
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : const Text(
+                    '+ Thêm chi tiêu',
+                    style: TextStyle(fontSize: 14, color: Colors.white),
+                  ),
           ),
         ),
       ],
     );
+  }
+
+  Future<void> _handleSubmit() async {
+    if (selectedCategory == null) {
+      showTopToast(
+        context,
+        message: 'Vui lòng chọn danh mục',
+        type: TopToastType.error,
+      );
+      return;
+    }
+
+    if (descriptionController.text.trim().isEmpty) {
+      showTopToast(
+        context,
+        message: 'Vui lòng nhập mô tả',
+        type: TopToastType.error,
+      );
+      return;
+    }
+
+    final amount = double.tryParse(amountController.text.trim());
+    if (amount == null || amount <= 0) {
+      showTopToast(
+        context,
+        message: 'Vui lòng nhập số tiền hợp lệ',
+        type: TopToastType.error,
+      );
+      return;
+    }
+
+    if (selectedPayerId == null) {
+      showTopToast(
+        context,
+        message: 'Vui lòng chọn người đã trả',
+        type: TopToastType.error,
+      );
+      return;
+    }
+
+    if (selectedMemberIds.isEmpty) {
+      showTopToast(
+        context,
+        message: 'Vui lòng chọn người tham gia',
+        type: TopToastType.error,
+      );
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      await _repository.createExpense(
+        tripId: widget.tripId,
+        amount: amount,
+        description: descriptionController.text.trim(),
+        category: selectedCategory,
+        payerId: selectedPayerId!,
+        involvedUserIds: selectedMemberIds.toList(),
+        expenseDate: selectedDateTime,
+      );
+
+      if (!mounted) return;
+
+      showTopToast(
+        context,
+        message: 'Thêm chi tiêu thành công',
+        type: TopToastType.success,
+      );
+      Navigator.pop(context, true);
+    } catch (e) {
+      if (!mounted) return;
+      showTopToast(context, message: 'Lỗi: $e', type: TopToastType.error);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
   }
 
   // ignore: unused_field

@@ -26,7 +26,7 @@ class EmailInputStep extends StatelessWidget {
           title: 'Quên mật khẩu',
           description: 'Vui lòng nhập email của bạn để đặt lại mật khẩu',
         ),
-        
+
         const SizedBox(height: 48),
 
         Form(
@@ -104,7 +104,7 @@ class EmailInputStep extends StatelessWidget {
                   return null;
                 },
               ),
-              
+
               const SizedBox(height: 24),
 
               SizedBox(

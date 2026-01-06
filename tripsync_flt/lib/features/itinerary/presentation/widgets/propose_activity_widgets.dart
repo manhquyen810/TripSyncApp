@@ -99,7 +99,7 @@ class ProposeActivityTypeSelector extends StatelessWidget {
                         width: 36,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFC8C8C8).withOpacity(0.3),
+                          color: const Color(0xFFC8C8C8).withAlpha(77),
                           borderRadius: BorderRadius.circular(24),
                         ),
                         alignment: Alignment.center,
@@ -174,7 +174,7 @@ class ProposeActivityLabeledTextField extends StatelessWidget {
           builder: (context, _) {
             final borderColor = focusNode.hasFocus
                 ? green
-                : muted.withOpacity(0.3);
+                : muted.withAlpha(77);
 
             return Container(
               constraints: minHeight == null
@@ -258,7 +258,7 @@ class ProposeActivityLocationField extends StatelessWidget {
           builder: (context, _) {
             final borderColor = focusNode.hasFocus
                 ? green
-                : muted.withOpacity(0.3);
+                : muted.withAlpha(77);
 
             return Container(
               decoration: BoxDecoration(

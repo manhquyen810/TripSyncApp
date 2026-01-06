@@ -7,6 +7,8 @@ class LoginForm extends StatefulWidget {
   final VoidCallback onForgotPassword;
   final Future<void> Function() onLogin;
   final bool isLoading;
+  final bool rememberMe;
+  final ValueChanged<bool> onRememberMeChanged;
 
   const LoginForm({
     super.key,
@@ -16,6 +18,8 @@ class LoginForm extends StatefulWidget {
     required this.onForgotPassword,
     required this.onLogin,
     this.isLoading = false,
+    required this.rememberMe,
+    required this.onRememberMeChanged,
   });
 
   @override
@@ -40,7 +44,7 @@ class _LoginFormState extends State<LoginForm> {
     borderRadius: _borderRadius,
     borderSide: BorderSide(color: Color(0xFFE5E7EB)),
   );
-  
+
   bool _obscurePassword = true;
 
   @override
@@ -56,10 +60,7 @@ class _LoginFormState extends State<LoginForm> {
             children: [
               const Padding(
                 padding: EdgeInsets.only(bottom: 3),
-                child: Text(
-                  'Email',
-                  style: _labelStyle,
-                ),
+                child: Text('Email', style: _labelStyle),
               ),
               TextFormField(
                 controller: widget.emailController,
@@ -99,10 +100,7 @@ class _LoginFormState extends State<LoginForm> {
             children: [
               const Padding(
                 padding: EdgeInsets.only(bottom: 3),
-                child: Text(
-                  'Mật khẩu',
-                  style: _labelStyle,
-                ),
+                child: Text('Mật khẩu', style: _labelStyle),
               ),
               TextFormField(
                 controller: widget.passwordController,
@@ -152,18 +150,56 @@ class _LoginFormState extends State<LoginForm> {
             ],
           ),
           const SizedBox(height: 19),
-          TextButton(
-            onPressed: widget.isLoading ? null : widget.onForgotPassword,
-            child: const Text(
-              'Quên mật khẩu?',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 14,
-                color: Color(0xFF6A7282),
-                height: 1.43,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: Checkbox(
+                      value: widget.rememberMe,
+                      onChanged: widget.isLoading
+                          ? null
+                          : (v) => widget.onRememberMeChanged(v ?? false),
+                      activeColor: const Color(0xFF72BF83),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Nhớ tài khoản',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      color: Color(0xFF6A7282),
+                      height: 1.43,
+                    ),
+                  ),
+                ],
               ),
-            ),
+              TextButton(
+                onPressed: widget.isLoading ? null : widget.onForgotPassword,
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: const Text(
+                  'Quên mật khẩu?',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    color: Color(0xFF6A7282),
+                    height: 1.43,
+                  ),
+                ),
+              ),
+            ],
           ),
+          const SizedBox(height: 19),
           SizedBox(
             width: double.infinity,
             height: 51,

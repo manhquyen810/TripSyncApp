@@ -2,8 +2,24 @@ import 'package:flutter/material.dart';
 
 class AddChecklistItemScreen extends StatefulWidget {
   final Function(String itemName, String category, String? assignee)? onAdd;
+  final List<String>? members;
 
-  const AddChecklistItemScreen({super.key, this.onAdd});
+  final String? initialItemName;
+  final String? initialCategory;
+  final String? initialAssignee;
+  final String? headerText;
+  final String? submitText;
+
+  const AddChecklistItemScreen({
+    super.key,
+    this.onAdd,
+    this.members,
+    this.initialItemName,
+    this.initialCategory,
+    this.initialAssignee,
+    this.headerText,
+    this.submitText,
+  });
 
   @override
   State<AddChecklistItemScreen> createState() => _AddChecklistItemScreenState();
@@ -14,20 +30,39 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
   String? _selectedCategory;
   String? _selectedAssignee;
 
-  final _members = [
-    {'name': 'Nguyễn Văn A', 'avatar': Icons.person},
-    {'name': 'Trần Thị B', 'avatar': Icons.person},
-    {'name': 'Lê Văn C', 'avatar': Icons.person},
-    {'name': 'Phạm Thị D', 'avatar': Icons.person},
-  ];
+  List<String> get _memberNames {
+    final fromParent = widget.members;
+    if (fromParent != null && fromParent.isNotEmpty) return fromParent;
+    return const <String>[
+      'Nguyễn Văn A',
+      'Trần Thị B',
+      'Lê Văn C',
+      'Phạm Thị D',
+    ];
+  }
 
   final _categories = [
-    {'name': 'Thiết yếu', 'color': Color(0xFFE7000B), 'icon': Icons.warning},
+    {'name': 'Thiết yếu', 'color': Color(0xFFE7000B), 'icon': Icons.list_alt},
     {'name': 'Quần áo', 'color': Color(0xFF55ACEE), 'icon': Icons.checkroom},
-    {'name': 'Vệ sinh cá nhân', 'color': Color(0x8000C950), 'icon': Icons.clean_hands},
-    {'name': 'Thiết bị điện tử', 'color': Color(0xFFFFA1E0), 'icon': Icons.devices},
-    {'name': 'Khác', 'color': Color(0xFF65758B), 'icon': Icons.more_horiz},
+    {
+      'name': 'Vệ sinh cá nhân',
+      'color': Color(0x8000C950),
+      'icon': Icons.clean_hands,
+    },
+    {
+      'name': 'Thiết bị điện tử',
+      'color': Color(0xFFFFA1E0),
+      'icon': Icons.devices,
+    },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _itemNameController.text = widget.initialItemName?.trim() ?? '';
+    _selectedCategory = widget.initialCategory;
+    _selectedAssignee = widget.initialAssignee;
+  }
 
   @override
   void dispose() {
@@ -70,7 +105,7 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
             const SizedBox(height: 16),
             ListView.builder(
               shrinkWrap: true,
-              itemCount: _members.length + 1,
+              itemCount: _memberNames.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return ListTile(
@@ -94,26 +129,26 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
                     },
                   );
                 }
-                final member = _members[index - 1];
+                final memberName = _memberNames[index - 1];
                 return ListTile(
                   leading: CircleAvatar(
                     backgroundColor: const Color(0xFF55ACEE),
-                    child: Icon(member['avatar'] as IconData, color: Colors.white),
+                    child: const Icon(Icons.person, color: Colors.white),
                   ),
                   title: Text(
-                    member['name'] as String,
+                    memberName,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       fontFamily: 'Poppins',
                     ),
                   ),
-                  trailing: _selectedAssignee == member['name']
+                  trailing: _selectedAssignee == memberName
                       ? const Icon(Icons.check, color: Color(0xFF00C950))
                       : null,
                   onTap: () {
                     setState(() {
-                      _selectedAssignee = member['name'] as String;
+                      _selectedAssignee = memberName;
                     });
                     Navigator.pop(context);
                   },
@@ -128,32 +163,26 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              const SizedBox(height: 30),
-              _buildItemNameField(),
-              const SizedBox(height: 24),
-              _buildCategorySection(),
-              const SizedBox(height: 24),
-              _buildAssigneeSection(),
-              const SizedBox(height: 32),
-              _buildAddButton(),
-              const SizedBox(height: 20),
-            ],
-          ),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(context),
+            const SizedBox(height: 30),
+            _buildItemNameField(),
+            const SizedBox(height: 24),
+            _buildCategorySection(),
+            const SizedBox(height: 24),
+            _buildAssigneeSection(),
+            const SizedBox(height: 32),
+            _buildAddButton(),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
@@ -171,17 +200,13 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
               color: const Color(0xFF55ACEE),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
-              Icons.checklist,
-              color: Colors.white,
-              size: 24,
-            ),
+            child: const Icon(Icons.checklist, color: Colors.white, size: 24),
           ),
           const SizedBox(width: 10),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Thêm món đồ cần mang',
-              style: TextStyle(
+              widget.headerText ?? 'Thêm món đồ cần mang',
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Poppins',
@@ -234,9 +259,15 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFF00C950), width: 2),
+                borderSide: const BorderSide(
+                  color: Color(0xFF00C950),
+                  width: 2,
+                ),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 10,
+              ),
             ),
           ),
         ],
@@ -251,39 +282,37 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Loại hoạt động*',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                fontFamily: 'Inter',
-                color: Colors.black,
-              ),
+            'Danh mục*',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              fontFamily: 'Inter',
+              color: Colors.black,
             ),
+          ),
           const SizedBox(height: 12),
-          Center(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: _categories.map((category) {
-                  final isSelected = _selectedCategory == category['name'];
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: _CategoryCard(
-                      name: category['name'] as String,
-                      color: category['color'] as Color,
-                      icon: category['icon'] as IconData,
-                      isSelected: isSelected,
-                      onTap: () {
-                        setState(() {
-                          _selectedCategory = category['name'] as String;
-                        });
-                      },
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
+          Row(
+            children: List.generate(_categories.length, (index) {
+              final category = _categories[index];
+              final isSelected = _selectedCategory == category['name'];
+
+              return Padding(
+                padding: EdgeInsets.only(
+                  right: index == _categories.length - 1 ? 0 : 27,
+                ),
+                child: _CategoryCard(
+                  name: category['name'] as String,
+                  color: category['color'] as Color,
+                  icon: category['icon'] as IconData,
+                  isSelected: isSelected,
+                  onTap: () {
+                    setState(() {
+                      _selectedCategory = category['name'] as String;
+                    });
+                  },
+                ),
+              );
+            }),
           ),
         ],
       ),
@@ -335,7 +364,11 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
                       ),
                     ),
                   ),
-                  const Icon(Icons.arrow_drop_down, size: 20, color: Color(0xFF959DA3)),
+                  const Icon(
+                    Icons.arrow_drop_down,
+                    size: 20,
+                    color: Color(0xFF959DA3),
+                  ),
                 ],
               ),
             ),
@@ -359,9 +392,9 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
-          child: const Text(
-            'Thêm món đồ',
-            style: TextStyle(
+          child: Text(
+            widget.submitText ?? 'Thêm món đồ',
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
               fontFamily: 'Inter',
@@ -399,7 +432,9 @@ class _CategoryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(
-            color: isSelected ? const Color(0xFF00C950) : const Color(0xFFC8C8C8),
+            color: isSelected
+                ? const Color(0xFF00C950)
+                : const Color(0xFFC8C8C8),
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(12),
@@ -411,7 +446,7 @@ class _CategoryCard extends StatelessWidget {
               width: 36,
               height: 32,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.8),
+                color: color.withAlpha(204),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: Colors.white, size: 20),

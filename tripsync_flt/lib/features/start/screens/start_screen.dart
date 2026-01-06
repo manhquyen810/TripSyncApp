@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+
+import '../../../core/network/api_client.dart';
+import '../../../core/network/auth_token_store.dart';
+import '../../../core/network/exceptions.dart';
+import '../../../routes/app_routes.dart';
+import '../../auth/data/datasources/auth_remote_data_source.dart';
+import '../../auth/data/repositories/auth_repository_impl.dart';
+import '../../auth/domain/repositories/auth_repository.dart';
 import '../../auth/presentation/screens/login_screen.dart';
 
 class StartScreen extends StatefulWidget {
@@ -12,11 +20,62 @@ class StartScreen extends StatefulWidget {
 
 class _StartScreenState extends State<StartScreen> {
   bool _didAutoOpenLogin = false;
+  bool _isCheckingSession = true;
+
+  late final AuthRepository _authRepository;
+
+  @override
+  void initState() {
+    super.initState();
+    _authRepository = AuthRepositoryImpl(
+      AuthRemoteDataSourceImpl(
+        ApiClient(authTokenProvider: AuthTokenStore.getAccessToken),
+      ),
+    );
+    _checkExistingSession();
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
+    if (_isCheckingSession || _didAutoOpenLogin) return;
+
+    _maybeOpenLoginSheet();
+  }
+
+  Future<void> _checkExistingSession() async {
+    final token = await AuthTokenStore.getAccessToken();
+    if (token == null) {
+      _finishCheckingAndMaybeOpenLogin();
+      return;
+    }
+
+    try {
+      await _authRepository.me();
+      if (!mounted) return;
+
+      // Token is valid, navigate straight to Home.
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+    } on ApiException {
+      await AuthTokenStore.clear();
+      _finishCheckingAndMaybeOpenLogin();
+    } catch (_) {
+      _finishCheckingAndMaybeOpenLogin();
+    }
+  }
+
+  void _finishCheckingAndMaybeOpenLogin() {
+    if (!mounted) return;
+    setState(() => _isCheckingSession = false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _maybeOpenLoginSheet();
+    });
+  }
+
+  void _maybeOpenLoginSheet() {
     if (_didAutoOpenLogin) return;
 
     final args = ModalRoute.of(context)?.settings.arguments;
@@ -48,7 +107,17 @@ class _StartScreenState extends State<StartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
-        children: [const _BackgroundImage(), const _ContentOverlay()],
+        children: [
+          const _BackgroundImage(),
+          const _ContentOverlay(),
+          if (_isCheckingSession)
+            Container(
+              color: Colors.black45,
+              child: const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+            ),
+        ],
       ),
     );
   }

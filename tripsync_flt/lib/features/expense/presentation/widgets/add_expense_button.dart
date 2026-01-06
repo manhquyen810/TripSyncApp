@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
-import '../screens/add_expense_screen.dart';
 
 class AddExpenseButton extends StatelessWidget {
-  const AddExpenseButton({super.key});
+  final VoidCallback? onTap;
+
+  const AddExpenseButton({super.key, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const AddExpenseScreen(),
-          ),
-        );
-      },
+      onTap: onTap,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: const Color(0xFF6A72821A).withOpacity(0.05),
+          color: const Color(0xFF6A7282).withAlpha(13),
           borderRadius: BorderRadius.circular(12),
         ),
         child: const Center(
