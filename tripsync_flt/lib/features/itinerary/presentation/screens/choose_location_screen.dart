@@ -81,8 +81,11 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
   static String _newSessionToken() {
     final rand = Random();
     final a = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
-    final b = rand.nextInt(1 << 32).toRadixString(16).padLeft(8, '0');
-    final c = rand.nextInt(1 << 32).toRadixString(16).padLeft(8, '0');
+    // On web, `1 << 32` becomes 0 (JS bitwise ops are 32-bit), which would
+    // crash with `nextInt(0)`. Use a safe positive max instead.
+    const max = 0x7fffffff; // < 2^32 and safe across platforms
+    final b = rand.nextInt(max).toRadixString(16).padLeft(8, '0');
+    final c = rand.nextInt(max).toRadixString(16).padLeft(8, '0');
     return '$a-$b-$c';
   }
 

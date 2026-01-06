@@ -42,11 +42,10 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
   }
 
   final _categories = [
-    {'name': 'Thiết yếu', 'color': Color(0xFFE7000B), 'icon': Icons.warning},
+    {'name': 'Thiết yếu', 'color': Color(0xFFE7000B), 'icon': Icons.list_alt},
     {'name': 'Quần áo', 'color': Color(0xFF55ACEE), 'icon': Icons.checkroom},
     {'name': 'Vệ sinh cá nhân', 'color': Color(0x8000C950), 'icon': Icons.clean_hands},
     {'name': 'Thiết bị điện tử', 'color': Color(0xFFFFA1E0), 'icon': Icons.devices},
-    {'name': 'Khác', 'color': Color(0xFF65758B), 'icon': Icons.more_horiz},
   ];
 
   @override
@@ -156,32 +155,26 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              const SizedBox(height: 30),
-              _buildItemNameField(),
-              const SizedBox(height: 24),
-              _buildCategorySection(),
-              const SizedBox(height: 24),
-              _buildAssigneeSection(),
-              const SizedBox(height: 32),
-              _buildAddButton(),
-              const SizedBox(height: 20),
-            ],
-          ),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(context),
+            const SizedBox(height: 30),
+            _buildItemNameField(),
+            const SizedBox(height: 24),
+            _buildCategorySection(),
+            const SizedBox(height: 24),
+            _buildAssigneeSection(),
+            const SizedBox(height: 32),
+            _buildAddButton(),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
@@ -279,39 +272,35 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Loại hoạt động*',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                fontFamily: 'Inter',
-                color: Colors.black,
-              ),
+            'Danh mục*',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              fontFamily: 'Inter',
+              color: Colors.black,
             ),
+          ),
           const SizedBox(height: 12),
-          Center(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: _categories.map((category) {
-                  final isSelected = _selectedCategory == category['name'];
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: _CategoryCard(
-                      name: category['name'] as String,
-                      color: category['color'] as Color,
-                      icon: category['icon'] as IconData,
-                      isSelected: isSelected,
-                      onTap: () {
-                        setState(() {
-                          _selectedCategory = category['name'] as String;
-                        });
-                      },
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
+          Row(
+            children: List.generate(_categories.length, (index) {
+              final category = _categories[index];
+              final isSelected = _selectedCategory == category['name'];
+
+              return Padding(
+                padding: EdgeInsets.only(right: index == _categories.length - 1 ? 0 : 27),
+                child: _CategoryCard(
+                  name: category['name'] as String,
+                  color: category['color'] as Color,
+                  icon: category['icon'] as IconData,
+                  isSelected: isSelected,
+                  onTap: () {
+                    setState(() {
+                      _selectedCategory = category['name'] as String;
+                    });
+                  },
+                ),
+              );
+            }),
           ),
         ],
       ),

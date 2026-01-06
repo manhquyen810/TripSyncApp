@@ -310,10 +310,14 @@ class TripListLoader {
     const avatarKeys = <String>[
       'avatar_url',
       'avatarUrl',
+      'avatar',
       'photo_url',
       'photoUrl',
+      'photo',
       'profile_image_url',
       'profileImageUrl',
+      'profile_picture_url',
+      'profilePictureUrl',
       'image_url',
       'imageUrl',
     ];
@@ -447,10 +451,14 @@ class TripListLoader {
     const avatarKeys = <String>[
       'avatar_url',
       'avatarUrl',
+      'avatar',
       'photo_url',
       'photoUrl',
+      'photo',
       'profile_image_url',
       'profileImageUrl',
+      'profile_picture_url',
+      'profilePictureUrl',
       'image_url',
       'imageUrl',
     ];
