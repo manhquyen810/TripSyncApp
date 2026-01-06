@@ -11,6 +11,7 @@ import '../features/home/presentation/models/profile_data.dart';
 import '../features/itinerary/presentation/screens/itinerary_screen.dart';
 import '../features/checklist/presentation/screens/checklist_screen.dart';
 import '../features/expense/presentation/screens/expense_screen_dynamic.dart';
+import '../features/expense/presentation/screens/add_expense_screen.dart';
 import '../features/documents/presentation/screens/document_management_screen.dart';
 import '../features/trip/domain/entities/trip.dart';
 
@@ -27,6 +28,7 @@ class AppRoutes {
   static const settings = "/settings";
   static const checklist = "/checklist";
   static const expense = "/expense";
+  static const addExpense = "/add-expense";
   static const documents = "/documents";
 
   static final routes = <String, WidgetBuilder>{
@@ -36,7 +38,12 @@ class AppRoutes {
     home: (_) => const HomeScreen(),
     createTrip: (_) => const CreateTripScreen(),
     documents: (context) {
-      final trip = ModalRoute.of(context)!.settings.arguments as Trip;
+      final trip = ModalRoute.of(context)?.settings.arguments as Trip?;
+      if (trip == null) {
+        return const Scaffold(
+          body: Center(child: Text('Không tìm thấy chuyến đi')),
+        );
+      }
       return DocumentManagementScreen(trip: trip);
     },
     editProfile: (context) {
@@ -46,21 +53,47 @@ class AppRoutes {
     myProfile: (_) => const MyProfileScreen(),
     settings: (_) => const SettingsScreen(),
     itinerary: (context) {
-      final trip = ModalRoute.of(context)!.settings.arguments as Trip;
+      final trip = ModalRoute.of(context)?.settings.arguments as Trip?;
+      if (trip == null) {
+        return const Scaffold(
+          body: Center(child: Text('Không tìm thấy chuyến đi')),
+        );
+      }
       return TripItineraryScreen(trip: trip);
     },
     checklist: (context) {
-      final trip = ModalRoute.of(context)!.settings.arguments as Trip;
+      final trip = ModalRoute.of(context)?.settings.arguments as Trip?;
+      if (trip == null) {
+        return const Scaffold(
+          body: Center(child: Text('Không tìm thấy chuyến đi')),
+        );
+      }
       return ChecklistScreen(trip: trip);
     },
     expense: (context) {
-      final trip = ModalRoute.of(context)!.settings.arguments as Trip?;
+      final trip = ModalRoute.of(context)?.settings.arguments as Trip?;
       if (trip == null) {
         return const Scaffold(
           body: Center(child: Text('Không tìm thấy chuyến đi')),
         );
       }
       return ExpenseScreen(trip: trip);
+    },
+    addExpense: (context) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      final tripId = args is Trip
+          ? args.id
+          : args is int
+          ? args
+          : null;
+
+      if (tripId == null) {
+        return const Scaffold(
+          body: Center(child: Text('Không tìm thấy chuyến đi')),
+        );
+      }
+
+      return AddExpenseScreen(tripId: tripId);
     },
   };
 }

@@ -164,21 +164,8 @@ class ExpenseScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: AddFloatingButton(
-        onPressed: () {
-          final tripId = trip.id;
-          if (tripId == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Không thể thêm chi tiêu (thiếu trip_id)')),
-            );
-            return;
-          }
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => AddExpenseScreen(tripId: tripId),
-            ),
-          );
-        },
+        onPressed: () =>
+            Navigator.pushNamed(context, AppRoutes.addExpense, arguments: trip),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );

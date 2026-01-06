@@ -5,6 +5,7 @@ class AppColors {
 
   // Primary Colors
   static const Color primary = Color(0xFF00C950);
+  static const Color accent = Color(0xFFFFB74D);
   static const Color blue = Color(0xFF55ACEE);
   static const Color danger = Color(0xFFEF4444);
 
