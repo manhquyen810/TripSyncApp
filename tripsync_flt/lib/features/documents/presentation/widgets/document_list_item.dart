@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/styles/app_colors.dart';
+import '../../../../features/home/presentation/widgets/member_avatar.dart';
 import '../models/document_item.dart';
 
 class DocumentListItem extends StatelessWidget {
@@ -68,22 +69,11 @@ class DocumentListItem extends StatelessWidget {
                     const SizedBox(height: 5),
                     Row(
                       children: [
-                        Container(
-                          width: 18,
-                          height: 18,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            shape: BoxShape.circle,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(3),
-                            child: Image.asset(
-                              'assets/icons/person.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
+                        MemberAvatar(
+                          color: Colors.grey.shade400,
+                          imageUrl: doc.authorAvatarUrl,
+                          size: 18,
                         ),
-                        const SizedBox(width: 8),
                         Text(
                           doc.author,
                           style: TextStyle(

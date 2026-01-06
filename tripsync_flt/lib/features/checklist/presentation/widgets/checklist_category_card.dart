@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../shared/styles/app_colors.dart';
+import '../../../home/presentation/widgets/member_avatar.dart';
 
 class ChecklistCategoryCard extends StatelessWidget {
   final ChecklistCategoryData data;
@@ -69,84 +69,49 @@ class ChecklistCategoryCard extends StatelessWidget {
 }
 
 class ChecklistItemRow extends StatelessWidget {
-  final ChecklistItemData data;
-  final VoidCallback? onTap;
-  final VoidCallback? onLongPress;
-  final Future<bool> Function()? onConfirmDelete;
-  final VoidCallback? onDelete;
+	final ChecklistItemData data;
+	final VoidCallback? onTap;
 
-  const ChecklistItemRow({
-    super.key,
-    required this.data,
-    this.onTap,
-    this.onLongPress,
-    this.onConfirmDelete,
-    this.onDelete,
-  });
+	const ChecklistItemRow({super.key, required this.data, this.onTap});
 
-  @override
-  Widget build(BuildContext context) {
-    final content = InkWell(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            _ChecklistCheckbox(isChecked: data.isChecked),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                data.title,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                  fontFamily: 'Poppins',
-                  decoration: data.isChecked
-                      ? TextDecoration.lineThrough
-                      : TextDecoration.none,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            if (data.assigneeName != null) ...[
-              const SizedBox(width: 10),
-              _AssigneeChip(
-                name: data.assigneeName!,
-                avatarUrl: data.assigneeAvatarUrl,
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-
-    final canSwipeDelete =
-        onConfirmDelete != null && onDelete != null && data.id != null;
-    if (!canSwipeDelete) return content;
-
-    return Dismissible(
-      key: ValueKey<String>('checklist-item-${data.id}'),
-      direction: DismissDirection.endToStart,
-      confirmDismiss: (direction) async {
-        if (direction != DismissDirection.endToStart) return false;
-        return onConfirmDelete!.call();
-      },
-      onDismissed: (_) => onDelete!.call(),
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 16),
-        decoration: BoxDecoration(
-          color: AppColors.primary,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Icon(Icons.delete, color: Colors.white),
-      ),
-      child: content,
-    );
-  }
+	@override
+	Widget build(BuildContext context) {
+		return InkWell(
+			onTap: onTap,
+			borderRadius: BorderRadius.circular(12),
+			child: Padding(
+				padding: const EdgeInsets.all(10),
+				child: Row(
+					children: [
+						_ChecklistCheckbox(isChecked: data.isChecked),
+						const SizedBox(width: 10),
+						Expanded(
+							child: Text(
+								data.title,
+								style: TextStyle(
+									fontSize: 14,
+									color: Colors.black,
+									fontFamily: 'Poppins',
+									decoration: data.isChecked
+											? TextDecoration.lineThrough
+											: TextDecoration.none,
+								),
+								maxLines: 1,
+								overflow: TextOverflow.ellipsis,
+							),
+						),
+						if (data.assigneeName != null) ...[
+							const SizedBox(width: 10),
+							_AssigneeChip(
+								name: data.assigneeName!,
+								avatarUrl: data.assigneeAvatarUrl,
+							),
+						],
+					],
+				),
+			),
+		);
+	}
 }
 
 class _ChecklistCheckbox extends StatelessWidget {
@@ -171,72 +136,41 @@ class _ChecklistCheckbox extends StatelessWidget {
 }
 
 class _AssigneeChip extends StatelessWidget {
-  final String name;
-  final String? avatarUrl;
+	final String name;
+	final String? avatarUrl;
 
-  const _AssigneeChip({required this.name, this.avatarUrl});
+	const _AssigneeChip({required this.name, this.avatarUrl});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildAvatar(),
-          const SizedBox(width: 8),
-          Text(
-            name,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black,
-              fontFamily: 'Poppins',
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAvatar() {
-    final url = avatarUrl?.trim();
-    return Container(
-      width: 18,
-      height: 18,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.grey.shade200,
-      ),
-      child: ClipOval(
-        child: (url != null && url.isNotEmpty)
-            ? Image.network(
-                url,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return _fallbackAvatar();
-                },
-              )
-            : _fallbackAvatar(),
-      ),
-    );
-  }
-
-  Widget _fallbackAvatar() {
-    return Center(
-      child: Image.asset(
-        'assets/icons/person.png',
-        width: 14,
-        height: 14,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          return const Icon(Icons.person, size: 14, color: Colors.black);
-        },
-      ),
-    );
-  }
+	@override
+	Widget build(BuildContext context) {
+		return Container(
+			padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+			decoration: BoxDecoration(
+				borderRadius: BorderRadius.circular(12),
+			),
+			child: Row(
+				mainAxisSize: MainAxisSize.min,
+				children: [
+					MemberAvatar(
+						color: Colors.grey.shade300,
+						imageUrl: avatarUrl,
+						size: 18,
+					),
+					const SizedBox(width: 8),
+					Text(
+						name,
+						style: const TextStyle(
+							fontSize: 14,
+							color: Colors.black,
+							fontFamily: 'Poppins',
+						),
+						maxLines: 1,
+						overflow: TextOverflow.ellipsis,
+					),
+				],
+			),
+		);
+	}
 }
 
 class ChecklistCategoryData {
@@ -257,12 +191,27 @@ class ChecklistCategoryData {
 }
 
 class ChecklistItemData {
-  final int? id;
-  final String title;
-  final bool isChecked;
-  final int? assigneeId;
-  final String? assigneeName;
-  final String? assigneeAvatarUrl;
+	final String title;
+	final bool isChecked;
+	final String? assigneeName;
+	final String? assigneeAvatarUrl;
+
+	const ChecklistItemData({
+		required this.title,
+		this.isChecked = false,
+		this.assigneeName,
+		this.assigneeAvatarUrl,
+	});
+
+	ChecklistItemData copyWith({String? title, bool? isChecked, String? assigneeName, String? assigneeAvatarUrl}) {
+		return ChecklistItemData(
+			title: title ?? this.title,
+			isChecked: isChecked ?? this.isChecked,
+			assigneeName: assigneeName ?? this.assigneeName,
+			assigneeAvatarUrl: assigneeAvatarUrl ?? this.assigneeAvatarUrl,
+		);
+	}
+}
 
   const ChecklistItemData({
     this.id,
