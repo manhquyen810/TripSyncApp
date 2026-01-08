@@ -53,13 +53,13 @@ class ExpenseHistoryItem extends StatelessWidget {
               width: 43,
               height: 43,
               decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
+                color: const Color(0xFF00C853).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 _getCategoryIcon(),
                 size: 24,
-                color: Colors.black,
+                color: const Color(0xFF00C853),
               ),
             ),
             const SizedBox(width: 14),
@@ -70,19 +70,20 @@ class ExpenseHistoryItem extends StatelessWidget {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1A1A1A),
                       fontFamily: 'Inter',
                     ),
                   ),
-                  const SizedBox(height: 11),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       Text(
                         '$payer đã trả ',
                         style: const TextStyle(
                           fontSize: 12,
-                          color: Colors.black,
+                          color: Color(0xFF6B7280),
                           fontFamily: 'Inter',
                         ),
                       ),
@@ -90,7 +91,7 @@ class ExpenseHistoryItem extends StatelessWidget {
                         width: 4,
                         height: 4,
                         decoration: const BoxDecoration(
-                          color: Colors.black,
+                          color: Color(0xFF6B7280),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -98,7 +99,7 @@ class ExpenseHistoryItem extends StatelessWidget {
                         ' Chia $splitCount người',
                         style: const TextStyle(
                           fontSize: 12,
-                          color: Colors.black,
+                          color: Color(0xFF6B7280),
                           fontFamily: 'Inter',
                         ),
                       ),
@@ -113,17 +114,18 @@ class ExpenseHistoryItem extends StatelessWidget {
                 Text(
                   totalAmount,
                   style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1A1A1A),
                     fontFamily: 'Inter',
                   ),
                 ),
-                const SizedBox(height: 11),
+                const SizedBox(height: 8),
                 Text(
                   perPersonAmount,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Colors.black,
+                    color: Color(0xFF6B7280),
                     fontFamily: 'Inter',
                   ),
                 ),
