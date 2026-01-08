@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/auth_token_store.dart';
@@ -79,7 +80,7 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
                   ),
                   child: IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_back, size: 24),
+                    icon: const Icon(LucideIcons.arrowLeft, size: 24),
                   ),
                 ),
 

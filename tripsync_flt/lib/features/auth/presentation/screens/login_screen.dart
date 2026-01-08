@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/auth_token_store.dart';
@@ -179,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: IconButton(
                     padding: EdgeInsets.zero,
                     icon: const Icon(
-                      Icons.arrow_back,
+                      LucideIcons.arrowLeft,
                       color: Colors.white,
                       size: 15,
                     ),

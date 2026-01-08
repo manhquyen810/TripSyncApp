@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class SuccessDialog extends StatelessWidget {
   final String title;
@@ -29,7 +30,7 @@ class SuccessDialog extends StatelessWidget {
                 color: Color(0xFF00D756),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.check, color: Colors.white, size: 40),
+              child: const Icon(LucideIcons.check, color: Colors.white, size: 40),
             ),
 
             const SizedBox(height: 24),

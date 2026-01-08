@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/exceptions.dart';
@@ -268,7 +269,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   child: IconButton(
                     padding: EdgeInsets.zero,
                     icon: const Icon(
-                      Icons.arrow_back,
+                      LucideIcons.arrowLeft,
                       color: Color(0xFF1D1D1D),
                       size: 15,
                     ),

@@ -115,7 +115,7 @@ class _TripInviteCard extends StatelessWidget {
                     ),
                     child: IconButton(
                       onPressed: onCopy,
-                      icon: const Icon(Icons.copy, size: 16),
+                      icon: const Icon(LucideIcons.copy, size: 16),
                       color: AppColors.textPrimary,
                       padding: EdgeInsets.zero,
                     ),
@@ -243,7 +243,7 @@ class _RoleCard extends StatelessWidget {
           Row(
             children: [
               const Icon(
-                Icons.verified_user,
+                LucideIcons.badgeCheck,
                 size: 16,
                 color: AppColors.primary,
               ),
@@ -364,7 +364,7 @@ class _HeaderDelegate extends SliverPersistentHeaderDelegate {
             ),
             child: IconButton(
               onPressed: onBack,
-              icon: const Icon(Icons.arrow_back, size: 24),
+              icon: const Icon(LucideIcons.arrowLeft, size: 24),
               padding: EdgeInsets.zero,
             ),
           ),

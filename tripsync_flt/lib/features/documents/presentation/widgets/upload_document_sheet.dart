@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../shared/styles/app_colors.dart';
 import '../models/document_item.dart';
 
@@ -131,7 +132,7 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
                       IconButton(
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(
-                          Icons.close,
+                          LucideIcons.x,
                           color: AppColors.textPrimary,
                         ),
                       ),

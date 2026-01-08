@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide TabBarView;
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:tripsync_flt/features/auth/presentation/screens/login_screen.dart';
 
 import '../../../../core/network/api_client.dart';
@@ -144,7 +145,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: IconButton(
                         padding: EdgeInsets.zero,
                         icon: const Icon(
-                          Icons.arrow_back,
+                          LucideIcons.arrowLeft,
                           color: Colors.white,
                           size: 15,
                         ),

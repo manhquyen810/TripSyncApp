@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class TripListHeader extends StatelessWidget {
   final int activeTripCount;
@@ -38,7 +39,7 @@ class TripListHeader extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.circle, size: 10, color: activeColor),
+                    const Icon(LucideIcons.circle, size: 10, color: activeColor),
                     const SizedBox(width: 6),
                     Flexible(
                       child: Text(
@@ -80,7 +81,7 @@ class TripListHeader extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: 4),
-                  Icon(Icons.arrow_forward_ios, size: 14, color: Colors.black),
+                  Icon(LucideIcons.chevronRight, size: 14, color: Colors.black),
                 ],
               ),
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../shared/styles/app_colors.dart';
 import '../../../../features/home/presentation/widgets/member_avatar.dart';
 import '../models/document_item.dart';
@@ -115,7 +116,7 @@ class DocumentListItem extends StatelessWidget {
               IconButton(
                 onPressed: onDownloadPressed,
                 icon: Icon(
-                  Icons.download_for_offline_outlined,
+                  LucideIcons.download,
                   color: Colors.grey[600],
                   size: 24,
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class BalanceItem extends StatelessWidget {
   final String name;
@@ -25,7 +26,7 @@ class BalanceItem extends StatelessWidget {
                 color: Colors.orange,
                 borderRadius: BorderRadius.circular(9),
               ),
-              child: const Icon(Icons.person, size: 14, color: Colors.white),
+              child: const Icon(LucideIcons.user, size: 14, color: Colors.white),
             ),
             const SizedBox(width: 9),
             Text(

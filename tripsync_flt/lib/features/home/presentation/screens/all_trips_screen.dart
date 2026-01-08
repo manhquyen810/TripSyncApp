@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/auth_token_store.dart';
 import '../../../../core/network/exceptions.dart';
@@ -171,7 +172,7 @@ class _AllTripsScreenState extends State<AllTripsScreen> {
                     onTap: () => Navigator.pop(context),
                     child: const Center(
                       child: Icon(
-                        Icons.arrow_back,
+                        LucideIcons.arrowLeft,
                         color: Colors.black,
                         size: 22,
                       ),
@@ -324,7 +325,7 @@ class _AllTripsScreenState extends State<AllTripsScreen> {
                               alignment: Alignment.centerRight,
                               padding: const EdgeInsets.only(right: 20),
                               child: const Icon(
-                                Icons.delete,
+                                LucideIcons.trash2,
                                 color: Colors.white,
                               ),
                             ),

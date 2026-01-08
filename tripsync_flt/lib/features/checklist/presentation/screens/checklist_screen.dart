@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../core/config/env.dart';
 import '../../../../routes/app_routes.dart';
@@ -220,7 +221,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.edit),
+                leading: const Icon(LucideIcons.pencil),
                 title: const Text('Sửa'),
                 onTap: () {
                   Navigator.pop(context);
@@ -231,7 +232,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.delete, color: Colors.red),
+                leading: const Icon(LucideIcons.trash2, color: Colors.red),
                 title: const Text('Xóa'),
                 onTap: () {
                   Navigator.pop(context);
@@ -545,7 +546,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                 color: const Color(0xFFF5F6F8),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.arrow_back, size: 24),
+              child: const Icon(LucideIcons.arrowLeft, size: 24),
             ),
           ),
           const SizedBox(width: 17),

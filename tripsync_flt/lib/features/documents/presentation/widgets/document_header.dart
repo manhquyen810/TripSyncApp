@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../shared/styles/app_colors.dart';
 
 class DocumentHeader extends StatelessWidget {
@@ -29,7 +30,7 @@ class DocumentHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
-                Icons.arrow_back,
+                LucideIcons.arrowLeft,
                 size: 24,
                 color: AppColors.textPrimary,
               ),

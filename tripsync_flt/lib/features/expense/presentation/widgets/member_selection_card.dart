@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class MemberSelectionCard extends StatelessWidget {
   final String name;
@@ -35,7 +36,7 @@ class MemberSelectionCard extends StatelessWidget {
           children: [
             if (showCheckIcon && isSelected) ...[
               const Icon(
-                Icons.check_circle,
+                LucideIcons.checkCircle,
                 color: Color(0xFF00C950),
                 size: 24,
               ),

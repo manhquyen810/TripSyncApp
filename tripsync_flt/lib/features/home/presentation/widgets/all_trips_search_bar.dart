@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class AllTripsSearchBar extends StatelessWidget {
   final Function(String)? onSearchChanged;
@@ -42,7 +43,7 @@ class AllTripsSearchBar extends StatelessWidget {
               height: 20,
               color: borderColor,
               errorBuilder: (context, error, stackTrace) =>
-                  Icon(Icons.search, size: 20, color: borderColor),
+                  Icon(LucideIcons.search, size: 20, color: borderColor),
             ),
           ),
           prefixIconConstraints: const BoxConstraints(

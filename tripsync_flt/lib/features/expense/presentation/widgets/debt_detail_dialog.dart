@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../domain/entities/balance.dart';
 
 class DebtDetailDialog extends StatelessWidget {
@@ -35,7 +36,7 @@ class DebtDetailDialog extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close),
+                  icon: const Icon(LucideIcons.x),
                   onPressed: () => Navigator.pop(context),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -73,7 +74,7 @@ class DebtDetailDialog extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(
-                            Icons.person,
+                            LucideIcons.user,
                             size: 24,
                             color: Colors.white,
                           ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 enum TopToastType { success, error }
 
@@ -93,7 +94,7 @@ class _TopToastEntryState extends State<_TopToastEntry>
     const errorBg = Color(0xFFFF6B6B);
 
     final backgroundColor = isSuccess ? successBg : errorBg;
-    final icon = isSuccess ? Icons.check : Icons.close;
+    final icon = isSuccess ? LucideIcons.check : LucideIcons.x;
 
     return Material(
       color: Colors.transparent,

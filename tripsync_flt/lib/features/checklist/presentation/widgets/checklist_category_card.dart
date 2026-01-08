@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../home/presentation/widgets/member_avatar.dart';
 
@@ -72,7 +73,7 @@ class ChecklistCategoryCard extends StatelessWidget {
                         alignment: Alignment.centerRight,
                         padding: const EdgeInsets.only(right: 16),
                         child: const Icon(
-                          Icons.delete,
+                          LucideIcons.trash2,
                           color: Colors.white,
                         ),
                       ),
@@ -177,7 +178,7 @@ class _ChecklistCheckbox extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
       ),
       child: isChecked
-          ? const Icon(Icons.check, size: 16, color: Color(0xFF00C950))
+          ? const Icon(LucideIcons.check, size: 16, color: Color(0xFF00C950))
           : null,
     );
   }

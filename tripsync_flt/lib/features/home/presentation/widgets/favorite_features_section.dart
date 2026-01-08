@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'feature_button.dart';
 
 class FavoriteFeaturesSection extends StatelessWidget {
@@ -42,26 +43,26 @@ class FavoriteFeaturesSection extends StatelessWidget {
           final buttons = [
             FeatureButton(
               label: 'Tham gia chuyến đi',
-              icon: Icons.group_add,
+              icon: LucideIcons.userPlus,
               onTap: onJoinTripTap,
               width: buttonWidth,
             ),
             FeatureButton(
               label: 'Tạo chuyến đi',
-              icon: Icons.add_circle_outline,
+              icon: LucideIcons.plusCircle,
               onTap: onCreateTripTap,
               width: buttonWidth,
             ),
             FeatureButton(
               label: 'Hồ sơ',
-              icon: Icons.person,
+              icon: LucideIcons.user,
               assetIconPath: 'assets/icons/person.png',
               onTap: onProfileTap,
               width: buttonWidth,
             ),
             FeatureButton(
               label: 'Cài đặt',
-              icon: Icons.settings,
+              icon: LucideIcons.settings,
               onTap: onSettingsTap,
               width: buttonWidth,
             ),

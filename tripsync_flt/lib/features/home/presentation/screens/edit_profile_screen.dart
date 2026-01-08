@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 
@@ -294,7 +295,7 @@ class _EditInfoList extends StatelessWidget {
     return Column(
       children: [
         _EditInfoRow(
-          icon: Icons.email_outlined,
+          icon: LucideIcons.mail,
           controller: emailController,
           width: 303,
         ),

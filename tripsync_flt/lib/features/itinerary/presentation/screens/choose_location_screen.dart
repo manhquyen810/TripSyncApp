@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:http/http.dart' as http;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -514,7 +515,7 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
 
   Future<Uint8List?> _buildGreenPinImage() async {
     try {
-      // Build a green pin using the same Material icon used elsewhere in the UI.
+      // Build a green pin using the same Lucide icon used elsewhere in the UI.
       const double size = 72;
       final recorder = PictureRecorder();
       final canvas = Canvas(recorder);
@@ -523,10 +524,10 @@ class _ChooseLocationScreenState extends State<ChooseLocationScreen> {
         textDirection: TextDirection.ltr,
         textAlign: TextAlign.center,
         text: TextSpan(
-          text: String.fromCharCode(Icons.place.codePoint),
+          text: String.fromCharCode(LucideIcons.mapPin.codePoint),
           style: TextStyle(
-            fontFamily: Icons.place.fontFamily,
-            package: Icons.place.fontPackage,
+            fontFamily: LucideIcons.mapPin.fontFamily,
+            package: LucideIcons.mapPin.fontPackage,
             fontSize: 64,
             color: _pinGreen,
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../styles/app_colors.dart';
 
@@ -33,7 +34,7 @@ class AddFloatingButton extends StatelessWidget {
       child: FloatingActionButton(
         onPressed: effectiveOnPressed,
         backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add, color: Colors.white, size: 28),
+        child: const Icon(LucideIcons.plus, color: Colors.white, size: 28),
       ),
     );
   }

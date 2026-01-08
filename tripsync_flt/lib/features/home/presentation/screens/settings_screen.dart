@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../shared/styles/app_colors.dart';
 import '../../../../core/network/auth_token_store.dart';
 import '../../../../core/storage/secure_storage_service.dart';
@@ -34,7 +35,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     IconButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.arrow_back, color: Colors.black),
+                      icon: const Icon(
+                        LucideIcons.arrowLeft,
+                        color: Colors.black,
+                      ),
                       tooltip: 'Quay lại',
                     ),
                     const SizedBox(width: 6),
@@ -58,7 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   children: [
                     _SettingsToggleRow(
-                      icon: Icons.phone_android,
+                      icon: LucideIcons.smartphone,
                       label: 'Thông báo đẩy',
                       value: _pushNotificationsEnabled,
                       onChanged: (v) =>
@@ -66,7 +70,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 10),
                     _SettingsToggleRow(
-                      icon: Icons.email_outlined,
+                      icon: LucideIcons.mail,
                       label: 'Thông báo email',
                       value: _emailNotificationsEnabled,
                       onChanged: (v) =>
@@ -74,7 +78,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 10),
                     const _SettingsNavRow(
-                      icon: Icons.volume_up_outlined,
+                      icon: LucideIcons.volume2,
                       label: 'Âm thanh',
                     ),
                     const SizedBox(height: 18),
@@ -98,7 +102,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 14),
                     _SettingsToggleRow(
-                      icon: Icons.dark_mode_outlined,
+                      icon: LucideIcons.moon,
                       label: 'Chế độ tối',
                       value: _darkModeEnabled,
                       onChanged: (v) => setState(() => _darkModeEnabled = v),
@@ -108,17 +112,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Container(height: 2, color: dividerColor),
                     const SizedBox(height: 10),
                     const _SettingsNavRow(
-                      icon: Icons.language,
+                      icon: LucideIcons.languages,
                       label: 'Ngôn ngữ',
                     ),
                     const SizedBox(height: 2),
                     const _SettingsNavRow(
-                      icon: Icons.shield_outlined,
+                      icon: LucideIcons.shield,
                       label: 'Bảo mật & Quyền riêng tư',
                     ),
                     const SizedBox(height: 2),
                     const _SettingsNavRow(
-                      icon: Icons.headset_mic_outlined,
+                      icon: LucideIcons.headphones,
                       label: 'Trợ giúp & Hỗ trợ',
                     ),
                     const SizedBox(height: 18),
@@ -152,7 +156,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             },
                           );
                         },
-                        icon: Icon(Icons.logout, color: errorColor, size: 20),
+                        icon: Icon(
+                          LucideIcons.logOut,
+                          color: errorColor,
+                          size: 20,
+                        ),
                         label: Text(
                           'Đăng xuất',
                           style: TextStyle(

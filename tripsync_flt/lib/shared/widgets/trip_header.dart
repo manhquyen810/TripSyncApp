@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../styles/app_colors.dart';
 import '../../routes/app_routes.dart';
@@ -49,7 +50,7 @@ class TripHeader extends StatelessWidget {
                 color: AppColors.buttonBackground,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.arrow_back, size: 24),
+              child: const Icon(LucideIcons.arrowLeft, size: 24),
             ),
           ),
           const SizedBox(width: 17),
@@ -94,7 +95,7 @@ class TripHeader extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.settings, color: Colors.black),
+            icon: const Icon(LucideIcons.settings, color: Colors.black),
             onPressed: onSettingsPressed,
           ),
         ],

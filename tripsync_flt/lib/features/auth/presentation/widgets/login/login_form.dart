@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class LoginForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
@@ -78,7 +79,7 @@ class _LoginFormState extends State<LoginForm> {
                   hintText: 'Nhập email',
                   hintStyle: _hintStyle,
                   prefixIcon: Icon(
-                    Icons.email_outlined,
+                    LucideIcons.mail,
                     color: Color(0xFF99A1AF),
                     size: 20,
                   ),
@@ -119,15 +120,15 @@ class _LoginFormState extends State<LoginForm> {
                   hintText: 'Nhập mật khẩu',
                   hintStyle: _hintStyle,
                   prefixIcon: const Icon(
-                    Icons.lock_outline,
+                    LucideIcons.lock,
                     color: Color(0xFF99A1AF),
                     size: 20,
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
+                          ? LucideIcons.eye
+                          : LucideIcons.eyeOff,
                       color: const Color(0xFF99A1AF),
                       size: 20,
                     ),

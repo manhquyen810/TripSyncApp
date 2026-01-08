@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'bottom_nav_item.dart';
 import '../../routes/app_routes.dart';
 import '../../features/trip/domain/entities/trip.dart';
@@ -34,7 +35,7 @@ class TripBottomNavigation extends StatelessWidget {
         children: [
           Expanded(
             child: BottomNavItem(
-              assetIconPath: 'assets/icons/plane.png',
+              icon: LucideIcons.plane,
               label: 'Plane',
               isActive: currentIndex == 0,
               onTap: () => _handleTap(context, 0),
@@ -42,7 +43,7 @@ class TripBottomNavigation extends StatelessWidget {
           ),
           Expanded(
             child: BottomNavItem(
-              assetIconPath: 'assets/icons/document.png',
+              icon: LucideIcons.fileUp,
               label: 'Upload',
               isActive: currentIndex == 1,
               onTap: () => _handleTap(context, 1),
@@ -50,7 +51,7 @@ class TripBottomNavigation extends StatelessWidget {
           ),
           Expanded(
             child: BottomNavItem(
-              assetIconPath: 'assets/icons/coin.png',
+              icon: LucideIcons.coins,
               label: 'Chi tiêu',
               isActive: currentIndex == 2,
               onTap: () => _handleTap(context, 2),
@@ -58,7 +59,7 @@ class TripBottomNavigation extends StatelessWidget {
           ),
           Expanded(
             child: BottomNavItem(
-              assetIconPath: 'assets/icons/list.png',
+              icon: LucideIcons.listChecks,
               label: 'Checklist',
               isActive: currentIndex == 3,
               onTap: () => _handleTap(context, 3),

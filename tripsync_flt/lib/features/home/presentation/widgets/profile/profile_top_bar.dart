@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class ProfileTopBar extends StatelessWidget {
   final String title;
@@ -19,7 +20,7 @@ class ProfileTopBar extends StatelessWidget {
             ),
             child: IconButton(
               onPressed: onBack,
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              icon: const Icon(LucideIcons.arrowLeft, color: Colors.black),
             ),
           ),
           const SizedBox(width: 12),

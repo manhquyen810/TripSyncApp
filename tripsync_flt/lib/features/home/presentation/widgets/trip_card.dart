@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'member_avatar.dart';
 
 class TripCard extends StatelessWidget {
@@ -224,7 +225,7 @@ class TripCard extends StatelessWidget {
     final placeholder = Container(
       color: Colors.grey[300],
       alignment: Alignment.center,
-      child: const Icon(Icons.image, size: 50),
+      child: const Icon(LucideIcons.image, size: 50),
     );
 
     if (url.isEmpty) {

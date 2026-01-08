@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class RegisterForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
@@ -87,7 +88,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   hintText: 'Nhập họ và tên',
                   hintStyle: _hintStyle,
                   prefixIcon: Icon(
-                    Icons.person_outline,
+                    LucideIcons.user,
                     color: _iconColor,
                     size: 20,
                   ),
@@ -129,7 +130,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   hintText: 'Nhập email',
                   hintStyle: _hintStyle,
                   prefixIcon: Icon(
-                    Icons.email_outlined,
+                    LucideIcons.mail,
                     color: _iconColor,
                     size: 20,
                   ),
@@ -172,15 +173,15 @@ class _RegisterFormState extends State<RegisterForm> {
                   hintText: 'Nhập mật khẩu',
                   hintStyle: _hintStyle,
                   prefixIcon: const Icon(
-                    Icons.lock_outline,
+                    LucideIcons.lock,
                     color: _iconColor,
                     size: 20,
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
+                          ? LucideIcons.eye
+                          : LucideIcons.eyeOff,
                       color: _iconColor,
                       size: 20,
                     ),
@@ -231,15 +232,15 @@ class _RegisterFormState extends State<RegisterForm> {
                   hintText: 'Nhập lại mật khẩu',
                   hintStyle: _hintStyle,
                   prefixIcon: const Icon(
-                    Icons.lock_outline,
+                    LucideIcons.lock,
                     color: _iconColor,
                     size: 20,
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscureConfirmPassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
+                          ? LucideIcons.eye
+                          : LucideIcons.eyeOff,
                       color: _iconColor,
                       size: 20,
                     ),

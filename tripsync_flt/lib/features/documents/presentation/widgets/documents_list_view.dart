@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../shared/styles/app_colors.dart';
 import '../models/document_item.dart';
@@ -73,7 +74,7 @@ class DocumentsListView extends StatelessWidget {
               color: AppColors.primary,
               alignment: Alignment.centerRight,
               padding: const EdgeInsets.only(right: 20),
-              child: const Icon(Icons.delete, color: Colors.white, size: 24),
+              child: const Icon(LucideIcons.trash2, color: Colors.white),
             ),
             child: card,
           ),

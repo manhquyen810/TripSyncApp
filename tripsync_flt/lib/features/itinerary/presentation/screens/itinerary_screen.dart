@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'propose_activity_screen.dart';
 import 'itinerary_map_screen.dart';
 import 'choose_location_screen.dart';
@@ -264,7 +265,7 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
     final placeholder = Container(
       color: Colors.grey.shade300,
       alignment: Alignment.center,
-      child: const Icon(Icons.image, size: 50),
+      child: const Icon(LucideIcons.image, size: 50),
     );
 
     if (url.isEmpty) return placeholder;
@@ -547,7 +548,7 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add, size: 20, color: Colors.white),
+                  Icon(LucideIcons.plus, size: 20, color: Colors.white),
                   SizedBox(width: 8),
                   Text(
                     'Thêm đề xuất hoạt động',
@@ -585,7 +586,7 @@ class _TripItineraryScreenState extends State<TripItineraryScreen> {
                 );
               },
               icon: const Icon(
-                Icons.map_outlined,
+                LucideIcons.map,
                 size: 22,
                 color: AppColors.textPrimary,
               ),

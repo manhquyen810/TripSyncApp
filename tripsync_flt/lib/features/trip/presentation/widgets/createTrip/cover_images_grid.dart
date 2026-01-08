@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../services/trip_cover_images.dart';
 
@@ -57,7 +58,7 @@ class CoverImagesGrid extends StatelessWidget {
                               color: const Color(0xFFF5F6F8),
                               alignment: Alignment.center,
                               child: const Icon(
-                                Icons.image,
+                                LucideIcons.image,
                                 color: Colors.grey,
                               ),
                             )
@@ -70,7 +71,7 @@ class CoverImagesGrid extends StatelessWidget {
                                   color: const Color(0xFFF5F6F8),
                                   alignment: Alignment.center,
                                   child: const Icon(
-                                    Icons.image,
+                                    LucideIcons.image,
                                     color: Colors.grey,
                                   ),
                                 );
@@ -83,7 +84,7 @@ class CoverImagesGrid extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              Icons.add_photo_alternate_outlined,
+                              LucideIcons.imagePlus,
                               color: Colors.black54,
                             ),
                             SizedBox(height: 6),
@@ -124,7 +125,7 @@ class CoverImagesGrid extends StatelessWidget {
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     color: const Color(0xFFF5F6F8),
-                    child: const Icon(Icons.image, color: Colors.grey),
+                    child: const Icon(LucideIcons.image, color: Colors.grey),
                   );
                 },
               ),

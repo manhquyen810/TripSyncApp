@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class PaymentRequestItem extends StatelessWidget {
   final String fromName;
@@ -33,7 +34,7 @@ class PaymentRequestItem extends StatelessWidget {
               color: Colors.orange,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.person, size: 12, color: Colors.white),
+            child: const Icon(LucideIcons.user, size: 12, color: Colors.white),
           ),
           const SizedBox(width: 15),
           Text(
@@ -55,7 +56,7 @@ class PaymentRequestItem extends StatelessWidget {
               color: Colors.blue,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.person, size: 12, color: Colors.white),
+            child: const Icon(LucideIcons.user, size: 12, color: Colors.white),
           ),
           const SizedBox(width: 15),
           Text(
@@ -87,7 +88,7 @@ class PaymentRequestItem extends StatelessWidget {
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.check, size: 20, color: Colors.white),
+                  Icon(LucideIcons.check, size: 20, color: Colors.white),
                   SizedBox(width: 5),
                   Text(
                     'Đã trả',

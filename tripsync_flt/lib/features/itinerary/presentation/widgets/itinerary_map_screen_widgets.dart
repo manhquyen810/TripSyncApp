@@ -40,7 +40,7 @@ class _HeaderBar extends StatelessWidget {
                 child: IconButton(
                   onPressed: onBack,
                   icon: const Icon(
-                    Icons.arrow_back,
+                    LucideIcons.arrowLeft,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -79,7 +79,10 @@ class _HeaderBar extends StatelessWidget {
                 height: 40,
                 child: IconButton(
                   onPressed: onSearch,
-                  icon: const Icon(Icons.search, color: AppColors.textPrimary),
+                  icon: const Icon(
+                    LucideIcons.search,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
             ],
@@ -189,7 +192,7 @@ class _DayFilterDropdown extends StatelessWidget {
             child: DropdownButton<int?>(
               value: value,
               isDense: true,
-              icon: const Icon(Icons.keyboard_arrow_down_rounded),
+              icon: const Icon(LucideIcons.chevronDown),
               onChanged: onChanged,
               items: items,
             ),
@@ -301,7 +304,7 @@ class _MapControls extends StatelessWidget {
           ),
           child: IconButton(
             onPressed: onLocate,
-            icon: const Icon(Icons.my_location, color: AppColors.textPrimary),
+            icon: const Icon(LucideIcons.crosshair, color: AppColors.textPrimary),
           ),
         ),
         const SizedBox(height: 12),
@@ -322,12 +325,12 @@ class _MapControls extends StatelessWidget {
           child: Column(
             children: [
               _ControlButton(
-                icon: Icons.add,
+                icon: LucideIcons.plus,
                 showDivider: true,
                 onPressed: onZoomIn,
               ),
               _ControlButton(
-                icon: Icons.remove,
+                icon: LucideIcons.minus,
                 showDivider: false,
                 onPressed: onZoomOut,
               ),
@@ -447,29 +450,29 @@ class _MarkerPopup extends StatelessWidget {
 
     IconData categoryIcon(String raw) {
       final s = raw.trim().toLowerCase();
-      if (s.isEmpty) return Icons.local_activity_outlined;
+      if (s.isEmpty) return LucideIcons.activity;
       if (s.contains('ăn') ||
           s.contains('food') ||
           s.contains('cafe') ||
           s.contains('restaurant')) {
-        return Icons.restaurant_outlined;
+        return LucideIcons.utensils;
       }
       if (s.contains('khách sạn') || s.contains('hotel')) {
-        return Icons.apartment_outlined;
+        return LucideIcons.building;
       }
       if (s.contains('tham quan') ||
           s.contains('sight') ||
           s.contains('tour') ||
           s.contains('visit')) {
-        return Icons.photo_camera_outlined;
+        return LucideIcons.camera;
       }
       if (s.contains('di chuyển') ||
           s.contains('transport') ||
           s.contains('move') ||
           s.contains('car')) {
-        return Icons.directions_car_filled_outlined;
+        return LucideIcons.car;
       }
-      return Icons.local_activity_outlined;
+      return LucideIcons.activity;
     }
 
     return Container(

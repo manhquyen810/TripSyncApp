@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import 'forgot_password_header.dart';
 
@@ -69,8 +70,8 @@ class _ResetPasswordStepState extends State<ResetPasswordStep> {
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscureNewPassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
+                          ? LucideIcons.eye
+                          : LucideIcons.eyeOff,
                       color: const Color(0xFF6A7282),
                     ),
                     onPressed: () {
@@ -155,8 +156,8 @@ class _ResetPasswordStepState extends State<ResetPasswordStep> {
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscureConfirmPassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
+                          ? LucideIcons.eye
+                          : LucideIcons.eyeOff,
                       color: const Color(0xFF6A7282),
                     ),
                     onPressed: () {

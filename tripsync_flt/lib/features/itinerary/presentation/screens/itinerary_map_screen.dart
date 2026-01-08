@@ -5,6 +5,7 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:http/http.dart' as http;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -451,38 +452,38 @@ class _TripItineraryMapScreenState extends State<TripItineraryMapScreen> {
 
   IconData _markerIconForCategory(String raw) {
     final s = raw.trim().toLowerCase();
-    if (s.isEmpty) return Icons.local_activity_outlined;
+    if (s.isEmpty) return LucideIcons.activity;
     if (s.contains('ăn') ||
         s.contains('food') ||
         s.contains('cafe') ||
         s.contains('restaurant')) {
-      return Icons.restaurant_outlined;
+      return LucideIcons.utensils;
     }
     if (s.contains('khách sạn') || s.contains('hotel')) {
-      return Icons.apartment_outlined;
+      return LucideIcons.building;
     }
     if (s.contains('tham quan') ||
         s.contains('sight') ||
         s.contains('tour') ||
         s.contains('visit')) {
-      return Icons.photo_camera_outlined;
+      return LucideIcons.camera;
     }
     if (s.contains('di chuyển') ||
         s.contains('transport') ||
         s.contains('move') ||
         s.contains('car')) {
-      return Icons.directions_car_filled_outlined;
+      return LucideIcons.car;
     }
-    return Icons.local_activity_outlined;
+    return LucideIcons.activity;
   }
 
   Future<void> _ensureMarkerFallbacks() async {
     _confirmedMarkerFallback ??= await _buildIconImage(
-      icon: Icons.place,
+      icon: LucideIcons.mapPin,
       color: AppColors.primary,
     );
     _proposedMarkerFallback ??= await _buildIconImage(
-      icon: Icons.place,
+      icon: LucideIcons.mapPin,
       color: AppColors.accent,
     );
   }

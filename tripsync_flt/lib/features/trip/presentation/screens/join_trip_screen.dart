@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/auth_token_store.dart';
@@ -176,7 +177,7 @@ class _JoinTripScreenState extends State<JoinTripScreen> {
                 child: const SizedBox(
                   width: 32,
                   height: 32,
-                  child: Icon(Icons.close, size: 24),
+                  child: Icon(LucideIcons.x, size: 24),
                 ),
               ),
               const SizedBox(height: 30),

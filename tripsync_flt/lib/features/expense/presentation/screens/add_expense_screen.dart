@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/auth_token_store.dart';
 import '../../../../shared/widgets/top_toast.dart';
@@ -28,11 +29,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   bool _isSubmitting = false;
 
   final Map<String, Map<String, dynamic>> categories = {
-    'food': {'name': 'Ăn uống', 'icon': Icons.restaurant},
-    'flight': {'name': 'Vé máy bay', 'icon': Icons.flight},
-    'transportation': {'name': 'Vé xe khách', 'icon': Icons.directions_bus},
-    'accommodation': {'name': 'Khách sạn', 'icon': Icons.hotel},
-    'other': {'name': 'Khác', 'icon': Icons.more_horiz},
+    'food': {'name': 'Ăn uống', 'icon': LucideIcons.utensils},
+    'flight': {'name': 'Vé máy bay', 'icon': LucideIcons.plane},
+    'transportation': {'name': 'Vé xe khách', 'icon': LucideIcons.bus},
+    'accommodation': {'name': 'Khách sạn', 'icon': LucideIcons.building},
+    'other': {'name': 'Khác', 'icon': LucideIcons.moreHorizontal},
   };
 
   @override
@@ -112,7 +113,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: IconButton(
-              icon: const Icon(Icons.arrow_back, size: 20),
+              icon: const Icon(LucideIcons.arrowLeft, size: 20),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -304,7 +305,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             child: Row(
               children: [
                 const Icon(
-                  Icons.calendar_today,
+                  LucideIcons.calendar,
                   size: 20,
                   color: Color(0xFF9A9A9A),
                 ),
@@ -374,7 +375,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       children: [
                         if (isSelected)
                           const Icon(
-                            Icons.check_circle,
+                            LucideIcons.checkCircle,
                             color: Color(0xFF00C950),
                             size: 20,
                           ),
@@ -458,7 +459,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       children: [
                         if (isSelected)
                           const Icon(
-                            Icons.check_circle,
+                            LucideIcons.checkCircle,
                             color: Color(0xFF00C950),
                             size: 20,
                           ),
@@ -823,7 +824,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                               const Padding(
                                 padding: EdgeInsets.only(right: 6),
                                 child: Icon(
-                                  Icons.check_circle,
+                                  LucideIcons.checkCircle,
                                   color: Colors.white,
                                   size: 18,
                                 ),

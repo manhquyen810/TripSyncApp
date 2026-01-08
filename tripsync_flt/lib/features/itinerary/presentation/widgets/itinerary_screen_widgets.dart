@@ -233,7 +233,7 @@ class _ItinerarySections extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
             _ItinerarySectionHeader(
-              icon: Icons.check_circle_outline,
+              icon: LucideIcons.checkCircle,
               title: 'Đã chốt (0)',
               color: AppColors.primary,
             ),
@@ -241,7 +241,7 @@ class _ItinerarySections extends StatelessWidget {
             _ItineraryEmptySectionText(),
             SizedBox(height: 8),
             _ItinerarySectionHeader(
-              icon: Icons.lightbulb_outline,
+              icon: LucideIcons.lightbulb,
               title: 'Đề xuất (0)',
               color: Color(0xFFFFB74D),
             ),
@@ -282,7 +282,7 @@ class _ItinerarySections extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _ItinerarySectionHeader(
-                icon: Icons.check_circle_outline,
+                icon: LucideIcons.checkCircle,
                 title: 'Đã chốt (${confirmed.length})',
                 color: AppColors.primary,
               ),
@@ -309,7 +309,7 @@ class _ItinerarySections extends StatelessWidget {
                 }),
               const SizedBox(height: 8),
               _ItinerarySectionHeader(
-                icon: Icons.lightbulb_outline,
+                icon: LucideIcons.lightbulb,
                 title: 'Đề xuất (${proposed.length})',
                 color: const Color(0xFFFFB74D),
               ),
@@ -530,7 +530,7 @@ class _ConfirmedActivityCard extends StatelessWidget {
           Row(
             children: [
               const Icon(
-                Icons.location_on_outlined,
+                LucideIcons.mapPin,
                 size: 16,
                 color: AppColors.textSecondary,
               ),
@@ -552,7 +552,7 @@ class _ConfirmedActivityCard extends StatelessWidget {
           Row(
             children: [
               const Icon(
-                Icons.person_outline,
+                LucideIcons.user,
                 size: 16,
                 color: AppColors.textSecondary,
               ),
@@ -585,7 +585,7 @@ class _ConfirmedActivityCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(
-                      Icons.thumb_up,
+                      LucideIcons.thumbsUp,
                       size: 14,
                       color: AppColors.primary,
                     ),
@@ -747,7 +747,7 @@ class _ProposedActivityCard extends StatelessWidget {
                   Row(
                     children: [
                       const Icon(
-                        Icons.schedule,
+                        LucideIcons.clock,
                         size: 16,
                         color: AppColors.textSecondary,
                       ),
@@ -777,7 +777,7 @@ class _ProposedActivityCard extends StatelessWidget {
                   Row(
                     children: [
                       const Icon(
-                        Icons.location_on_outlined,
+                        LucideIcons.mapPin,
                         size: 16,
                         color: AppColors.textSecondary,
                       ),
@@ -804,7 +804,7 @@ class _ProposedActivityCard extends StatelessWidget {
                       Row(
                         children: [
                           _VoteButton(
-                            icon: Icons.thumb_up_outlined,
+                            icon: LucideIcons.thumbsUp,
                             iconColor: myVote == 'upvote'
                                 ? AppColors.blue
                                 : AppColors.textSecondary,
@@ -812,7 +812,7 @@ class _ProposedActivityCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           _VoteButton(
-                            icon: Icons.thumb_down_outlined,
+                            icon: LucideIcons.thumbsDown,
                             iconColor: myVote == 'downvote'
                                 ? AppColors.danger
                                 : AppColors.textSecondary,

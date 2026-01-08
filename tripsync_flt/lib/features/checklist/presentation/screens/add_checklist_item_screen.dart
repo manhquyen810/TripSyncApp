@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class AddChecklistItemScreen extends StatefulWidget {
   final Function(String itemName, String category, String? assignee)? onAdd;
@@ -42,17 +43,21 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
   }
 
   final _categories = [
-    {'name': 'Thiết yếu', 'color': Color(0xFFE7000B), 'icon': Icons.list_alt},
-    {'name': 'Quần áo', 'color': Color(0xFF55ACEE), 'icon': Icons.checkroom},
+    {
+      'name': 'Thiết yếu',
+      'color': Color(0xFFE7000B),
+      'icon': LucideIcons.list,
+    },
+    {'name': 'Quần áo', 'color': Color(0xFF55ACEE), 'icon': LucideIcons.shirt},
     {
       'name': 'Vệ sinh cá nhân',
       'color': Color(0x8000C950),
-      'icon': Icons.clean_hands,
+      'icon': LucideIcons.hand,
     },
     {
       'name': 'Thiết bị điện tử',
       'color': Color(0xFFFFA1E0),
-      'icon': Icons.devices,
+      'icon': LucideIcons.smartphone,
     },
   ];
 
@@ -111,7 +116,10 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
                   return ListTile(
                     leading: const CircleAvatar(
                       backgroundColor: Color(0xFFE8E8E8),
-                      child: Icon(Icons.clear, color: Color(0xFF65758B)),
+                        child: Icon(
+                          LucideIcons.x,
+                          color: Color(0xFF65758B),
+                        ),
                     ),
                     title: const Text(
                       'Không phân công',
@@ -133,7 +141,7 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
                 return ListTile(
                   leading: CircleAvatar(
                     backgroundColor: const Color(0xFF55ACEE),
-                    child: const Icon(Icons.person, color: Colors.white),
+                    child: const Icon(LucideIcons.user, color: Colors.white),
                   ),
                   title: Text(
                     memberName,
@@ -144,7 +152,7 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
                     ),
                   ),
                   trailing: _selectedAssignee == memberName
-                      ? const Icon(Icons.check, color: Color(0xFF00C950))
+                      ? const Icon(LucideIcons.check, color: Color(0xFF00C950))
                       : null,
                   onTap: () {
                     setState(() {
@@ -200,7 +208,11 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
               color: const Color(0xFF55ACEE),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.checklist, color: Colors.white, size: 24),
+            child: const Icon(
+              LucideIcons.listChecks,
+              color: Colors.white,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -216,7 +228,7 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
           ),
           GestureDetector(
             onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.close, size: 24, color: Colors.black),
+            child: const Icon(LucideIcons.x, size: 24, color: Colors.black),
           ),
         ],
       ),
@@ -327,7 +339,7 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.person, size: 18, color: Colors.black),
+              const Icon(LucideIcons.user, size: 18, color: Colors.black),
               const SizedBox(width: 5),
               const Text(
                 'Phân công cho',
@@ -365,7 +377,7 @@ class _AddChecklistItemScreenState extends State<AddChecklistItemScreen> {
                     ),
                   ),
                   const Icon(
-                    Icons.arrow_drop_down,
+                    LucideIcons.chevronDown,
                     size: 20,
                     color: Color(0xFF959DA3),
                   ),

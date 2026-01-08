@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../widgets/propose_activity_widgets.dart';
 import '../widgets/propose_activity_form_widgets.dart';
 import 'choose_location_screen.dart';
@@ -63,16 +64,16 @@ class _ProposeActivityScreenState extends State<ProposeActivityScreen> {
   int _selectedTypeIndex = 0;
 
   final List<ProposeActivityType> _types = const [
-    ProposeActivityType(label: 'Ăn uống', icon: Icons.restaurant_outlined),
-    ProposeActivityType(label: 'Khách sạn', icon: Icons.apartment_outlined),
-    ProposeActivityType(label: 'Tham quan', icon: Icons.photo_camera_outlined),
+    ProposeActivityType(label: 'Ăn uống', icon: LucideIcons.utensils),
+    ProposeActivityType(label: 'Khách sạn', icon: LucideIcons.building),
+    ProposeActivityType(label: 'Tham quan', icon: LucideIcons.camera),
     ProposeActivityType(
       label: 'Hoạt động',
-      icon: Icons.local_activity_outlined,
+      icon: LucideIcons.activity,
     ),
     ProposeActivityType(
       label: 'Di chuyển',
-      icon: Icons.directions_car_filled_outlined,
+      icon: LucideIcons.car,
     ),
   ];
 

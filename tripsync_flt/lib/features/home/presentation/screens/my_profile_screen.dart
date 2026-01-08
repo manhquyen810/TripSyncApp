@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/auth_token_store.dart';
@@ -225,7 +226,7 @@ class _InfoList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [_InfoRow(icon: Icons.email_outlined, text: email)],
+      children: [_InfoRow(icon: LucideIcons.mail, text: email)],
     );
   }
 }

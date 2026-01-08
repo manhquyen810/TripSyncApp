@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../../shared/styles/app_colors.dart';
 
 class ProfileAvatar extends StatelessWidget {
@@ -37,7 +38,7 @@ class ProfileAvatar extends StatelessWidget {
                 errorBuilder: (context, error, stackTrace) {
                   return const ColoredBox(
                     color: AppColors.buttonBackground,
-                    child: Center(child: Icon(Icons.person, size: 32)),
+                    child: Center(child: Icon(LucideIcons.user, size: 32)),
                   );
                 },
               )
@@ -48,7 +49,7 @@ class ProfileAvatar extends StatelessWidget {
                 errorBuilder: (context, error, stackTrace) {
                   return const ColoredBox(
                     color: AppColors.buttonBackground,
-                    child: Center(child: Icon(Icons.person, size: 32)),
+                    child: Center(child: Icon(LucideIcons.user, size: 32)),
                   );
                 },
               )
@@ -58,7 +59,7 @@ class ProfileAvatar extends StatelessWidget {
                 errorBuilder: (context, error, stackTrace) {
                   return const ColoredBox(
                     color: AppColors.buttonBackground,
-                    child: Center(child: Icon(Icons.person, size: 32)),
+                    child: Center(child: Icon(LucideIcons.user, size: 32)),
                   );
                 },
               ),
@@ -87,7 +88,7 @@ class ProfileAvatar extends StatelessWidget {
             border: Border.all(color: AppColors.primary, width: 1),
           ),
           child: const Icon(
-            Icons.camera_alt_outlined,
+            LucideIcons.camera,
             size: 14,
             color: AppColors.primary,
           ),

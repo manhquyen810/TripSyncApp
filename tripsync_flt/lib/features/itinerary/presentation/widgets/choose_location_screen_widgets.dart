@@ -35,7 +35,7 @@ class _Header extends StatelessWidget {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(16),
                   onTap: onBack,
-                  child: const Icon(Icons.arrow_back, size: 24),
+                  child: const Icon(LucideIcons.arrowLeft, size: 24),
                 ),
               ),
             ),
@@ -107,7 +107,7 @@ class _SearchBar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 17),
           child: Row(
             children: [
-              Icon(Icons.search, color: _green, size: 24),
+              Icon(LucideIcons.search, color: _green, size: 24),
               const SizedBox(width: 12),
               Expanded(
                 child: TextField(
@@ -155,7 +155,9 @@ class _SearchBar extends StatelessWidget {
                               }
                             : () {},
                         child: Icon(
-                          showClear ? Icons.close : Icons.tune,
+                          showClear
+                              ? LucideIcons.x
+                              : LucideIcons.slidersHorizontal,
                           size: 22,
                         ),
                       );
@@ -329,7 +331,7 @@ class _SelectedPinOverlay extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
               ),
-              Icon(Icons.place, size: 46, color: _green),
+              Icon(LucideIcons.mapPin, size: 46, color: _green),
             ],
           ),
         ],
@@ -412,7 +414,7 @@ class _BottomSheet extends StatelessWidget {
                         border: Border.all(color: _border),
                       ),
                       child: const Icon(
-                        Icons.store_mall_directory_outlined,
+                        LucideIcons.store,
                         size: 28,
                       ),
                     ),
@@ -515,7 +517,7 @@ class _BottomSheet extends StatelessWidget {
                                   )
                                 else
                                   const Icon(
-                                    Icons.alt_route,
+                                    LucideIcons.map,
                                     size: 20,
                                     color: _green,
                                   ),
@@ -557,7 +559,7 @@ class _BottomSheet extends StatelessWidget {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
                           onTap: onMyLocation,
-                          child: const Icon(Icons.my_location, size: 20),
+                          child: const Icon(LucideIcons.crosshair, size: 20),
                         ),
                       ),
                     ),
@@ -578,7 +580,7 @@ class _BottomSheet extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                     ),
-                    icon: const Icon(Icons.check, size: 16),
+                    icon: const Icon(LucideIcons.check, size: 16),
                     label: const Text(
                       'Xác nhận vị trí',
                       style: TextStyle(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class ProposeActivityType {
   final String label;
@@ -32,7 +33,7 @@ class ProposeActivityHeader extends StatelessWidget {
                     color: const Color(0xFFF5F6F8),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.arrow_back, size: 24),
+                  child: const Icon(LucideIcons.arrowLeft, size: 24),
                 ),
               ),
             ),
@@ -238,7 +239,7 @@ class ProposeActivityLocationField extends StatelessWidget {
       children: [
         const Row(
           children: [
-            Icon(Icons.location_on_outlined, size: 24, color: Colors.black),
+            Icon(LucideIcons.mapPin, size: 24, color: Colors.black),
             SizedBox(width: 4),
             Text(
               'Địa điểm *',
@@ -301,7 +302,7 @@ class ProposeActivityLocationField extends StatelessWidget {
                         ),
                         padding: const EdgeInsets.all(10),
                         child: const Icon(
-                          Icons.map_outlined,
+                          LucideIcons.map,
                           size: 20,
                           color: Colors.black,
                         ),
@@ -374,7 +375,7 @@ class ProposeActivityBottomButtons extends StatelessWidget {
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.add, size: 18, color: Colors.white),
+                Icon(LucideIcons.plus, size: 18, color: Colors.white),
                 SizedBox(width: 10),
                 Text(
                   'Đề xuất',

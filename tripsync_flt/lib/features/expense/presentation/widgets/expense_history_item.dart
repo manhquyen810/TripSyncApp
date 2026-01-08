@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class ExpenseHistoryItem extends StatelessWidget {
   final String title;
@@ -23,17 +24,17 @@ class ExpenseHistoryItem extends StatelessWidget {
   IconData _getCategoryIcon() {
     switch (category) {
       case 'food':
-        return Icons.restaurant;
+        return LucideIcons.utensils;
       case 'flight':
-        return Icons.flight;
+        return LucideIcons.plane;
       case 'transportation':
-        return Icons.directions_bus;
+        return LucideIcons.bus;
       case 'accommodation':
-        return Icons.hotel;
+        return LucideIcons.building;
       case 'other':
-        return Icons.more_horiz;
+        return LucideIcons.moreHorizontal;
       default:
-        return Icons.payment;
+        return LucideIcons.creditCard;
     }
   }
 

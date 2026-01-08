@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import 'propose_activity_widgets.dart';
 
@@ -179,10 +180,10 @@ class ProposeActivityDateTimeRow extends StatelessWidget {
             muted: muted,
             hint: hint,
             label: 'Ngày *',
-            labelIcon: Icons.calendar_month_outlined,
+            labelIcon: LucideIcons.calendar,
             value: dateText,
             isPlaceholder: isDatePlaceholder,
-            trailingIcon: Icons.calendar_month_outlined,
+            trailingIcon: LucideIcons.calendar,
             onTap: () => onPickDate(),
           ),
         ),
@@ -192,10 +193,10 @@ class ProposeActivityDateTimeRow extends StatelessWidget {
             muted: muted,
             hint: hint,
             label: 'Giờ *',
-            labelIcon: Icons.access_time,
+            labelIcon: LucideIcons.clock,
             value: timeText,
             isPlaceholder: isTimePlaceholder,
-            trailingIcon: Icons.access_time,
+            trailingIcon: LucideIcons.clock,
             onTap: () => onPickTime(),
           ),
         ),

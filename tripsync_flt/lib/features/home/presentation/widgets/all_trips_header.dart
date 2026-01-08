@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class AllTripsHeader extends StatelessWidget {
   final VoidCallback? onCreateTripTap;
@@ -46,7 +47,7 @@ class AllTripsHeader extends StatelessWidget {
             height: 46,
             child: ElevatedButton.icon(
               onPressed: onCreateTripTap,
-              icon: const Icon(Icons.add, size: 20),
+              icon: const Icon(LucideIcons.plus, size: 20),
               label: const Text('Tạo chuyến đi mới'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF00C950),

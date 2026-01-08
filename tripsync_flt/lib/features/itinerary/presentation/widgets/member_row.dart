@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../shared/styles/app_colors.dart';
 
@@ -121,7 +122,7 @@ class MemberRow extends StatelessWidget {
             _StatusDot(isActive: model.isActive!, isLeader: model.isLeader),
             const SizedBox(width: 8),
           ],
-          _ActionButton(icon: isLeader ? Icons.edit : Icons.more_vert),
+          _ActionButton(icon: isLeader ? LucideIcons.pencil : LucideIcons.moreVertical),
         ],
       ),
     );
@@ -218,7 +219,7 @@ class _LargeAvatar extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 2),
             ),
-            child: const Icon(Icons.star, size: 10, color: Colors.white),
+            child: const Icon(LucideIcons.star, size: 10, color: Colors.white),
           ),
         ),
       ],
@@ -245,7 +246,7 @@ class _AvatarImageOrFallback extends StatelessWidget {
       return Container(
         color: color,
         alignment: Alignment.center,
-        child: Icon(Icons.person, color: iconColor, size: 22),
+        child: Icon(LucideIcons.user, color: iconColor, size: 22),
       );
     }
 
