@@ -73,7 +73,7 @@ class DocumentsListView extends StatelessWidget {
               color: AppColors.primary,
               alignment: Alignment.centerRight,
               padding: const EdgeInsets.only(right: 20),
-              child: const Icon(Icons.delete, color: Colors.white),
+              child: const Icon(Icons.delete, color: Colors.white, size: 24),
             ),
             child: card,
           ),

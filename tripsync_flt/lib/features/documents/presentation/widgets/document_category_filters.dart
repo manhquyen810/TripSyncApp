@@ -124,7 +124,13 @@ class _CategoryCard extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(10),
-                child: Image.asset(iconAsset, fit: BoxFit.contain),
+                child: Image.asset(
+                  iconAsset,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const SizedBox.shrink();
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 8),

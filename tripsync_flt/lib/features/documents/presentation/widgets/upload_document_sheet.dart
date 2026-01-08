@@ -28,18 +28,18 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
     'txt',
   ];
 
-  String _typeIconAsset(DocumentCategory category) {
+  String _typeEmoji(DocumentCategory category) {
     switch (category) {
       case DocumentCategory.flight:
         return 'assets/icons/vemaybay.png';
       case DocumentCategory.hotel:
-        return 'assets/icons/document.png';
-      case DocumentCategory.cccd:
-        return 'assets/icons/document.png';
+        return 'assets/icons/building.png';
       case DocumentCategory.bus:
         return 'assets/icons/xekhach.png';
-      case DocumentCategory.all:
-        return 'assets/icons/document.png';
+      case DocumentCategory.cccd:
+        return 'assets/icons/tailieu.png';
+      default:
+        return 'assets/icons/document all.png';
     }
   }
 
@@ -153,7 +153,7 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
                     children: [
                       Expanded(
                         child: _buildTypeChip(
-                          iconAsset: _typeIconAsset(DocumentCategory.flight),
+                          icon: _typeEmoji(DocumentCategory.flight),
                           label: 'Vé máy bay',
                           value: DocumentCategory.flight,
                         ),
@@ -161,7 +161,7 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildTypeChip(
-                          iconAsset: _typeIconAsset(DocumentCategory.hotel),
+                          icon: _typeEmoji(DocumentCategory.hotel),
                           label: 'Khách Sạn',
                           value: DocumentCategory.hotel,
                         ),
@@ -173,7 +173,7 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
                     children: [
                       Expanded(
                         child: _buildTypeChip(
-                          iconAsset: _typeIconAsset(DocumentCategory.bus),
+                          icon: _typeEmoji(DocumentCategory.bus),
                           label: 'Vé xe',
                           value: DocumentCategory.bus,
                         ),
@@ -181,7 +181,7 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildTypeChip(
-                          iconAsset: _typeIconAsset(DocumentCategory.cccd),
+                          icon: _typeEmoji(DocumentCategory.cccd),
                           label: 'Giấy tờ tùy thân',
                           value: DocumentCategory.cccd,
                         ),
@@ -367,7 +367,7 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
   }
 
   Widget _buildTypeChip({
-    required String iconAsset,
+    required String icon,
     required String label,
     required DocumentCategory value,
   }) {
@@ -376,6 +376,34 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
         ? AppColors.blue.withValues(alpha: 0.25)
         : AppColors.buttonBackground;
     final foregroundColor = isSelected ? AppColors.blue : AppColors.textPrimary;
+
+    final iconWidget = () {
+      final trimmed = icon.trim();
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+        return Image.network(
+          trimmed,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return const SizedBox.shrink();
+          },
+        );
+      }
+
+      if (trimmed.contains('/')) {
+        return Image.asset(
+          trimmed,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return const SizedBox.shrink();
+          },
+        );
+      }
+
+      return Text(
+        trimmed,
+        style: const TextStyle(fontSize: 18, height: 1),
+      );
+    }();
 
     return GestureDetector(
       onTap: () => setState(() => _selectedType = value),
@@ -391,7 +419,7 @@ class _UploadDocumentSheetState extends State<UploadDocumentSheet> {
             SizedBox(
               width: 18,
               height: 18,
-              child: Image.asset(iconAsset, fit: BoxFit.contain),
+              child: iconWidget,
             ),
             const SizedBox(width: 8),
             Text(
