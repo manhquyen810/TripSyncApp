@@ -1,14 +1,123 @@
 import 'package:flutter/material.dart';
-import '../../../routes/app_routes.dart';
 
-class StartScreen extends StatelessWidget {
+import '../../../core/network/api_client.dart';
+import '../../../core/network/auth_token_store.dart';
+import '../../../core/network/exceptions.dart';
+import '../../../routes/app_routes.dart';
+import '../../auth/data/datasources/auth_remote_data_source.dart';
+import '../../auth/data/repositories/auth_repository_impl.dart';
+import '../../auth/domain/repositories/auth_repository.dart';
+import '../../auth/presentation/screens/login_screen.dart';
+
+class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
+
+  static const String kOpenLoginArg = 'openLogin';
+
+  @override
+  State<StartScreen> createState() => _StartScreenState();
+}
+
+class _StartScreenState extends State<StartScreen> {
+  bool _didAutoOpenLogin = false;
+  bool _isCheckingSession = true;
+
+  late final AuthRepository _authRepository;
+
+  @override
+  void initState() {
+    super.initState();
+    _authRepository = AuthRepositoryImpl(
+      AuthRemoteDataSourceImpl(
+        ApiClient(authTokenProvider: AuthTokenStore.getAccessToken),
+      ),
+    );
+    _checkExistingSession();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_isCheckingSession || _didAutoOpenLogin) return;
+
+    _maybeOpenLoginSheet();
+  }
+
+  Future<void> _checkExistingSession() async {
+    final token = await AuthTokenStore.getAccessToken();
+    if (token == null) {
+      _finishCheckingAndMaybeOpenLogin();
+      return;
+    }
+
+    try {
+      await _authRepository.me();
+      if (!mounted) return;
+
+      // Token is valid, navigate straight to Home.
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+    } on ApiException {
+      await AuthTokenStore.clear();
+      _finishCheckingAndMaybeOpenLogin();
+    } catch (_) {
+      _finishCheckingAndMaybeOpenLogin();
+    }
+  }
+
+  void _finishCheckingAndMaybeOpenLogin() {
+    if (!mounted) return;
+    setState(() => _isCheckingSession = false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _maybeOpenLoginSheet();
+    });
+  }
+
+  void _maybeOpenLoginSheet() {
+    if (_didAutoOpenLogin) return;
+
+    final args = ModalRoute.of(context)?.settings.arguments;
+    bool openLogin = false;
+
+    if (args is bool) {
+      openLogin = args;
+    } else if (args is Map) {
+      final map = Map<String, dynamic>.from(args);
+      final v = map[StartScreen.kOpenLoginArg];
+      if (v is bool) openLogin = v;
+    }
+
+    if (!openLogin) return;
+
+    _didAutoOpenLogin = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => const LoginScreen(),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
-        children: [const _BackgroundImage(), const _ContentOverlay()],
+        children: [
+          const _BackgroundImage(),
+          const _ContentOverlay(),
+          if (_isCheckingSession)
+            Container(
+              color: Colors.black45,
+              child: const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -20,7 +129,13 @@ class _BackgroundImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox.expand(
-      child: Image.asset("assets/images/start.jpg", fit: BoxFit.cover),
+      child: Image.asset(
+        "assets/images/app/start.jpg",
+        fit: BoxFit.cover,
+        cacheWidth: 540,
+        cacheHeight: 1200,
+        filterQuality: FilterQuality.medium,
+      ),
     );
   }
 }
@@ -40,11 +155,11 @@ class _ContentOverlay extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _LogoTitle(),
+              const _LogoTitle(),
               const SizedBox(height: 20),
-              _WelcomeMessage(),
+              const _WelcomeMessage(),
               const SizedBox(height: 16),
-              _StartButton(),
+              const _StartButton(),
               const SizedBox(height: 40),
             ],
           ),
@@ -55,6 +170,8 @@ class _ContentOverlay extends StatelessWidget {
 }
 
 class _LogoTitle extends StatelessWidget {
+  const _LogoTitle();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -62,7 +179,7 @@ class _LogoTitle extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(color: Colors.white, width: 1),
         borderRadius: BorderRadius.circular(22),
-        color: Colors.black.withOpacity(0.2),
+        color: const Color(0x33000000),
       ),
       child: const Text(
         "TripSync",
@@ -101,16 +218,18 @@ class _WelcomeMessage extends StatelessWidget {
 }
 
 class _StartButton extends StatelessWidget {
+  const _StartButton();
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueGrey[100],
+          backgroundColor: const Color(0xFFE0E0E0),
           foregroundColor: Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(34),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(34)),
           ),
           padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 30),
           textStyle: const TextStyle(
@@ -120,7 +239,12 @@ class _StartButton extends StatelessWidget {
           ),
         ),
         onPressed: () {
-          Navigator.pushNamed(context, AppRoutes.login);
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => const LoginScreen(),
+          );
         },
         child: const Text("Bắt đầu"),
       ),
